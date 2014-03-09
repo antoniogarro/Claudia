@@ -1,0 +1,24 @@
+
+Claudia is an UCI chess engine written in C, with the purpose of serving as an exercise in chess programming techniques.
+
+
+USAGE
+
+Claudia runs as a console application and can be used with any chess GUI that supports the UCI protocol. Note that the parser does not check the validity of the input, so the program may crash when passed malformed commands.
+
+
+ALGORITHM
+
+The engine uses a 0x88 internal board representation and a single threaded negamax algorithm with alpha-beta pruning, quiescent search, static exchange evaluation and transposition tables. Its leaf evaluation function is still very rudimentary, currently only taking into account material advantage and piece mobility, and lacking specific opening and ending knowledge.
+
+
+NAME
+
+Claudia is obviously named after Claude E. Shannon (1916 - 2001).
+
+
+COPYRIGHT
+
+This program was written by Antonio Garro, and is released under a permissive BSD license, so the code can be used and modified, as long as proper attribution is maintained. Please refer to license in the source code for further details. 
+
+The Mersenne Twister pseudorandom number generator was written by Makoto Matsumoto and Takuji Nishimura. See copyright notice in random.h
