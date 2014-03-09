@@ -141,10 +141,10 @@ int Command(char *input)
 					ReadFEN(str_param);
 				}
 			}
-			str_param = strtok(NULL, " \n\t");	/*str_param == "moves"
-			//if(!str_param || strcmp(str_param, "oves")) break;*/
+			str_param = strtok(NULL, " \n\t");	/*e.g. str_param == "moves"*/
+			/*if(!str_param || strcmp(str_param, "oves")) break;*/
 			/*actually, it may be str_param == "oves", as strtok removes the 'm'; ugly.*/
-			str_param = strtok(NULL, " \n\t");	//str_param == "e2e4", e.g.
+			str_param = strtok(NULL, " \n\t");	/*e.g. str_param == "e2e4", e.g.*/
 			while(str_param){
 					curr_move = AlgebToMove(str_param);
 					MakeMove(&curr_move);

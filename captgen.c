@@ -113,7 +113,7 @@ int WhitePawnCaptures(const char orig, move *captures, int ncapts)
 		dest = orig + w_pawn_capture[i];
 		if(IN_BOARD(dest)){
 			if(board.squares[dest] == EMPTY){
-				if(dest == board.en_passant){ //Captures en Passant.
+				if(dest == board.en_passant){ /*Captures en Passant.*/
 					captures[ncapts] = (dest << 8) | orig;
 					ncapts++;
 				}

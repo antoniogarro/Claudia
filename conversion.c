@@ -200,17 +200,17 @@ move AlgebToMove(const char *str_mov)
 	move curr_move = 0;
 	char square = 0;
 	
-	//Pieced promoted to:				
+	/*Pieced promoted to:*/				
 	square = CharToPiece(str_mov[4]);
 	curr_move += square;
 	curr_move = curr_move << 8;
 
-	//DEST:
+	/*DEST:*/
 	square = CharToCoordinate(str_mov[3]) + CharToCoordinate(str_mov[2]);
 	curr_move += square;
 	curr_move = curr_move << 8;
 
-	//ORIG:
+	/*ORIG:*/
 	square = CharToCoordinate(str_mov[1]) + CharToCoordinate(str_mov[0]);
 	curr_move += square;
 
@@ -219,8 +219,8 @@ return curr_move;
 
 void MoveToAlgeb(const move curr_move, char *str_mov)
 {
-	//TODO?: check str_mov to have at least 6; else, return 0.
-	move aux_move = (curr_move & 0xFFFFF) >> 16; //(curr_move >> 16) & 0xF, faster?
+	/*TODO?: check str_mov to have at least 6; else, return 0.*/
+	move aux_move = (curr_move & 0xFFFFF) >> 16;
 	str_mov [4] = PieceToChar(aux_move);
 	if(str_mov[4] == 'P' || str_mov[4] == 'p' || str_mov[4] == 'C'){
 		str_mov[4] = ' ';
@@ -231,19 +231,19 @@ void MoveToAlgeb(const move curr_move, char *str_mov)
 		str_mov[6] = 0;
 	}
 
-	//DEST ROW:
+	/*DEST ROW:*/
 	aux_move = (curr_move & 0xFFFF) >> 12;
 	str_mov [3] = RowCoordinateToChar(aux_move);
 	
-	//DEST COLUMN:
+	/*DEST COLUMN:*/
 	aux_move = (curr_move & 0xFFF) >> 8;
 	str_mov [2] = ColumnCoordinateToChar(aux_move);
 	
-	//ORIG ROW:
+	/*ORIG ROW:*/
 	aux_move = (curr_move & 0xFF) >> 4;
 	str_mov [1] = RowCoordinateToChar(aux_move);
 	
-	//ORIG COLUMN:
+	/*ORIG COLUMN:*/
 	aux_move = (curr_move & 0xF);
 	str_mov [0] = ColumnCoordinateToChar(aux_move);
 }

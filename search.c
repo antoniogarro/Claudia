@@ -89,10 +89,14 @@ void IterativeDeep()
 		}
 		else{
 			if(-eval < MATE_VALUE/2){
-				printf("info depth %i time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",                        depth, curr_time, control.node_count, nps, (PVlen+1)/2, sPV);                           /*or (-eval-MATE_VALUE-board.ply+1)/2*/
+				printf("info depth %i time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
+                        depth, curr_time, control.node_count, nps, (PVlen+1)/2, sPV);
+                /*or (-eval-MATE_VALUE-board.ply+1)/2*/
 			}
 			if(eval < MATE_VALUE/2){
-				printf("info depth %i time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",                        depth, curr_time, control.node_count, nps, -(PVlen+1)/2, sPV);                          /*or -(eval-MATE_VALUE-board.ply+1)/2*/
+				printf("info depth %i time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
+                        depth, curr_time, control.node_count, nps, -(PVlen+1)/2, sPV);
+                /*or -(eval-MATE_VALUE-board.ply+1)/2*/
 			}
 		}
 		if(eval <= alpha || eval >= beta){
@@ -172,10 +176,10 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
 		}
 		if(nlegal == 0){
 			if(InCheck(checking_sqs)){
-//UpdateTable(board.zobrist_key, MATE_VALUE+board.ply, 0, depth, HASH_EXACT, hash_table.entries);
+/*UpdateTable(board.zobrist_key, MATE_VALUE+board.ply, 0, depth, HASH_EXACT, hash_table.entries);*/
 				return MATE_VALUE;
 			}else{
-//UpdateTable(board.zobrist_key, DRAW_VALUE, 0, depth, HASH_EXACT, hash_table.entries);
+/*UpdateTable(board.zobrist_key, DRAW_VALUE, 0, depth, HASH_EXACT, hash_table.entries);*/
 				return DRAW_VALUE;	/*Stalemate*/
 			}
 		}else UpdateTable(board.zobrist_key, alpha, best_move, depth, hash_flag);

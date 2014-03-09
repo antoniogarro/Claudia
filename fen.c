@@ -33,7 +33,7 @@
 #include "engine.h"
 
 int ReadFEN(const char* sFEN)
-{		//TODO: check FEN validity.
+{	/*TODO: check FEN validity.*/
 	char fen_pos = 0;
 	char square = 0x70;
 	char on_board = 1;
@@ -83,7 +83,7 @@ int ReadFEN(const char* sFEN)
 	board.white_to_move = (sFEN[fen_pos] == 'w');
 	fen_pos+=2;
 	
-	for (on_board = 1; on_board; fen_pos++){		//Castle rights loop.
+	for (on_board = 1; on_board; fen_pos++){		/*Castle rights loop.*/
 		switch (sFEN[fen_pos]){			
 			case 'K':  board.wk_castle = 1;
 				break;
@@ -97,7 +97,7 @@ int ReadFEN(const char* sFEN)
 				break;
 		}
 	}
-	//Store En Passant coordinates. TODO: check.
+	/*Store En Passant coordinates. TODO: check.*/
 	board.en_passant = 0x00;
 	for (on_board = 1; on_board; fen_pos++){
 		switch (sFEN[fen_pos]){			
@@ -108,9 +108,9 @@ int ReadFEN(const char* sFEN)
 				break;
 		}
 	}
-	//only 3rd y 6th row:
-	//if((cEnPassant >> 4) == 0x2 || (cEnPassant >> 4) == 0x5) board.squares[cEnPassant] = PAWN_EP;
-	//TODO: halfmoves and moves.
+	/*only 3rd y 6th row:*/
+	/*if((cEnPassant >> 4) == 0x2 || (cEnPassant >> 4) == 0x5) board.squares[cEnPassant] = PAWN_EP;*/
+	/*TODO: halfmoves and moves.*/
 	board.ply = 0;
 	InitZobrist();
 

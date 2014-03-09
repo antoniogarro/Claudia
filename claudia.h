@@ -32,7 +32,7 @@
 #define CLAUDIAH
 
 #define NAME  "Claudia"
-#define VERSION "0.0"
+#define VERSION "0.1"
 
 #define EMPTY 0x0			//0000			
 #define W_PAWN 0x9			//1001			
