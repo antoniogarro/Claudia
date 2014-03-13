@@ -128,7 +128,7 @@ int FilterWinning(move *captures, int ncapts)
 	/*Store the number of 'good' captures:*/
 	for(int i = 0; i < ncapts; i++){
 		if(eval[i] <= 0){
-			/*captures[i] = 0; /*Shouldn't be here.*/
+			/*captures[i] = 0; Shouldn't be here.*/
 			good_capts--;
 		}
 	}

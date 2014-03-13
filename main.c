@@ -61,11 +61,17 @@ int main(int argc, char* argv[])
 	char sFirst[] = "position fen r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 moves e1g1\n";
 	*/
 	control.stop = 1;
-	do{
+	/*do{
 		fgets(input, sizeof(input), stdin);
 		go_on = Command(input);
 		memset(input, 0, 2048);
-	}while(go_on);
+	}while(go_on);*/
+	while(fgets(input, sizeof(input), stdin)){
+		if(!Command(input)){
+			break;
+		}	
+		memset(input, 0, 2048);
+	}
 	
 	DeleteTable();
 	return 0;

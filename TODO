@@ -1,0 +1,34 @@
+
+	FEATURES			PRIORITY		STATUS
+
+* Split genmove subroutines		high			done
+
+* Halfmove clock			high			done
+
+* Threefold repetition detection	high			done
+
+* Hash tables support			high			done
+
+* Change castle rights representation	high			done
+
+* Time control				high			ongoing
+
+* Null move heuristic			medium			pending
+
+* Check extensions			high			pending
+
+* King safety evaluation		medium			pending
+
+* Pawn structure evaluation		medium			pending
+
+* Ponder				low			pending
+
+* Get rid of global variables		medium			pending
+
+* Multithreading			low			pending
+
+* Opening book support			high			pending
+
+* UCI options				high			pending
+
+* Ending knowledge			low			pending
