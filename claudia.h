@@ -122,7 +122,8 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 #define ROOK_VALUE 500
 #define QUEEN_VALUE 900
 #define KING_VALUE 5000
-#define INFINITE 2000000000
+#define INFINITE 10000000
+//#define INFINITE 2000000000
 #define DRAW_VALUE 0
 #define MATE_VALUE -100000
 #define HASHMOVE_VALUE 100000

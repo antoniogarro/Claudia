@@ -56,7 +56,7 @@ struct CONTROL {
 	int wtime, btime, wtime_inc, btime_inc;
 	clock_t init_time, wish_time, max_time;
 	unsigned int max_depth;
-	unsigned long node_count;
+	unsigned long long node_count;
 	char uci, stop;
 };
 extern struct CONTROL control;

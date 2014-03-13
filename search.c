@@ -56,11 +56,11 @@ void IterativeDeep()
 	const int sLen = 500;
 	char sPV[sLen];
 	char str_mov[7];
-	clock_t curr_time;
+	unsigned long long curr_time;
 	int eval = 0;
 	int alpha = -INFINITE;
 	int beta = INFINITE;
-	long nps = 0;
+	unsigned long long nps = 0;
 	
 	for(unsigned int depth = 1; depth <= control.max_depth;){
 		curr_time = clock();
@@ -79,22 +79,22 @@ void IterativeDeep()
 		strncpy(str_mov, sPV, 5);
 		str_mov[5] = 0;
 
-		curr_time = (clock() - curr_time)/CPMS;
+		curr_time = (unsigned long long)((clock() - curr_time)/CPMS);
 		if(curr_time){
 			nps = 1000*(control.node_count/curr_time);
 		}
 		if(eval > MATE_VALUE/2 && -eval > MATE_VALUE/2){
-			printf("info depth %i time %Lu nodes %Lu nps %Lu score cp %i pv %s\n",
+			printf("info depth %u time %Lu nodes %Lu nps %Lu score cp %i pv %s\n",
                     depth, curr_time, control.node_count, nps, eval, sPV);
 		}
 		else{
 			if(-eval < MATE_VALUE/2){
-				printf("info depth %i time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
+				printf("info depth %u time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
                         depth, curr_time, control.node_count, nps, (PVlen+1)/2, sPV);
                 /*or (-eval-MATE_VALUE-board.ply+1)/2*/
 			}
 			if(eval < MATE_VALUE/2){
-				printf("info depth %i time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
+				printf("info depth %u time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
                         depth, curr_time, control.node_count, nps, -(PVlen+1)/2, sPV);
                 /*or -(eval-MATE_VALUE-board.ply+1)/2*/
 			}
@@ -110,6 +110,7 @@ void IterativeDeep()
 			depth++;
 		}
 	}
+    control.stop = 1;
 	printf("bestmove %s\n", str_mov);
 }
 
