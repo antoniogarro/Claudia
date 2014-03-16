@@ -35,24 +35,24 @@
 #include "hashtable.h"
 
 struct BOARD {
-	unsigned char squares[128];
-	/*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
+    unsigned char squares[128];
+    /*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
     unsigned char en_passant;
     unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
-	unsigned char w_castled, b_castled;
-	unsigned char wking_pos, bking_pos;
-	unsigned char white_to_move;
-	int ply;
-	int rev_plies [500];
-	unsigned long long zobrist_key;
-	unsigned long long zobrist_history[500];
+    unsigned char w_castled, b_castled;
+    unsigned char wking_pos, bking_pos;
+    unsigned char white_to_move;
+    int ply;
+    int rev_plies [500];
+    unsigned long long zobrist_key;
+    unsigned long long zobrist_history[500];
 };
 extern struct BOARD board;
 struct ZOBKEYS {
-	unsigned long long zob_pieces[16][128];
-	unsigned long long zob_enpass[128];
-	unsigned long long zob_castle[4];
-	unsigned long long zob_side;
+    unsigned long long zob_pieces[16][128];
+    unsigned long long zob_enpass[128];
+    unsigned long long zob_castle[4];
+    unsigned long long zob_side;
 };
 extern struct ZOBKEYS zobkeys;
 
@@ -104,25 +104,25 @@ int KingStaticVal(unsigned char, unsigned char);
 
 /*
 static char SideToMove(){
-	return board.white_to_move;
+    return board.white_to_move;
 }
 */
 static char WhiteInCheck(){
-	return IsAttacked(board.wking_pos, BLACK_COLOR);
+    return IsAttacked(board.wking_pos, BLACK_COLOR);
 }
 
 static char BlackInCheck(){
-	return IsAttacked(board.bking_pos, WHITE_COLOR);
+    return IsAttacked(board.bking_pos, WHITE_COLOR);
 }
 
 static int InCheck(unsigned char * attacking_sqs){
-	if(board.white_to_move) return AttackingPieces(board.wking_pos, BLACK_COLOR, attacking_sqs);
-	else return AttackingPieces(board.bking_pos, WHITE_COLOR, attacking_sqs);
+    if(board.white_to_move) return AttackingPieces(board.wking_pos, BLACK_COLOR, attacking_sqs);
+    else return AttackingPieces(board.bking_pos, WHITE_COLOR, attacking_sqs);
 }
 
 static char LeftInCheck(){
-	if(board.white_to_move)	return IsAttacked(board.bking_pos, WHITE_COLOR);
-	else return IsAttacked(board.wking_pos, BLACK_COLOR);
+    if(board.white_to_move)    return IsAttacked(board.bking_pos, WHITE_COLOR);
+    else return IsAttacked(board.wking_pos, BLACK_COLOR);
 }
 
 /* Some methods to convert coordinates to algebraic notation, and the other way round.*/

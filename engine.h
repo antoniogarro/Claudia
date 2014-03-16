@@ -54,11 +54,11 @@
 #define B_INC 6
 
 struct CONTROL {
-	int wtime, btime, wtime_inc, btime_inc;
-	clock_t init_time, wish_time, max_time;
-	unsigned int max_depth;
-	unsigned long long node_count;
-	char uci, stop;
+    int wtime, btime, wtime_inc, btime_inc;
+    clock_t init_time, wish_time, max_time;
+    unsigned int max_depth;
+    unsigned long long node_count;
+    char uci, stop;
 };
 extern struct CONTROL control;
 
@@ -73,25 +73,25 @@ int Command(char *);
 
 static void ManageTimes()
 {
-	if(board.white_to_move){
-		control.wish_time = control.wtime/30 + control.wtime_inc;
-		control.max_time = control.wtime;
-	}
-	else{
-		control.wish_time = control.btime/30 + control.btime_inc;
-		control.max_time = control.btime;
-	}
+    if(board.white_to_move){
+        control.wish_time = control.wtime/30 + control.wtime_inc;
+        control.max_time = control.wtime;
+    }
+    else{
+        control.wish_time = control.btime/30 + control.btime_inc;
+        control.max_time = control.btime;
+    }
 }
 
 static void ResetTimes()
 {
-	control.wtime = 0; control.btime = 0;
-	control.wtime_inc = 0; control.btime_inc = 0;
+    control.wtime = 0; control.btime = 0;
+    control.wtime_inc = 0; control.btime_inc = 0;
 }
 
 static void think(void *pparams)
 {
-	if(PolyglotChooseMove(PolyglotKey())) return;
+    if(PolyglotChooseMove(PolyglotKey())) return;
     IterativeDeep();
     return;
 }

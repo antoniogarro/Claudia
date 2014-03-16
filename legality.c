@@ -32,52 +32,52 @@
 
 char IsLegal(move *curr_move)
 {
-	move poss_moves[100];
-	int nposs_movs = MoveGen(poss_moves);
-	/*We only compare info about squares to decide legality, not captured piece or previous EP:*/
-	move Squares = (*curr_move & 0xFFFF); 
-	/*TODO: promoted.*/
-	for(int i = 0; i < nposs_movs; i++){
-		if(Squares == (poss_moves[i] & 0xFFFF)){	/*curr_move is possible.*/
-			MakeMove(curr_move);
-			if(!LeftInCheck()){
-				Takeback(*curr_move);
-				return 1;		/*curr_move is legal.*/
-			}
-			Takeback(*curr_move);
-		}
-	}
+    move poss_moves[100];
+    int nposs_movs = MoveGen(poss_moves);
+    /*We only compare info about squares to decide legality, not captured piece or previous EP:*/
+    move Squares = (*curr_move & 0xFFFF); 
+    /*TODO: promoted.*/
+    for(int i = 0; i < nposs_movs; i++){
+        if(Squares == (poss_moves[i] & 0xFFFF)){    /*curr_move is possible.*/
+            MakeMove(curr_move);
+            if(!LeftInCheck()){
+                Takeback(*curr_move);
+                return 1;        /*curr_move is legal.*/
+            }
+            Takeback(*curr_move);
+        }
+    }
 return 0;
 }
 
 int Perft(const int depth)
 {
-	int val = 0;
-	int nposs_movs = 0;
-	move poss_moves [100];
-	
-	if(depth > 0){
-		nposs_movs = MoveGen(poss_moves);
-		for(int i = 0; i < nposs_movs; i++){
-			MakeMove(&poss_moves[i]);
-			if(board.white_to_move){
-				if(!BlackInCheck()) val += Perft(depth - 1);
-			}else{
-				if(!WhiteInCheck()) val += Perft(depth - 1);
-			}	
-			Takeback(poss_moves[i]);
-		}
-	}else{
-		nposs_movs = MoveGen(poss_moves);
-		for(int i = 0; i < nposs_movs; i++){
-			MakeMove(&poss_moves[i]);
-			if(board.white_to_move){
-				if(!BlackInCheck()) val++;
-			}else{
-				if(!WhiteInCheck()) val++;
-			}
-			Takeback(poss_moves[i]);
-		}
-	}
-	return val;
+    int val = 0;
+    int nposs_movs = 0;
+    move poss_moves [100];
+    
+    if(depth > 0){
+        nposs_movs = MoveGen(poss_moves);
+        for(int i = 0; i < nposs_movs; i++){
+            MakeMove(&poss_moves[i]);
+            if(board.white_to_move){
+                if(!BlackInCheck()) val += Perft(depth - 1);
+            }else{
+                if(!WhiteInCheck()) val += Perft(depth - 1);
+            }    
+            Takeback(poss_moves[i]);
+        }
+    }else{
+        nposs_movs = MoveGen(poss_moves);
+        for(int i = 0; i < nposs_movs; i++){
+            MakeMove(&poss_moves[i]);
+            if(board.white_to_move){
+                if(!BlackInCheck()) val++;
+            }else{
+                if(!WhiteInCheck()) val++;
+            }
+            Takeback(poss_moves[i]);
+        }
+    }
+    return val;
 }

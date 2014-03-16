@@ -34,71 +34,71 @@
 
 void AllocTable(const int table_size)
 {
-	hash_table.entries = (HashData*) malloc(table_size*sizeof(HashData));
-	hash_table.size = table_size;
+    hash_table.entries = (HashData*) malloc(table_size*sizeof(HashData));
+    hash_table.size = table_size;
 }
 
 void DeleteTable()
 {
-	free(hash_table.entries);
+    free(hash_table.entries);
 }
 
 void ClearHashTable()
 {
-	for(int i = 0;  i < hash_table.size; i++){
-		hash_table.entries[i].zobrist_key = 0;
-		hash_table.entries[i].data = 0;
-	}
-	hash_table.full = 0;
+    for(int i = 0;  i < hash_table.size; i++){
+        hash_table.entries[i].zobrist_key = 0;
+        hash_table.entries[i].data = 0;
+    }
+    hash_table.full = 0;
 }
 
 void UpdateTable(const unsigned long long zob_key, const int eval,
                  const move best_move, const int depth, const int flag)
 {
-	int key = zob_key%hash_table.size;
-	HashData *entry = &hash_table.entries[key];
-	
-	if(MOVEMASK(entry->data)){
-		if(!best_move) return;
-		if(DEPTHMASK(entry->data) > depth) return;
-	}
-	/*if(entry->depth >= depth && entry->best_move && !best_move) return;*/
-	if(entry->zobrist_key != zob_key){
-		if(entry->zobrist_key == 0) hash_table.full++;
-		entry->zobrist_key = zob_key;
-	}
-	/*if(flag == HASHEXACT || flag == HASHBETA);*/
-	entry->data = PUT_HASH_MOVE(best_move);
-	entry->data |= PUT_HASH_EVAL(eval);
-	entry->data |= PUT_HASH_DEPTH(depth);
-	entry->data |=  PUT_HASH_FLAG(flag);
+    int key = zob_key%hash_table.size;
+    HashData *entry = &hash_table.entries[key];
+    
+    if(MOVEMASK(entry->data)){
+        if(!best_move) return;
+        if(DEPTHMASK(entry->data) > depth) return;
+    }
+    /*if(entry->depth >= depth && entry->best_move && !best_move) return;*/
+    if(entry->zobrist_key != zob_key){
+        if(entry->zobrist_key == 0) hash_table.full++;
+        entry->zobrist_key = zob_key;
+    }
+    /*if(flag == HASHEXACT || flag == HASHBETA);*/
+    entry->data = PUT_HASH_MOVE(best_move);
+    entry->data |= PUT_HASH_EVAL(eval);
+    entry->data |= PUT_HASH_DEPTH(depth);
+    entry->data |=  PUT_HASH_FLAG(flag);
 }
 
 move GetHashMove(const unsigned long long zob_key)
 {
-	int key = zob_key%hash_table.size;
-	if(hash_table.entries[key].zobrist_key == zob_key){
-		return MOVEMASK(hash_table.entries[key].data);
-	}
-	else return 0;
+    int key = zob_key%hash_table.size;
+    if(hash_table.entries[key].zobrist_key == zob_key){
+        return MOVEMASK(hash_table.entries[key].data);
+    }
+    else return 0;
 }
 
 int GetHashEval(const unsigned long long zob_key, const int depth, const int alpha,                const int beta)
 {
-	int key = zob_key%hash_table.size;
-	const HashData* entry = &hash_table.entries[key];
-	if(entry->zobrist_key == zob_key && DEPTHMASK(entry->data) >= depth){
-		int eval = EVALMASK(entry->data);
-		char flag = FLAGMASK(entry->data);
-		if(flag == HASH_EXACT){
-			return eval;
-		}
-		if(flag == HASH_BETA && eval >= beta){
-			return beta;
-		}
-		if(flag == HASH_ALPHA && eval < alpha){
-			return alpha;
-		}
-	}
-	return ERRORVALUE;
+    int key = zob_key%hash_table.size;
+    const HashData* entry = &hash_table.entries[key];
+    if(entry->zobrist_key == zob_key && DEPTHMASK(entry->data) >= depth){
+        int eval = EVALMASK(entry->data);
+        char flag = FLAGMASK(entry->data);
+        if(flag == HASH_EXACT){
+            return eval;
+        }
+        if(flag == HASH_BETA && eval >= beta){
+            return beta;
+        }
+        if(flag == HASH_ALPHA && eval < alpha){
+            return alpha;
+        }
+    }
+    return ERRORVALUE;
 }

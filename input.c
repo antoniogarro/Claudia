@@ -32,46 +32,46 @@
 #include <string.h>
 
 int ParseInput(char *command)
-{	
-	if(command){
-		if(!strcmp(command, "perft")) return COM_PERFT;
+{    
+    if(command){
+        if(!strcmp(command, "perft")) return COM_PERFT;
 
-		if(!strcmp(command, "go")) return COM_GO;
+        if(!strcmp(command, "go")) return COM_GO;
 
-		if(!strcmp(command, "stop")) return COM_STOP;
+        if(!strcmp(command, "stop")) return COM_STOP;
 
-		if(!strcmp(command, "position")) return COM_POSITION;
+        if(!strcmp(command, "position")) return COM_POSITION;
 
-		if(!strcmp(command, "isready")) return COM_IS_READY;
+        if(!strcmp(command, "isready")) return COM_IS_READY;
 
-		if(!strcmp(command, "uci")) return COM_UCI;
+        if(!strcmp(command, "uci")) return COM_UCI;
 
-		if(!strcmp(command, "quit")) return COM_QUIT;
+        if(!strcmp(command, "quit")) return COM_QUIT;
 
-		move curr_move = AlgebToMove(command);
-		if(curr_move) return COM_MOVE;
+        move curr_move = AlgebToMove(command);
+        if(curr_move) return COM_MOVE;
 
-	}
-	return COM_INVALID;
+    }
+    return COM_INVALID;
 }
 
 int ParseGoParams(char *pparams)
 {
-	if(pparams){
-		if(!strcmp(pparams, "depth")) return GO_DEPTH;
+    if(pparams){
+        if(!strcmp(pparams, "depth")) return GO_DEPTH;
 
-		if(!strcmp(pparams, "movetime")) return GO_TIME;
+        if(!strcmp(pparams, "movetime")) return GO_TIME;
 
-		if(!strcmp(pparams, "infinite")) return GO_INFINITE;
+        if(!strcmp(pparams, "infinite")) return GO_INFINITE;
 
-		if(!strcmp(pparams, "wtime")) return W_TIME;
+        if(!strcmp(pparams, "wtime")) return W_TIME;
 
-		if(!strcmp(pparams, "btime")) return B_TIME;
+        if(!strcmp(pparams, "btime")) return B_TIME;
 
-		if(!strcmp(pparams, "winc")) return W_INC;
+        if(!strcmp(pparams, "winc")) return W_INC;
 
-		if(!strcmp(pparams, "binc")) return B_INC;
+        if(!strcmp(pparams, "binc")) return B_INC;
 
-	}
-	return COM_INVALID;
+    }
+    return COM_INVALID;
 }

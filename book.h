@@ -50,10 +50,10 @@ typedef unsigned int uint32;
 #endif
 
 typedef struct {
-	uint64 key;	
-	uint16 move;
-	uint16 weight;
-	uint32 learn;
+    uint64 key;    
+    uint16 move;
+    uint16 weight;
+    uint32 learn;
 } entry_t;
 
 unsigned long long PolyglotKey();

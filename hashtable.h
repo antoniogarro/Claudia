@@ -47,15 +47,15 @@
 #define FLAGMASK(data) (char)(data >> 62)
 
 typedef struct{
-	unsigned long long zobrist_key;
-	/*bits 0-19: hash_move; bits 20-51: eval; bits 52-61: depth; 62-63: flags.*/
-	unsigned long long data;
+    unsigned long long zobrist_key;
+    /*bits 0-19: hash_move; bits 20-51: eval; bits 52-61: depth; 62-63: flags.*/
+    unsigned long long data;
 } HashData;
 
 struct HASHTABLE{
-	HashData* entries;
-	unsigned int size;
-	unsigned int full;
+    HashData* entries;
+    unsigned int size;
+    unsigned int full;
 };
 extern struct HASHTABLE hash_table;
 

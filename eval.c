@@ -33,98 +33,98 @@
 
 int StaticEval()
 {
-	int val = 0;
-	for(unsigned char sq = 0; sq<0x78; sq++){
-		switch(board.squares[sq]){
-			case EMPTY:
-				break;
-			case W_PAWN:
-				val += PawnStaticVal(sq, WHITE_COLOR);
-				break;
-			case W_KNIGHT:
-				val += KnightStaticVal(sq, WHITE_COLOR);
-				break;
-			case W_BISHOP:
-				val += BishopStaticVal(sq, WHITE_COLOR);
-				break;
-			case W_ROOK:
-				val += RookStaticVal(sq, WHITE_COLOR);
-				break;
-			case W_QUEEN:
-				val += QueenStaticVal(sq, WHITE_COLOR);
-				break;
-			case W_KING:
-				val += KingStaticVal(sq, WHITE_COLOR);
-				break;
+    int val = 0;
+    for(unsigned char sq = 0; sq<0x78; sq++){
+        switch(board.squares[sq]){
+            case EMPTY:
+                break;
+            case W_PAWN:
+                val += PawnStaticVal(sq, WHITE_COLOR);
+                break;
+            case W_KNIGHT:
+                val += KnightStaticVal(sq, WHITE_COLOR);
+                break;
+            case W_BISHOP:
+                val += BishopStaticVal(sq, WHITE_COLOR);
+                break;
+            case W_ROOK:
+                val += RookStaticVal(sq, WHITE_COLOR);
+                break;
+            case W_QUEEN:
+                val += QueenStaticVal(sq, WHITE_COLOR);
+                break;
+            case W_KING:
+                val += KingStaticVal(sq, WHITE_COLOR);
+                break;
 
-			case B_PAWN:
-				val -= PawnStaticVal(sq, BLACK_COLOR);
-				break;
-			case B_KNIGHT:
-				val -= KnightStaticVal(sq, BLACK_COLOR);
-				break;
-			case B_BISHOP:
-				val -= BishopStaticVal(sq, BLACK_COLOR);
-				break;
-			case B_ROOK:
-				val -= RookStaticVal(sq, BLACK_COLOR);
-				break;
-			case B_QUEEN:
-				val -= QueenStaticVal(sq, BLACK_COLOR);
-				break;
-			case B_KING:
-				val -= KingStaticVal(sq, BLACK_COLOR);
-				break;
-			default:
-				break;
-		}
-		if(COLUMN(sq) == H_COLUMN && ROW(sq) != EIGHT_ROW) sq += 8;
-	}
-	if(board.white_to_move) return val;
-	else return -val;
+            case B_PAWN:
+                val -= PawnStaticVal(sq, BLACK_COLOR);
+                break;
+            case B_KNIGHT:
+                val -= KnightStaticVal(sq, BLACK_COLOR);
+                break;
+            case B_BISHOP:
+                val -= BishopStaticVal(sq, BLACK_COLOR);
+                break;
+            case B_ROOK:
+                val -= RookStaticVal(sq, BLACK_COLOR);
+                break;
+            case B_QUEEN:
+                val -= QueenStaticVal(sq, BLACK_COLOR);
+                break;
+            case B_KING:
+                val -= KingStaticVal(sq, BLACK_COLOR);
+                break;
+            default:
+                break;
+        }
+        if(COLUMN(sq) == H_COLUMN && ROW(sq) != EIGHT_ROW) sq += 8;
+    }
+    if(board.white_to_move) return val;
+    else return -val;
 }
 
 int PawnStaticVal(unsigned char sq, unsigned char color)
 {
-	int val = PAWN_VALUE;
-	if(color) val += WhitePawnMoves(sq, 0, 0);
-	else val += BlackPawnMoves(sq, 0, 0);
-	return val;
+    int val = PAWN_VALUE;
+    if(color) val += WhitePawnMoves(sq, 0, 0);
+    else val += BlackPawnMoves(sq, 0, 0);
+    return val;
 }
 int KnightStaticVal(unsigned char sq, unsigned char color)
 {
-	int val = KNIGHT_VALUE;
-	val += N_MOBILITY_BONUS*NonSlidingMoves(sq, knight_delta, color, 0, 0);
-	return val;
+    int val = KNIGHT_VALUE;
+    val += N_MOBILITY_BONUS*NonSlidingMoves(sq, knight_delta, color, 0, 0);
+    return val;
 }
 int BishopStaticVal(unsigned char sq, unsigned char color)
 {
-	int val = BISHOP_VALUE;
-	val += B_MOBILITY_BONUS*SlidingMoves(sq, bishop_delta, color, 0, 0);
-	return val;
+    int val = BISHOP_VALUE;
+    val += B_MOBILITY_BONUS*SlidingMoves(sq, bishop_delta, color, 0, 0);
+    return val;
 }
 int RookStaticVal(unsigned char sq, unsigned char color)
 {
-	int val = ROOK_VALUE;
-	val += R_MOBILITY_BONUS*SlidingMoves(sq, rook_delta, color, 0, 0);
-	return val;
+    int val = ROOK_VALUE;
+    val += R_MOBILITY_BONUS*SlidingMoves(sq, rook_delta, color, 0, 0);
+    return val;
 }
 int QueenStaticVal(unsigned char sq, unsigned char color)
 {
-	int val = QUEEN_VALUE;
-	val += Q_MOBILITY_BONUS*SlidingMoves(sq, king_delta, color, 0, 0);
-	return val;
+    int val = QUEEN_VALUE;
+    val += Q_MOBILITY_BONUS*SlidingMoves(sq, king_delta, color, 0, 0);
+    return val;
 }
 int KingStaticVal(unsigned char sq, unsigned char color)
 {
-	int val = KING_VALUE;
-	if(color){
-		val += CASTLE_BONUS*board.w_castled;
-		val += CASTLE_RIGHT_BONUS*(board.wk_castle + board.wq_castle);
-	}
-	else{
-		val += CASTLE_BONUS*board.b_castled;
-		val += CASTLE_RIGHT_BONUS*(board.bk_castle + board.bq_castle);
-	}
-	return val;
+    int val = KING_VALUE;
+    if(color){
+        val += CASTLE_BONUS*board.w_castled;
+        val += CASTLE_RIGHT_BONUS*(board.wk_castle + board.wq_castle);
+    }
+    else{
+        val += CASTLE_BONUS*board.b_castled;
+        val += CASTLE_RIGHT_BONUS*(board.bk_castle + board.bq_castle);
+    }
+    return val;
 }

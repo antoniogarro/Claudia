@@ -42,135 +42,135 @@
 
 int Command(char *input)
 {
-	char manage_times;
-	int command, params;
-	char *str_command = strtok(input, " \n\t");
-	char *str_param;
-	command = ParseInput(str_command);
+    char manage_times;
+    int command, params;
+    char *str_command = strtok(input, " \n\t");
+    char *str_param;
+    command = ParseInput(str_command);
 
-	move curr_move;
+    move curr_move;
 
-	switch(command){
-		case COM_PERFT:
-			str_param = strtok(NULL, " \n\t");
-			params = atoi(str_param);
-			control.init_time = clock();
-			printf("Depth: %i Moves: %i\n", params, Perft(params));
-			printf("Time elapsed: %llu ms\n", (unsigned long long)(clock() - control.init_time));
-			break;
+    switch(command){
+        case COM_PERFT:
+            str_param = strtok(NULL, " \n\t");
+            params = atoi(str_param);
+            control.init_time = clock();
+            printf("Depth: %i Moves: %i\n", params, Perft(params));
+            printf("Time elapsed: %llu ms\n", (unsigned long long)(clock() - control.init_time));
+            break;
 
-		case COM_GO:
-			control.max_depth = 70;
-			control.max_time = INFINITE;
-			control.wish_time = INFINITE;
-			control.stop = 1;
-			ResetTimes();
-			manage_times = 1;
-			do{
-				str_param = strtok(NULL, " \n\t");
-				params = ParseGoParams(str_param);
-				switch(params){
-					case GO_DEPTH:
-						str_param = strtok(NULL, " \n\t");
-						control.max_depth = atoi(str_param);
-						manage_times = 0;
-						break;
-					case GO_TIME:
-						str_param = strtok(NULL, " \n\t");
-						control.wish_time = atol(str_param);
-						control.max_time = atol(str_param);
-						manage_times = 0;
-						break;
-					case GO_INFINITE:	
-						manage_times = 0;
-						break;
-					case B_TIME:
-						str_param = strtok(NULL, " \n\t");
-						control.btime = atoi(str_param);
-						break;
-					case W_TIME:
-						str_param = strtok(NULL, " \n\t");
-						control.wtime = atoi(str_param);
-						break;
-					case B_INC:
-						str_param = strtok(NULL, " \n\t");
-						control.btime_inc = atoi(str_param);
-						break;
-					case W_INC:
-						str_param = strtok(NULL, " \n\t");
-						control.wtime_inc = atoi(str_param);
-						break;
-					default:
-						break;
-				}
-			}while(str_param);
+        case COM_GO:
+            control.max_depth = 70;
+            control.max_time = INFINITE;
+            control.wish_time = INFINITE;
+            control.stop = 1;
+            ResetTimes();
+            manage_times = 1;
+            do{
+                str_param = strtok(NULL, " \n\t");
+                params = ParseGoParams(str_param);
+                switch(params){
+                    case GO_DEPTH:
+                        str_param = strtok(NULL, " \n\t");
+                        control.max_depth = atoi(str_param);
+                        manage_times = 0;
+                        break;
+                    case GO_TIME:
+                        str_param = strtok(NULL, " \n\t");
+                        control.wish_time = atol(str_param);
+                        control.max_time = atol(str_param);
+                        manage_times = 0;
+                        break;
+                    case GO_INFINITE:    
+                        manage_times = 0;
+                        break;
+                    case B_TIME:
+                        str_param = strtok(NULL, " \n\t");
+                        control.btime = atoi(str_param);
+                        break;
+                    case W_TIME:
+                        str_param = strtok(NULL, " \n\t");
+                        control.wtime = atoi(str_param);
+                        break;
+                    case B_INC:
+                        str_param = strtok(NULL, " \n\t");
+                        control.btime_inc = atoi(str_param);
+                        break;
+                    case W_INC:
+                        str_param = strtok(NULL, " \n\t");
+                        control.wtime_inc = atoi(str_param);
+                        break;
+                    default:
+                        break;
+                }
+            }while(str_param);
 
-			if(control.stop){
-				if(manage_times){
-					ManageTimes();
-				}
-				control.stop = 0;
-				control.init_time = clock();
+            if(control.stop){
+                if(manage_times){
+                    ManageTimes();
+                }
+                control.stop = 0;
+                control.init_time = clock();
 #ifdef __linux__
-				pthread_t thread_id;
-				pthread_create(&thread_id, 0, (void *)(think), 0);
+                pthread_t thread_id;
+                pthread_create(&thread_id, 0, (void *)(think), 0);
 #elif _WIN32
-				_beginthread(think, 0, NULL);
+                _beginthread(think, 0, NULL);
 #endif
-			}
-			break;
+            }
+            break;
 
-		case COM_STOP:
-			control.stop = 1;
-			break;
+        case COM_STOP:
+            control.stop = 1;
+            break;
 
-		case COM_MOVE:
-			str_param = strtok(str_command, " \n\t");
-			curr_move = AlgebToMove(str_param);
-			if(IsLegal(&curr_move))
-				MakeMove(&curr_move);
-			if(!control.uci) PrintBoard();
-			break;
+        case COM_MOVE:
+            str_param = strtok(str_command, " \n\t");
+            curr_move = AlgebToMove(str_param);
+            if(IsLegal(&curr_move))
+                MakeMove(&curr_move);
+            if(!control.uci) PrintBoard();
+            break;
 
-		case COM_POSITION:
-			str_param = strtok(NULL, " \n\t");
-			if(!strcmp(str_param, "startpos")) ReadFEN(STARTPOS);
-			else{
-				if(!strcmp(str_param, "fen")){	 /*New uci specs! Cagüenlaputa!*/
-					/*Shouldn't cut chain at spaces; cut at 'm' for 'moves' or at '\n'.*/
-					str_param = strtok(NULL, "m\n\t"); 
-					ReadFEN(str_param);
-				}
-			}
-			str_param = strtok(NULL, " \n\t");	/*e.g. str_param == "moves"*/
-			/*if(!str_param || strcmp(str_param, "oves")) break;*/
-			/*actually, it may be str_param == "oves", as strtok removes the 'm'; ugly.*/
-			str_param = strtok(NULL, " \n\t");	/*e.g. str_param == "e2e4", e.g.*/
-			while(str_param){
-					curr_move = AlgebToMove(str_param);
-					MakeMove(&curr_move);
-					str_param = strtok(NULL, " \n\t");
-			}
-			break;
+        case COM_POSITION:
+            str_param = strtok(NULL, " \n\t");
+            if(!strcmp(str_param, "startpos")) ReadFEN(STARTPOS);
+            else{
+                if(!strcmp(str_param, "fen")){     /*New uci specs! Cagüenlaputa!*/
+                    /*Shouldn't cut chain at spaces; cut at 'm' for 'moves' or at '\n'.*/
+                    str_param = strtok(NULL, "m\n\t"); 
+                    ReadFEN(str_param);
+                }
+            }
+            str_param = strtok(NULL, " \n\t");    /*e.g. str_param == "moves"*/
+            /*if(!str_param || strcmp(str_param, "oves")) break;*/
+            /*actually, it may be str_param == "oves", as strtok removes the 'm'; ugly.*/
+            str_param = strtok(NULL, " \n\t");    /*e.g. str_param == "e2e4", e.g.*/
+            while(str_param){
+                    curr_move = AlgebToMove(str_param);
+                    MakeMove(&curr_move);
+                    str_param = strtok(NULL, " \n\t");
+            }
+            break;
 
-		case COM_UCI:
-			control.uci = 1;
-			printf("id name %s v. %s\n", NAME, VERSION);
-			printf("id author Antonio Garro\n");
-			/*printf("option\n");*/
-			printf("uciok\n");
-			break;
+        case COM_UCI:
+            control.uci = 1;
+            printf("id name %s v. %s\n", NAME, VERSION);
+            printf("id author Antonio Garro\n");
+            /*printf("option\n");*/
+            printf("uciok\n");
+            break;
 
-		case COM_IS_READY:
-			printf("readyok\n");
-			break;
+        case COM_IS_READY:
+            printf("readyok\n");
+            break;
 
-		case COM_QUIT:
-			control.stop = 1;
-			return 0;
+        case COM_QUIT:
+            control.stop = 1;
+            return 0;
 
-		default:
-			break;
-	}
-	return 1;
+        default:
+            break;
+    }
+    return 1;
 }
