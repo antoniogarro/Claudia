@@ -21,13 +21,13 @@
 
 * Pawn structure evaluation		medium			pending
 
-* Ponder				low			pending
+* Ponder				medium			pending
 
 * Get rid of global variables		medium			pending
 
 * Multithreading			low			pending
 
-* Opening book support			high			pending
+* Opening book support			high			ongoing
 
 * UCI options				high			pending
 

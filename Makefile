@@ -1,6 +1,6 @@
 NAME=claudia
 CC=gcc
-CFLAGS= -std=c99 -pthread -Wall -Ofast -flto
+CFLAGS= -std=c99 -pthread -Wall -Wno-unused -Ofast -flto
 DEPS=make.dep
 CSRCS=$(wildcard *.c)
 HSRCS=$(wildcard *.h)
