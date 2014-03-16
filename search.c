@@ -51,6 +51,7 @@ static int AssesDraw()
 
 void IterativeDeep()
 {
+    printf("info start search\n");
 	const int iLen = 100;
 	move iPV[iLen];
 	const int sLen = 500;
@@ -84,17 +85,17 @@ void IterativeDeep()
 			nps = 1000*(control.node_count/curr_time);
 		}
 		if(eval > MATE_VALUE/2 && -eval > MATE_VALUE/2){
-			printf("info depth %u time %Lu nodes %Lu nps %Lu score cp %i pv %s\n",
+			printf("info depth %u time %llu nodes %llu nps %llu score cp %i pv %s\n",
                     depth, curr_time, control.node_count, nps, eval, sPV);
 		}
 		else{
 			if(-eval < MATE_VALUE/2){
-				printf("info depth %u time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
+				printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
                         depth, curr_time, control.node_count, nps, (PVlen+1)/2, sPV);
                 /*or (-eval-MATE_VALUE-board.ply+1)/2*/
 			}
 			if(eval < MATE_VALUE/2){
-				printf("info depth %u time %Lu nodes %Lu nps %Lu score mate %i pv %s\n",
+				printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
                         depth, curr_time, control.node_count, nps, -(PVlen+1)/2, sPV);
                 /*or -(eval-MATE_VALUE-board.ply+1)/2*/
 			}
@@ -120,7 +121,7 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
 	move poss_moves [200];	/*TODO: could overflow.*/
 	move best_move = 0;
 	char str_mov[7];
-	char checking_sqs[5];
+	unsigned char checking_sqs[5];
 	int val = ERRORVALUE;
 	char hash_flag = HASH_ALPHA, PVfound = 0;
 
@@ -155,8 +156,8 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
 				Takeback(poss_moves[i]);
 
 				if(clock() - control.init_time > control.max_time*CPMS*0.95){
-                    control.stop = 1;
-                }
+					control.stop = 1;
+				}
 				if(control.stop) return alpha;
 				if(val >= beta){
 					UpdateTable(board.zobrist_key, val, poss_moves[i], depth, HASH_BETA);

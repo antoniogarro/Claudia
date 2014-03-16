@@ -34,7 +34,7 @@
 #include "engine.h"
 #include "board.h"
 
-const int TABLESIZE = (8*4194304);  /*TODO: variable size of hash table.*/
+const int TABLESIZE = (4*4194304);  /*TODO: variable size of hash table.*/
 
 /*Globals.*/
 struct BOARD board;

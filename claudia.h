@@ -77,10 +77,10 @@
 #define G_COLUMN 0x06
 #define H_COLUMN 0x07
 
-#define COLUMN(square) (square & 0x0F)
-#define ROW(square) (square & 0xF0)
+#define COLUMN(square) ((square) & 0x0F)
+#define ROW(square) ((square) & 0xF0)
 #define SQUARE(row, column) (row + column)
-#define IN_BOARD(square) !(square & 0x88)
+#define IN_BOARD(square) !((square) & 0x88)
 
 #define a1 0x00
 #define b1 0x01

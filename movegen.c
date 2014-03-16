@@ -36,7 +36,7 @@ int MoveGen(move *poss_moves)
 {
 	int nmoves = 0;
 	if(board.white_to_move){
-		for(char orig = 0; orig < 0x78; orig++){
+		for(unsigned char orig = 0; orig < 0x78; orig++){
 			switch (board.squares[orig]){
 				case W_PAWN:
 					nmoves = WhitePawnMoves(orig, poss_moves, nmoves);
@@ -70,7 +70,7 @@ int MoveGen(move *poss_moves)
 			if(COLUMN(orig) == H_COLUMN && ROW(orig) != EIGHT_ROW) orig += 8;
 		}
 	}else{
-		for(char orig = 0; orig < 0x78; orig++){
+		for(unsigned char orig = 0; orig < 0x78; orig++){
 			switch (board.squares[orig]){
 				case B_PAWN:
 					nmoves = BlackPawnMoves(orig, poss_moves, nmoves);
@@ -109,9 +109,9 @@ int MoveGen(move *poss_moves)
 }
 
 /*TODO: merge White and Black pawns generators?*/
-int WhitePawnMoves(const char orig, move *poss_moves, int nmoves)
+int WhitePawnMoves(unsigned char orig, move *poss_moves, int nmoves)
 {
-	char dest = orig + ROW_UP;
+	unsigned char dest = orig + ROW_UP;
 	if(IN_BOARD(dest) && board.squares[dest] == EMPTY){
 		if(ROW(dest) == EIGHT_ROW){			/*Promotions.*/
 			if(poss_moves) poss_moves[nmoves] = (W_QUEEN << 16) | (dest << 8) | orig;
@@ -164,9 +164,9 @@ int WhitePawnMoves(const char orig, move *poss_moves, int nmoves)
 	return nmoves;
 }
 
-int BlackPawnMoves(const char orig, move *poss_moves, int nmoves)
+int BlackPawnMoves(unsigned char orig, move *poss_moves, int nmoves)
 {
-	char dest = orig + ROW_DOWN;
+	unsigned char dest = orig + ROW_DOWN;
 	if(IN_BOARD(dest) && board.squares[dest] == EMPTY){
 		if(ROW(dest) == FIRST_ROW){
 			if(poss_moves) poss_moves[nmoves] = (B_QUEEN << 16) | (dest << 8) | orig;	
@@ -221,9 +221,9 @@ int BlackPawnMoves(const char orig, move *poss_moves, int nmoves)
 	return nmoves;
 }
 
-int SlidingMoves(const char orig, const char *delta, const char piece_color, move* poss_moves, int nmoves)
+int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, move* poss_moves, int nmoves)
 {
-	char dest;
+	unsigned char dest;
 	for(int i = 0; delta[i]; i++){
 		dest = orig + delta[i];
 		while(1){
@@ -246,9 +246,9 @@ int SlidingMoves(const char orig, const char *delta, const char piece_color, mov
 	return nmoves;
 }
 
-int NonSlidingMoves(const char orig, const char *delta, const char piece_color, move *poss_moves, int nmoves)
+int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_color, move *poss_moves, int nmoves)
 {
-	char dest;
+	unsigned char dest;
 	for(int i = 0; delta[i]; i++){
 		dest = orig + delta[i];
 		if(IN_BOARD(dest)){
@@ -268,7 +268,7 @@ int NonSlidingMoves(const char orig, const char *delta, const char piece_color, 
 
 int GenerateWhiteCastle(move* poss_moves, int nmoves)
 {
-	char dest;
+	unsigned char dest;
 	if(board.wk_castle && board.squares[0x07] == W_ROOK && board.squares[0x06] == EMPTY
 			&& board.squares[0x05] == EMPTY && !WhiteInCheck()
 			&& !IsAttacked(0x05, BLACK_COLOR)){
@@ -288,7 +288,7 @@ int GenerateWhiteCastle(move* poss_moves, int nmoves)
 
 int GenerateBlackCastle(move* poss_moves, int nmoves)
 {
-	char dest;
+	unsigned char dest;
 	if(board.bk_castle && board.squares[0x77] == B_ROOK &&board.squares[0x76] == EMPTY
 			&& board.squares[0x75] == EMPTY && !BlackInCheck() &&
 			!IsAttacked(0x75, WHITE_COLOR)){

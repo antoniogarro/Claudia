@@ -33,6 +33,7 @@
 
 #include <time.h>
 #include "board.h"
+#include "book.h"
 
 #define COM_INVALID -1
 #define COM_QUIT 0
@@ -70,7 +71,8 @@ int ParseInput(char*);
 int ParseGoParams(char*);
 int Command(char *);
 
-static void ManageTimes(){
+static void ManageTimes()
+{
 	if(board.white_to_move){
 		control.wish_time = control.wtime/30 + control.wtime_inc;
 		control.max_time = control.wtime;
@@ -80,17 +82,18 @@ static void ManageTimes(){
 		control.max_time = control.btime;
 	}
 }
-static void ResetTimes(){
+
+static void ResetTimes()
+{
 	control.wtime = 0; control.btime = 0;
 	control.wtime_inc = 0; control.btime_inc = 0;
 }
-#ifdef __linux__
-static void *think(void *pparams){
-	IterativeDeep();
+
+static void think(void *pparams)
+{
+	if(PolyglotChooseMove(PolyglotKey())) return;
+    IterativeDeep();
+    return;
 }
-#elif _WIN32
-static void think(void *pparams){
-	IterativeDeep();
-}
-#endif
+
 #endif

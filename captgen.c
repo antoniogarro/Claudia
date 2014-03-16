@@ -36,7 +36,7 @@ int CaptureGen(move *poss_moves)
 {
 	int nmoves = 0;
 	if(board.white_to_move){
-		for(char orig = 0; orig < 0x78; orig++){
+		for(unsigned char orig = 0; orig < 0x78; orig++){
 			switch (board.squares[orig]){
 				case W_PAWN:
 					nmoves = WhitePawnCaptures(orig, poss_moves, nmoves);
@@ -69,7 +69,7 @@ int CaptureGen(move *poss_moves)
 		}
 	}
 	else{
-		for(char orig = 0; orig < 0x78; orig++){
+		for(unsigned char orig = 0; orig < 0x78; orig++){
 			switch (board.squares[orig]){
 				case B_PAWN:
 					nmoves = BlackPawnCaptures(orig, poss_moves, nmoves);
@@ -105,9 +105,9 @@ int CaptureGen(move *poss_moves)
 }
 
 
-int WhitePawnCaptures(const char orig, move *captures, int ncapts)
+int WhitePawnCaptures(unsigned char orig, move *captures, int ncapts)
 {
-	char dest = orig + ROW_UP;
+	unsigned char dest = orig + ROW_UP;
 
 	for(int i = 0; w_pawn_capture[i]; i++){
 		dest = orig + w_pawn_capture[i];
@@ -139,9 +139,9 @@ int WhitePawnCaptures(const char orig, move *captures, int ncapts)
 	return ncapts;
 }
 
-int BlackPawnCaptures(const char orig, move *captures, int ncapts)
+int BlackPawnCaptures(unsigned char orig, move *captures, int ncapts)
 {
-	char dest = orig + ROW_DOWN;
+	unsigned char dest = orig + ROW_DOWN;
 	
 	for(int i = 0; b_pawn_capture[i]; i++){
 		dest = orig + b_pawn_capture[i];
@@ -174,9 +174,9 @@ int BlackPawnCaptures(const char orig, move *captures, int ncapts)
 	return ncapts;
 }
 
-int SlidingCaptures(const char orig, const char *delta, const char piece_color, move* captures, int ncapts)
+int SlidingCaptures(unsigned char orig, const char *delta, unsigned char piece_color, move* captures, int ncapts)
 {
-	char dest;
+	unsigned char dest;
 	for(int i = 0; delta[i]; i++){
 		dest = orig + delta[i];
 		while(1){
@@ -196,9 +196,9 @@ int SlidingCaptures(const char orig, const char *delta, const char piece_color, 
 	return ncapts;
 }
 
-int NonSlidingCaptures(const char orig, const char *delta, const char piece_color,	move *captures, int ncapts)
+int NonSlidingCaptures(unsigned char orig, const char *delta, unsigned char piece_color, move *captures, int ncapts)
 {
-	char dest;
+	unsigned char dest;
 	for(int i = 0; delta[i]; i++){
 		dest = orig + delta[i];
 		if(IN_BOARD(dest)){
@@ -212,7 +212,7 @@ int NonSlidingCaptures(const char orig, const char *delta, const char piece_colo
 	return ncapts;
 }
 
-int CheckEscGen(move *pPossibleEsc, const char *checking_sqs, const int nchecking)
+int CheckEscGen(move *pPossibleEsc, const char *checking_sqs, int nchecking)
 {
 	int ncheck_esc = 0;
 	//Si el jaque es simple:

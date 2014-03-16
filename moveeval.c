@@ -33,10 +33,10 @@
 
 int SEE(move* main_capture)
 {
-	char dest = (*main_capture & 0xFFFF) >> 8;
-	char captured, sq;
-	char attacking_sqs[10];
-	char *less_attack_sq;
+	unsigned char dest = (*main_capture & 0xFFFF) >> 8;
+	unsigned char captured, sq;
+	unsigned char attacking_sqs[10];
+	unsigned char *less_attack_sq;
 	int attackers, depth = 0, val = 0;
 	move move_hist[20];
 	
@@ -73,7 +73,7 @@ int SEE(move* main_capture)
 	val = val + Value(captured);
 	Takeback(*main_capture);
 
-return val;
+    return val;
 }
 
 void SortMoves(move *moves, const int nmoves)
@@ -109,7 +109,7 @@ int EvaluateMove(move *curr_move, const move hash_move)
 		return HASHMOVE_VALUE;		/*search HashMove first.*/
 	}
 	/*Evaluate captures with SEE:*/
-	char dest = (*curr_move & 0xFFFF) >> 8;
+	unsigned char dest = (*curr_move & 0xFFFF) >> 8;
 	if(board.squares[dest] != EMPTY) return SEE(curr_move);
 	else return 0;		/*TODO: evaluate non-captures.*/
 }
@@ -147,9 +147,8 @@ int FilterWinning(move *captures, int ncapts)
 	return good_capts;
 }
 
-int Value(const char piece)
+int Value(unsigned char piece)
 {
-
 		switch(piece){
 
 			case W_PAWN: return PAWN_VALUE;

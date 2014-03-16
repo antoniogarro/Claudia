@@ -35,13 +35,13 @@
 #include "hashtable.h"
 
 struct BOARD {
-	char squares[128];
+	unsigned char squares[128];
 	/*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
-    char en_passant;
-    char wk_castle, wq_castle, bk_castle, bq_castle;
-	char w_castled, b_castled;
-	char wking_pos, bking_pos;
-	char white_to_move;
+    unsigned char en_passant;
+    unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
+	unsigned char w_castled, b_castled;
+	unsigned char wking_pos, bking_pos;
+	unsigned char white_to_move;
 	int ply;
 	int rev_plies [500];
 	unsigned long long zobrist_key;
@@ -65,25 +65,25 @@ void PrintBoard();
 int MoveGen(move*);
 int CaptureGen(move*);
 
-int WhitePawnMoves(const char, move *, int);
-int BlackPawnMoves(const char, move *, int);
-int SlidingMoves(const char, const char*, const char, move*, int);
-int NonSlidingMoves(const char, const char *, const char, move *, int);
+int WhitePawnMoves(unsigned char, move *, int);
+int BlackPawnMoves(unsigned char, move *, int);
+int SlidingMoves(unsigned char, const char*, const char, move*, int);
+int NonSlidingMoves(unsigned char, const char *, const char, move *, int);
 int GenerateWhiteCastle(move*, int);
 int GenerateBlackCastle(move*, int);
-int WhitePawnCaptures(const char, move *, int);
-int BlackPawnCaptures(const char, move *, int );
-int SlidingCaptures(const char, const char *, const char, move*, int);
-int NonSlidingCaptures(const char, const char *, const char, move *, int);
+int WhitePawnCaptures(unsigned char, move *, int);
+int BlackPawnCaptures(unsigned char, move *, int );
+int SlidingCaptures(unsigned char, const char *, unsigned char, move*, int);
+int NonSlidingCaptures(unsigned char, const char *, unsigned char, move *, int);
 
 
-char IsAttacked(const char, const char);
-int AttackingPieces(const char, const char, char *);
+char IsAttacked(unsigned char, unsigned char);
+int AttackingPieces(unsigned char, unsigned char, unsigned char *);
 
 void MakeMove(move *);
 void Takeback(const move);
-void RemovePiece(const char);
-void DropPiece(const char, const char);
+void RemovePiece(unsigned char);
+void DropPiece(unsigned char, unsigned char);
 char IsLegal(move *);
 
 int Perft(const int);
@@ -93,14 +93,14 @@ void SortMoves(move *, const int);
 int FilterWinning(move *, const int);
 int Material();
 int StaticEval();
-int Value(const char);
+int Value(unsigned char);
 
-int PawnStaticVal(const char, const char);
-int KnightStaticVal(const char, const char);
-int BishopStaticVal(const char, const char);
-int RookStaticVal(const char, const char);
-int QueenStaticVal(const char, const char);
-int KingStaticVal(const char, const char);
+int PawnStaticVal(unsigned char, unsigned char);
+int KnightStaticVal(unsigned char, unsigned char);
+int BishopStaticVal(unsigned char, unsigned char);
+int RookStaticVal(unsigned char, unsigned char);
+int QueenStaticVal(unsigned char, unsigned char);
+int KingStaticVal(unsigned char, unsigned char);
 
 /*
 static char SideToMove(){
@@ -115,7 +115,7 @@ static char BlackInCheck(){
 	return IsAttacked(board.bking_pos, WHITE_COLOR);
 }
 
-static int InCheck(char * attacking_sqs){
+static int InCheck(unsigned char * attacking_sqs){
 	if(board.white_to_move) return AttackingPieces(board.wking_pos, BLACK_COLOR, attacking_sqs);
 	else return AttackingPieces(board.bking_pos, WHITE_COLOR, attacking_sqs);
 }

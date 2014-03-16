@@ -31,10 +31,10 @@
 #include "board.h"
 #include "claudia.h"
 
-char IsAttacked(const char square, const char attacking_color)
+char IsAttacked(unsigned char square, unsigned char attacking_color)
 {
 
-	char attacking_sq = 0;
+	unsigned char attacking_sq = 0;
 	if(attacking_color){
 		for(int i = 0; w_pawn_capture[i]; i++){
 			attacking_sq = square - w_pawn_capture[i];
@@ -64,7 +64,7 @@ char IsAttacked(const char square, const char attacking_color)
 
 	for(int i = 0; bishop_delta[i]; i++){
 		attacking_sq = square + bishop_delta[i];
-		while(1){
+		for(;;){
 			if(IN_BOARD(attacking_sq)){
 				if(board.squares[attacking_sq] == EMPTY){
 					attacking_sq += bishop_delta[i];
@@ -92,7 +92,7 @@ char IsAttacked(const char square, const char attacking_color)
 
 	for(int i = 0; rook_delta[i]; i++){
 		attacking_sq = square + rook_delta[i];
-		while(1){
+		for(;;){
 			if(IN_BOARD(attacking_sq)){
 				if(board.squares[attacking_sq] == EMPTY){
 					attacking_sq += rook_delta[i];
@@ -128,11 +128,11 @@ char IsAttacked(const char square, const char attacking_color)
 	return 0;
 }
 
-int AttackingPieces(const char square, const char attacking_color, char * attacking_sqs)
+int AttackingPieces(unsigned char square, unsigned char attacking_color, unsigned char * attacking_sqs)
 {
 	int attackers = 0;
 
-	char attacking_sq = 0;
+	unsigned char attacking_sq = 0;
 	if(attacking_color){
 		for(int i = 0; w_pawn_capture[i]; i++){
 			attacking_sq = square - w_pawn_capture[i];
@@ -166,7 +166,7 @@ int AttackingPieces(const char square, const char attacking_color, char * attack
 
 	for(int i = 0; bishop_delta[i]; i++){
 		attacking_sq = square + bishop_delta[i];
-		while(1){
+		for(;;){
 			if(IN_BOARD(attacking_sq)){
 				if(board.squares[attacking_sq] == EMPTY){
 					attacking_sq += bishop_delta[i];
@@ -198,7 +198,7 @@ int AttackingPieces(const char square, const char attacking_color, char * attack
 
 	for(int i = 0; rook_delta[i]; i++){
 		attacking_sq = square + rook_delta[i];
-		while(1){
+		for(;;){
 			if(IN_BOARD(attacking_sq)){
 				if(board.squares[attacking_sq] == EMPTY){
 					attacking_sq += rook_delta[i];

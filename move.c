@@ -37,9 +37,9 @@
 */
 void MakeMove(move *curr_move)
 {
-	char orig = ORIGMASK(*curr_move);
-	char dest = DESTMASK(*curr_move);
-	char promoted = PROMMASK(*curr_move);
+	unsigned char orig = ORIGMASK(*curr_move);
+	unsigned char dest = DESTMASK(*curr_move);
+	unsigned char promoted = PROMMASK(*curr_move);
 	/*Piecepromoted stores only piece type, NOT correct color, because it comes
 	from CharToPiece, and algebraic notation does not ensure Q != q.*/
 
@@ -179,11 +179,11 @@ void MakeMove(move *curr_move)
 
 void Takeback(const move prev_move)
 {
-	char orig = ORIGMASK(prev_move);
-	char dest = DESTMASK(prev_move);
+	unsigned char orig = ORIGMASK(prev_move);
+	unsigned char dest = DESTMASK(prev_move);
 	/*Piecepromoted stores the piece type, not correct color.*/
-	char promoted = PROMMASK(prev_move);
-	char captured = CAPTMASK(prev_move);
+	unsigned char promoted = PROMMASK(prev_move);
+	unsigned char captured = CAPTMASK(prev_move);
 	
 	/*if(IN_BOARD(board.en_passant)) board.zobrist_key ^= zobkeys.zob_enpass[board.en_passant];*/
 	board.en_passant = EPMASK(prev_move);
@@ -302,13 +302,13 @@ void Takeback(const move prev_move)
 	board.ply--;
 }
 
-void RemovePiece(const char sq)
+void RemovePiece(unsigned char sq)
 {
 	board.zobrist_key ^= zobkeys.zob_pieces[board.squares[sq]][sq];
 	board.squares[sq] = EMPTY;
 }
 
-void DropPiece(const char sq, const char piece)
+void DropPiece(unsigned char sq, unsigned char piece)
 {
 	board.zobrist_key ^= zobkeys.zob_pieces[board.squares[sq]][sq];
 	board.zobrist_key ^= zobkeys.zob_pieces[piece][sq];

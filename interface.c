@@ -56,13 +56,14 @@ int Command(char *input)
 			params = atoi(str_param);
 			control.init_time = clock();
 			printf("Depth: %i Moves: %i\n", params, Perft(params));
-			printf("Time elapsed: %i ms\n", clock() - control.init_time);
+			printf("Time elapsed: %llu ms\n", (unsigned long long)(clock() - control.init_time));
 			break;
 
 		case COM_GO:
 			control.max_depth = 70;
 			control.max_time = INFINITE;
 			control.wish_time = INFINITE;
+			control.stop = 1;
 			ResetTimes();
 			manage_times = 1;
 			do{
@@ -112,7 +113,7 @@ int Command(char *input)
 				control.init_time = clock();
 #ifdef __linux__
 				pthread_t thread_id;
-				pthread_create(&thread_id, 0, think, 0);
+				pthread_create(&thread_id, 0, (void *)(think), 0);
 #elif _WIN32
 				_beginthread(think, 0, NULL);
 #endif

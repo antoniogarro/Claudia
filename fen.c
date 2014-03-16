@@ -34,8 +34,8 @@
 
 int ReadFEN(const char* sFEN)
 {	/*TODO: check FEN validity.*/
-	char fen_pos = 0;
-	char square = 0x70;
+	unsigned char fen_pos = 0;
+	unsigned char square = 0x70;
 	char on_board = 1;
 	board.wk_castle = 0;
 	board.bk_castle = 0;
