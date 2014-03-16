@@ -51,7 +51,7 @@ static int AssesDraw()
 
 void IterativeDeep()
 {
-    printf("info start search\n");
+    printf("info start search %llu %llu\n", (unsigned long long)control.wish_time, (unsigned long long)control.max_time);
     const int iLen = 100;
     move iPV[iLen];
     const int sLen = 500;

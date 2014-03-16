@@ -82,7 +82,7 @@ int Command(char *input)
                         control.max_time = atol(str_param);
                         manage_times = 0;
                         break;
-                    case GO_INFINITE:    
+                    case GO_INFINITE:
                         manage_times = 0;
                         break;
                     case B_TIME:
@@ -113,8 +113,12 @@ int Command(char *input)
                 control.stop = 0;
                 control.init_time = clock();
 #ifdef __linux__
+		pthread_attr_t tattr;
+                pthread_attr_init(&tattr);
+                pthread_attr_setdetachstate(&tattr,PTHREAD_CREATE_DETACHED);
+
                 pthread_t thread_id;
-                pthread_create(&thread_id, 0, (void *)(think), 0);
+                pthread_create(&thread_id, &tattr, (void *)(think), 0);
 #elif _WIN32
                 _beginthread(think, 0, NULL);
 #endif
