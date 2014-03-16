@@ -35,7 +35,7 @@
 #include "board.h"
 #include "book.h"
 
-enum commands {COM_INVALID, COM_QUIT, COM_MOVE, COM_GO, COM_STOP, COM_PERFT, COM_POSITION,
+enum commands {COM_INVALID = -1, COM_QUIT, COM_MOVE, COM_GO, COM_STOP, COM_PERFT, COM_POSITION,
                 COM_UCI, COM_IS_READY, COM_SETOPTION};
 enum subcommands {GO_INFINITE, GO_DEPTH, GO_TIME, W_TIME, B_TIME, W_INC, B_INC};
 
