@@ -32,10 +32,11 @@
 #include "hashtable.h"
 #include "board.h"
 
-void AllocTable(const int table_size)
+int AllocTable(int table_size)
 {
-    hash_table.entries = (HashData*) malloc(table_size*sizeof(HashData));
-    hash_table.size = table_size;
+    hash_table.entries = (HashData*) malloc(1024*1024*table_size);
+    hash_table.size = 1024*1024*table_size/sizeof(HashData);
+    return (int)hash_table.entries;
 }
 
 void DeleteTable()
@@ -52,8 +53,8 @@ void ClearHashTable()
     hash_table.full = 0;
 }
 
-void UpdateTable(const unsigned long long zob_key, const int eval,
-                 const move best_move, const int depth, const int flag)
+void UpdateTable(unsigned long long zob_key, int eval,
+                    move best_move, int depth, int flag)
 {
     int key = zob_key%hash_table.size;
     HashData *entry = &hash_table.entries[key];
@@ -74,7 +75,7 @@ void UpdateTable(const unsigned long long zob_key, const int eval,
     entry->data |=  PUT_HASH_FLAG(flag);
 }
 
-move GetHashMove(const unsigned long long zob_key)
+move GetHashMove(unsigned long long zob_key)
 {
     int key = zob_key%hash_table.size;
     if(hash_table.entries[key].zobrist_key == zob_key){
@@ -83,7 +84,7 @@ move GetHashMove(const unsigned long long zob_key)
     else return 0;
 }
 
-int GetHashEval(const unsigned long long zob_key, const int depth, const int alpha,                const int beta)
+int GetHashEval(unsigned long long zob_key, int depth, int alpha, int beta)
 {
     int key = zob_key%hash_table.size;
     const HashData* entry = &hash_table.entries[key];

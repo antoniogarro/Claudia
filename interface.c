@@ -38,6 +38,7 @@
 #endif
 #include "engine.h"
 #include "claudia.h"
+#include "hashtable.h"
 
 
 int Command(char *input)
@@ -136,7 +137,7 @@ int Command(char *input)
             str_param = strtok(NULL, " \n\t");
             if(!strcmp(str_param, "startpos")) ReadFEN(STARTPOS);
             else{
-                if(!strcmp(str_param, "fen")){     /*New uci specs! Cagüenlaputa!*/
+                if(!strcmp(str_param, "fen")){
                     /*Shouldn't cut chain at spaces; cut at 'm' for 'moves' or at '\n'.*/
                     str_param = strtok(NULL, "m\n\t"); 
                     ReadFEN(str_param);
@@ -157,7 +158,7 @@ int Command(char *input)
             control.uci = 1;
             printf("id name %s v. %s\n", NAME, VERSION);
             printf("id author Antonio Garro\n");
-            /*printf("option\n");*/
+            printf("option name Hash type spin default 64 min 32 max 2048\n");
             printf("uciok\n");
             break;
 
@@ -168,6 +169,24 @@ int Command(char *input)
         case COM_QUIT:
             control.stop = 1;
             return 0;
+        
+        case COM_SETOPTION:
+            str_param = strtok(NULL, " \n\t");
+            if(strcmp(str_param, "name")) break;
+        
+            str_param = strtok(NULL, " \n\t");
+            if(strcmp(str_param, "Hash")) break;
+        
+            str_param = strtok(NULL, " \n\t");
+            if(strcmp(str_param, "value")) break;
+        
+            str_param = strtok(NULL, " \n\t");
+            int params = atoi(str_param);
+            
+            DeleteTable();
+            if(AllocTable(params) == 0) break;
+            ClearHashTable();
+            break;
 
         default:
             break;

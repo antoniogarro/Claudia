@@ -59,11 +59,11 @@ struct HASHTABLE{
 };
 extern struct HASHTABLE hash_table;
 
-void AllocTable(const int);
+int AllocTable(int);
 void DeleteTable();
 void ClearHashTable();
-void UpdateTable(const unsigned long long, const int, const move, const int, const int);
-move GetHashMove(const unsigned long long);
-int GetHashEval(const unsigned long long, const int, const int, const int);
+void UpdateTable(unsigned long long, int, move, int, int);
+move GetHashMove(unsigned long long);
+int GetHashEval(unsigned long long, int, int, int);
 
 #endif

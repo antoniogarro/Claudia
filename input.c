@@ -47,6 +47,8 @@ int ParseInput(char *command)
         if(!strcmp(command, "uci")) return COM_UCI;
 
         if(!strcmp(command, "quit")) return COM_QUIT;
+        
+        if(!strcmp(command, "setoption")) return COM_SETOPTION;
 
         move curr_move = AlgebToMove(command);
         if(curr_move) return COM_MOVE;
@@ -71,7 +73,6 @@ int ParseGoParams(char *pparams)
         if(!strcmp(pparams, "winc")) return W_INC;
 
         if(!strcmp(pparams, "binc")) return B_INC;
-
     }
     return COM_INVALID;
 }

@@ -34,7 +34,7 @@
 #include "engine.h"
 #include "board.h"
 
-const int TABLESIZE = (4*4194304);  /*TODO: variable size of hash table.*/
+const int TABLESIZE = 32;
 
 /*Globals.*/
 struct BOARD board;
@@ -48,7 +48,10 @@ int main(int argc, char* argv[])
     char input[2048];
 
     InitBoard();
-    AllocTable(TABLESIZE);
+    if(AllocTable(TABLESIZE) == 0){
+        printf("Not enough memory\n");
+        return 1;
+    }
     ClearHashTable();
 
     ReadFEN(STARTPOS);        /*or ReadFEN("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");*/

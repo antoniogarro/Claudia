@@ -35,23 +35,9 @@
 #include "board.h"
 #include "book.h"
 
-#define COM_INVALID -1
-#define COM_QUIT 0
-#define COM_MOVE 1
-#define COM_GO 2
-#define COM_STOP 3
-#define COM_PERFT 4
-#define COM_POSITION 5
-#define COM_UCI 6
-#define COM_IS_READY 7
-
-#define GO_DEPTH 1
-#define GO_TIME 2
-#define GO_INFINITE 0
-#define W_TIME 3
-#define B_TIME 4
-#define W_INC 5
-#define B_INC 6
+enum commands {COM_INVALID, COM_QUIT, COM_MOVE, COM_GO, COM_STOP, COM_PERFT, COM_POSITION,
+                COM_UCI, COM_IS_READY, COM_SETOPTION};
+enum subcommands {GO_INFINITE, GO_DEPTH, GO_TIME, W_TIME, B_TIME, W_INC, B_INC};
 
 struct CONTROL {
     int wtime, btime, wtime_inc, btime_inc;
