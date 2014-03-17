@@ -34,9 +34,14 @@
 
 int AllocTable(int table_size)
 {
-    hash_table.entries = (HashData*) malloc(1024*1024*table_size);
-    hash_table.size = 1024*1024*table_size/sizeof(HashData);
-    return (int)hash_table.entries;
+    unsigned int s = 1024*1024*table_size;
+    do{
+        hash_table.entries = (HashData*) malloc(s);
+        s *= 0.8;
+    }while(hash_table.entries == 0);
+    
+    hash_table.size = s/sizeof(HashData);
+    return hash_table.size;
 }
 
 void DeleteTable()
