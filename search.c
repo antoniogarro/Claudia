@@ -51,7 +51,6 @@ static int AssesDraw()
 
 void IterativeDeep()
 {
-    printf("info start search %llu %llu\n", (unsigned long long)control.wish_time, (unsigned long long)control.max_time);
     const int iLen = 100;
     move iPV[iLen];
     const int sLen = 500;
@@ -72,7 +71,7 @@ void IterativeDeep()
         if(control.stop){
             break;
         }
-        int PVlen = RetrievePV(iPV, iLen); /*Retrieve longer?*/
+        int PVlen = RetrievePV(iPV, 2*depth); /*Retrieve longer?*/
         for(int i = 0; i < PVlen; i++){
             MoveToAlgeb(iPV[i], str_mov);
             strcat(sPV, str_mov);
