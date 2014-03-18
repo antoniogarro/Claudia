@@ -389,8 +389,8 @@ int PolyglotFindKey(FILE *f, uint64 key, entry_t *entry)
     }
 }
 
-void PolyglotMoveToString(char move_s[6], uint16 move){
-    
+void PolyglotMoveToString(char move_s[6], uint16 move)
+{
     char *promote_pieces = " nbrq";
     int f = (move>>6)&077;
     int fr = (f>>3)&0x7;
@@ -423,8 +423,6 @@ void PolyglotMoveToString(char move_s[6], uint16 move){
     }
 }
 
-
-
 int PolyglotChooseMove(uint64 key)
 {
     entry_t entry;
@@ -438,6 +436,7 @@ int PolyglotChooseMove(uint64 key)
     int offset = PolyglotFindKey(f,key,&entry);
     if(entry.key!=key){
         printf("info string Out of book.\n");
+        fclose(f);
         return 0;
     }
     entries[0] = entry;
@@ -453,6 +452,7 @@ int PolyglotChooseMove(uint64 key)
         
         if(count == MAX_MOVES){
             /*printf("Too many moves in this position (max=%d)\n",MAX_MOVES);*/
+            fclose(f);
             return 0;
         }
         entries[count++] = entry;
@@ -470,11 +470,11 @@ int PolyglotChooseMove(uint64 key)
     
     int r = rand()%total_weight;
     int i = 0;
-    for(int w = 0; w < r; i++){
-        w += entries[i].weight;
+    for(int w = entries[0].weight; w < r; i++){
+        w += entries[i+1].weight;
     }
     
-    PolyglotMoveToString(move_s, entries[i-1].move);
+    PolyglotMoveToString(move_s, entries[i].move);
     control.stop = 1;
     printf("bestmove %s\n", move_s);
     return 1;
