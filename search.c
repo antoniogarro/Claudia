@@ -184,6 +184,8 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
                 return DRAW_VALUE;    /*Stalemate*/
             }
         }else UpdateTable(board.zobrist_key, alpha, best_move, depth, hash_flag);
+    }else if(InCheck(checking_sqs)){
+        alpha = AlphaBeta(1, alpha, beta, 0);
     }else{
         alpha = Quiescent(alpha, beta);
     }
