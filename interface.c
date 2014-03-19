@@ -162,7 +162,7 @@ int Command(char *input)
             control.uci = 1;
             printf("id name %s v. %s\n", NAME, VERSION);
             printf("id author Antonio Garro\n");
-            printf("option name Hash type spin default 64 min 32 max 2048\n");
+            printf("option name Hash type spin default 32 min 32 max 2048\n");
             printf("uciok\n");
             break;
 
@@ -185,7 +185,7 @@ int Command(char *input)
             if(strcmp(str_param, "value")) break;
         
             str_param = strtok(NULL, " \n\t");
-            int params = atoi(str_param);
+            params = atoi(str_param);
             
             DeleteTable();
             if(AllocTable(params) == 0) break;
