@@ -48,6 +48,7 @@ struct BOARD {
     unsigned long long zobrist_history[500];
 };
 extern struct BOARD board;
+
 struct ZOBKEYS {
     unsigned long long zob_pieces[16][128];
     unsigned long long zob_enpass[128];
@@ -102,11 +103,6 @@ int RookStaticVal(unsigned char, unsigned char);
 int QueenStaticVal(unsigned char, unsigned char);
 int KingStaticVal(unsigned char, unsigned char);
 
-/*
-static char SideToMove(){
-    return board.white_to_move;
-}
-*/
 static char WhiteInCheck(){
     return IsAttacked(board.wking_pos, BLACK_COLOR);
 }

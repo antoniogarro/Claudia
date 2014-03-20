@@ -4,12 +4,12 @@ Claudia is an UCI chess engine written in C, with the purpose of serving as an e
 
 USAGE
 
-Claudia runs as a console application and can be used with any chess GUI that supports the UCI protocol. Note that the parser does not check the validity of the input, so the program may crash when passed malformed commands.
+Claudia runs as a console application and can be used with any chess GUI that supports the UCI protocol. It is known to compile with gcc (both 64 and 32 bits systems) and Visual C++, has been thoroughly tested with Arena, and should be fairly stable right now.
 
 
 ALGORITHM
 
-The engine uses a 0x88 internal board representation and a single threaded negamax algorithm with alpha-beta pruning, aspiration windows, quiescent search, static exchange evaluation and transposition tables. Its leaf evaluation function is still very rudimentary, currently only taking into account material advantage and piece mobility, and lacking specific ending knowledge.
+The engine uses a 0x88 internal board representation and a single threaded negamax algorithm with alpha-beta pruning, aspiration windows, quiescent search, check extension, static exchange evaluation and transposition tables. Its leaf evaluation function is still very rudimentary, currently only taking into account material advantage and piece mobility, and lacking specific ending knowledge.
 
 Claudia supports opening books in Polyglot (.bin) format, and will attempt to use an opening book named "book.bin" and placed in its same directory. The default book has been built from over forty thousand high-quality tournament games played by Grand Masters and International Masters over the last five years.
 

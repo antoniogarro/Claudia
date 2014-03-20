@@ -1,21 +1,21 @@
 
 	FEATURES			PRIORITY		STATUS
 
-* Split genmove subroutines		high			done
+* Split genmove subroutines		-			done
 
-* Halfmove clock			high			done
+* Halfmove clock			-			done
 
-* Threefold repetition detection	high			done
+* Threefold repetition detection	-			done
 
-* Hash tables support			high			done
+* Hash tables support			-			done
 
-* Change castle rights representation	high			done
+* Change castle rights representation	-			done
 
-* Time control				high			ongoing
+* Time control				-			done
 
 * Null move heuristic			medium			pending
 
-* Check extensions			high			pending
+* Check extensions			high			ongoing
 
 * King safety evaluation		medium			pending
 
@@ -27,10 +27,10 @@
 
 * Multithreading			low			pending
 
-* Opening book support			high			ongoing
+* Opening book support			-			done
 
-* UCI options				high			ongoing
+* UCI options				medium			ongoing
 
 * Ending knowledge			low			pending
 
-* Tidy up parser			low			pending
+* Tidy up parser			-			done

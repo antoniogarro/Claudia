@@ -122,7 +122,7 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
     char str_mov[7];
     unsigned char checking_sqs[5];
     int val = ERRORVALUE;
-    char hash_flag = HASH_ALPHA, PVfound = 0;
+    char hash_flag = HASH_ALPHA;
 
     if(depth){
         val = GetHashEval(board.zobrist_key, depth, alpha, beta);
@@ -144,7 +144,7 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
                 val = AssesDraw();
                 
                 if(val) {
-                    if(PVfound){    /*TODO: ???*/
+                    if(best_move){
                         val = -AlphaBeta(depth - 1, -alpha-1, -alpha, 0);
                         if(val > alpha && val < beta){
                             val = -AlphaBeta(depth - 1, -beta, -alpha, 0);
@@ -165,7 +165,6 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
                 if(val > alpha){
                     alpha = val;
                     hash_flag = HASH_EXACT;
-                    PVfound = 1;
                     best_move = poss_moves[i];
                 }
                 if(root && ((clock() - control.init_time) > control.wish_time*CPMS)){
@@ -225,7 +224,8 @@ int Quiescent(int alpha, const int beta)
     return alpha;
 }
 
-/*This only works because the replacement scheme ensures shallow PV is not overwritten*/
+/*This only works because the replacement scheme ensures shallow PV is not overwritten,
+and may fail if the hash table is full. TODO: ensure the best move is stored.*/
 int RetrievePV(move *PV, const unsigned int depth)
 {
     unsigned int PVlen = 0;
