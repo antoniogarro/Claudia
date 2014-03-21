@@ -15,7 +15,9 @@
 
 * Null move heuristic			medium			pending
 
-* Check extensions			high			ongoing
+* Check extensions			-			done
+
+* Checks in quiescent search		low			pending
 
 * King safety evaluation		medium			pending
 
@@ -29,8 +31,10 @@
 
 * Opening book support			-			done
 
-* UCI options				low			ongoing
+* UCI Hash value option			-			done
 
-* Ending knowledge			low			pending
+* UCI options				low			pending
+
+* Ending knowledge			medium			pending
 
 * Tidy up parser			-			done
