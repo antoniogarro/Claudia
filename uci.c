@@ -41,6 +41,8 @@
 #include "hashtable.h"
 
 
+CMDFN make_move, quit, go, stop, perft, position, uci, isready, setoption, ucinewgame;
+
 const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
                                             {"quit", &quit},
                                             {"go", &go},
@@ -49,7 +51,8 @@ const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
                                             {"position", &position},
                                             {"uci", &uci},
                                             {"isready", &isready},
-                                            {"setoption", &setoption}};
+                                            {"setoption", &setoption},
+                                            {"ucinewgame", &ucinewgame}};
                                          
 int ParseCommand(const char *command)
 {    
@@ -242,6 +245,12 @@ int setoption(char *input)
     sscanf(input, "setoption name Hash value %i", &val);
     DeleteTable();
     if(AllocTable(val) == 0) return 0;
+    ClearHashTable();
+    return 1;
+}
+
+int ucinewgame(char *input)
+{
     ClearHashTable();
     return 1;
 }

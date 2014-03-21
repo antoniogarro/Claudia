@@ -37,7 +37,6 @@
 
 /*UCI commands*/
 typedef int CMDFN(char*);
-CMDFN make_move, quit, go, stop, perft, position, uci, isready, setoption;
 
 struct UCI_COMMAND{
     char *name;

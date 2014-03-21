@@ -21,7 +21,7 @@
 
 * Pawn structure evaluation		medium			pending
 
-* Ponder				medium			pending
+* Ponder				low			pending
 
 * Get rid of global variables		medium			pending
 
@@ -29,7 +29,7 @@
 
 * Opening book support			-			done
 
-* UCI options				medium			ongoing
+* UCI options				low			ongoing
 
 * Ending knowledge			low			pending
 
