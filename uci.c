@@ -89,9 +89,10 @@ void ResetTimes()
 int make_move(char *input)
 {
     char *str_param = strtok(input, " \n\t");
-    move curr_move = AlgebToMove(str_param);
-    if(IsLegal(&curr_move)) MakeMove(&curr_move);
-    //else return 0;
+    if(str_param){
+        move curr_move = AlgebToMove(str_param);
+        if(IsLegal(&curr_move)) MakeMove(&curr_move);
+    }
     if(!control.uci) PrintBoard();
     return 1;
 }
@@ -115,33 +116,47 @@ int go(char *input)
     for(str_param = strtok(NULL, " \n\t"); str_param; str_param = strtok(NULL, " \n\t")){
         if(!strcmp("depth",  str_param)){
             str_param = strtok(NULL, " \n\t");
-            control.max_depth = atoi(str_param);
-            manage_times = 0;
+            if(str_param){
+                control.max_depth = atoi(str_param);
+                manage_times = 0;
+            }
             break;
         }else if(!strcmp("time",  str_param)){
             str_param = strtok(NULL, " \n\t");
-            control.wish_time = atol(str_param);
-            control.max_time = atol(str_param);
-            manage_times = 0;
+            if(str_param){
+                control.wish_time = atol(str_param);
+                control.max_time = atol(str_param);
+                manage_times = 0;
+            }
             break;
         }else if(!strcmp("infinite",  str_param)){
             manage_times = 0;
             break;
         }else if(!strcmp("btime",  str_param)){
             str_param = strtok(NULL, " \n\t");
-            control.btime = atoi(str_param);
+            if(str_param){
+                control.btime = atoi(str_param);
+            }
         }else if(!strcmp("wtime",  str_param)){
             str_param = strtok(NULL, " \n\t");
-            control.wtime = atoi(str_param);
+            if(str_param){
+                control.wtime = atoi(str_param);
+            }
         }else if(!strcmp("binc",  str_param)){
             str_param = strtok(NULL, " \n\t");
-            control.btime_inc = atoi(str_param);
+            if(str_param){
+                control.btime_inc = atoi(str_param);
+            }
         }else if(!strcmp("winc",  str_param)){
             str_param = strtok(NULL, " \n\t");
-            control.wtime_inc = atoi(str_param);
+            if(str_param){
+                control.wtime_inc = atoi(str_param);
+            }
         }else if(!strcmp("movestogo",  str_param)){
             str_param = strtok(NULL, " \n\t");
-            movestogo = atoi(str_param);
+            if(str_param){
+                movestogo = atoi(str_param);
+            }
         }else break;
     }
 
@@ -152,7 +167,7 @@ int go(char *input)
         control.stop = 0;
         control.init_time = clock();
 #ifdef __linux__
-pthread_attr_t tattr;
+        pthread_attr_t tattr;
         pthread_attr_init(&tattr);
         pthread_attr_setdetachstate(&tattr,PTHREAD_CREATE_DETACHED);
 
@@ -183,13 +198,15 @@ int perft(char *input)
 
 int position(char *input)
 {
-    char *str_command = strtok(input, " \n\t");
+    strtok(input, " \n\t");
     char *str_param = strtok(NULL, " \n\t");
     if(!strcmp(str_param, "startpos")) ReadFEN(STARTPOS);
     else if(!strcmp(str_param, "fen")){
         /*Don't split chain at spaces; cut at 'm' for 'moves' or at '\n'.*/
         str_param = strtok(NULL, "m\n\t"); 
-        ReadFEN(str_param);
+        if(str_param){
+                ReadFEN(str_param);
+        }
     } else return 0;
     
     str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "moves"*/
