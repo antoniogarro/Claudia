@@ -41,7 +41,7 @@
 #include "hashtable.h"
 
 
-CMDFN make_move, quit, go, stop, perft, position, uci, isready, setoption, ucinewgame;
+CMDFN make_move, quit, go, stop, perft, position, uci, isready, setoption, ucinewgame, showboard;
 
 const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
                                             {"quit", &quit},
@@ -52,10 +52,11 @@ const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
                                             {"uci", &uci},
                                             {"isready", &isready},
                                             {"setoption", &setoption},
-                                            {"ucinewgame", &ucinewgame}};
+                                            {"ucinewgame", &ucinewgame},
+                                            {"showboard", &showboard}};
                                          
 int ParseCommand(const char *command)
-{    
+{   if(command == 0) return 0; 
     for(int i = 0; i < sizeof(uci_commands)/sizeof(struct UCI_COMMAND); i++){
         if(!strcmp(command, uci_commands[i].name)) return i;
     }
@@ -76,8 +77,7 @@ void ManageTimes(int nmoves)
     if(board.white_to_move){
         control.wish_time = control.wtime/nmoves + control.wtime_inc;
         control.max_time = control.wtime;
-    }
-    else{
+    }else{
         control.wish_time = control.btime/nmoves + control.btime_inc;
         control.max_time = control.btime;
     }
@@ -96,7 +96,6 @@ int make_move(char *input)
         move curr_move = AlgebToMove(str_param);
         if(IsLegal(&curr_move)) MakeMove(&curr_move);
     }
-    if(!control.uci) PrintBoard();
     return 1;
 }
 
@@ -194,8 +193,9 @@ int perft(char *input)
     int depth = 0;
     sscanf(input, "perft %i", &depth);
     control.init_time = clock();
-    printf("Depth: %i Moves: %i\n", depth, Perft(depth));
-    printf("Time elapsed: %llu ms\n", (unsigned long long)(clock() - control.init_time));
+    unsigned int nodes = Perft(depth);
+    float ms = (clock() - control.init_time)/CPMS;
+    printf("Depth: %i Moves: %i knps: %u\n", depth, nodes, (unsigned int)(nodes/ms));
     return 1;
 }
 
@@ -207,10 +207,8 @@ int position(char *input)
     else if(!strcmp(str_param, "fen")){
         /*Don't split chain at spaces; cut at 'm' for 'moves' or at '\n'.*/
         str_param = strtok(NULL, "m\n\t"); 
-        if(str_param){
-                ReadFEN(str_param);
-        }
-    } else return 0;
+        if(str_param) ReadFEN(str_param);
+    }else return 0;
     
     str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "moves"*/
     str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "e2e4"*/
@@ -252,5 +250,11 @@ int setoption(char *input)
 int ucinewgame(char *input)
 {
     ClearHashTable();
+    return 1;
+}
+
+int showboard(char *input)
+{
+    if(!control.uci) PrintBoard();
     return 1;
 }

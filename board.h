@@ -117,7 +117,7 @@ static int InCheck(unsigned char * attacking_sqs){
 }
 
 static char LeftInCheck(){
-    if(board.white_to_move)    return IsAttacked(board.bking_pos, WHITE_COLOR);
+    if(board.white_to_move) return IsAttacked(board.bking_pos, WHITE_COLOR);
     else return IsAttacked(board.wking_pos, BLACK_COLOR);
 }
 

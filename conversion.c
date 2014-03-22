@@ -62,7 +62,7 @@ char CharToPiece (const char fen)
         default: piece = EMPTY;
             break;
     }
-return piece;
+    return piece;
 }
 
 char PieceToChar (const char piece)
@@ -140,7 +140,7 @@ char CharToCoordinate (const char fen)
         default: coord =  0x0F;
             break;
     }
-return coord;
+    return coord;
 }
 
 char RowCoordinateToChar (const char coord)
@@ -166,7 +166,7 @@ char RowCoordinateToChar (const char coord)
         default:   row = 0;
             break;
     }
-return row;
+    return row;
 }
 
 char ColumnCoordinateToChar (const char coord)
@@ -192,7 +192,7 @@ char ColumnCoordinateToChar (const char coord)
         default:   column = 0;
             break;
     }
-return column;
+    return column;
 }
 
 move AlgebToMove(const char *str_mov)
@@ -214,7 +214,7 @@ move AlgebToMove(const char *str_mov)
     square = CharToCoordinate(str_mov[1]) + CharToCoordinate(str_mov[0]);
     curr_move += square;
 
-return curr_move;
+    return curr_move;
 }
 
 void MoveToAlgeb(const move curr_move, char *str_mov)
@@ -225,8 +225,7 @@ void MoveToAlgeb(const move curr_move, char *str_mov)
     if(str_mov[4] == 'P' || str_mov[4] == 'p' || str_mov[4] == 'C'){
         str_mov[4] = ' ';
         str_mov[5] = 0;
-    }
-    else{
+    }else{
         str_mov[5] = ' ';
         str_mov[6] = 0;
     }

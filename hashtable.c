@@ -85,8 +85,7 @@ move GetHashMove(unsigned long long zob_key)
     int key = zob_key%hash_table.size;
     if(hash_table.entries[key].zobrist_key == zob_key){
         return MOVEMASK(hash_table.entries[key].data);
-    }
-    else return 0;
+    }else return 0;
 }
 
 int GetHashEval(unsigned long long zob_key, int depth, int alpha, int beta)

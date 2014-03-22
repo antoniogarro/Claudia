@@ -93,7 +93,7 @@ void SortMoves(move *moves, const int nmoves)
                 temp = moves[i];
                 moves[i] = moves[j];
                 moves[j] = temp;
-                curr_eval = eval[j]; /*Cagüento!*/
+                curr_eval = eval[j];
                 eval[j] = eval[i];
 
             }

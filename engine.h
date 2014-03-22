@@ -35,6 +35,8 @@
 #include "board.h"
 #include "book.h"
 
+static const clock_t CPMS = CLOCKS_PER_SEC/1000;
+
 /*UCI commands*/
 typedef int CMDFN(char*);
 

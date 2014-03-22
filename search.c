@@ -33,8 +33,6 @@
 #include "engine.h"
 #include "hashtable.h"
 
-static const clock_t CPMS = CLOCKS_PER_SEC/1000;
-
 static int AssesDraw()
 {
     if(board.rev_plies[board.ply] >= 50) {
@@ -53,7 +51,7 @@ void IterativeDeep()
 {
     const int iLen = 100;
     move iPV[iLen];
-    const int sLen = 500;
+    const int sLen = 600;
     char sPV[sLen];
     char str_mov[7];
     unsigned long long curr_time;
@@ -86,24 +84,17 @@ void IterativeDeep()
         if(eval > MATE_VALUE/2 && -eval > MATE_VALUE/2){
             printf("info depth %u time %llu nodes %llu nps %llu score cp %i pv %s\n",
                     depth, curr_time, control.node_count, nps, eval, sPV);
-        }
-        else{
-            if(-eval < MATE_VALUE/2){
-                printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                        depth, curr_time, control.node_count, nps, (PVlen+1)/2, sPV);
-                /*or (-eval-MATE_VALUE-board.ply+1)/2*/
-            }
-            if(eval < MATE_VALUE/2){
-                printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                        depth, curr_time, control.node_count, nps, -(PVlen+1)/2, sPV);
-                /*or -(eval-MATE_VALUE-board.ply+1)/2*/
-            }
+        }else if(-eval < MATE_VALUE/2){
+            printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
+                    depth, curr_time, control.node_count, nps, (PVlen+1)/2, sPV);
+        }else if(eval < MATE_VALUE/2){
+            printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
+                    depth, curr_time, control.node_count, nps, -(PVlen+1)/2, sPV);
         }
         if(eval <= alpha || eval >= beta){
             alpha = -INFINITE;
             beta = INFINITE;
-        }
-        else{
+        }else{
             if(3*curr_time > control.wish_time-(clock()-control.init_time)) break;
             alpha = eval - ASP_WINDOW;
             beta = eval + ASP_WINDOW;
@@ -149,8 +140,7 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
                         if(val > alpha && val < beta){
                             val = -AlphaBeta(depth - 1, -beta, -alpha, 0);
                         }
-                    }
-                    else val = -AlphaBeta(depth - 1, -beta, -alpha, 0);
+                    }else val = -AlphaBeta(depth - 1, -beta, -alpha, 0);
                 }
                 Takeback(poss_moves[i]);
 
@@ -218,8 +208,7 @@ int Quiescent(int alpha, const int beta)
             if(val > alpha){
                 alpha = val;
             }
-        }
-        else Takeback(poss_moves[i]);
+        }else Takeback(poss_moves[i]);
     }
     return alpha;
 }
@@ -230,14 +219,11 @@ int RetrievePV(move *PV, const unsigned int depth)
 {
     unsigned int PVlen = 0;
     move mov = GetHashMove(board.zobrist_key);
-    while(mov && PVlen <= depth){
-        if(IsLegal(&mov)){
-            PV[PVlen] = mov;
-            PVlen++;
-            MakeMove(&mov);
-            mov = GetHashMove(board.zobrist_key);
-        }
-        else break;
+    while(mov && PVlen <= depth && IsLegal(&mov)){
+        PV[PVlen] = mov;
+        PVlen++;
+        MakeMove(&mov);
+        mov = GetHashMove(board.zobrist_key);
     }
     for(int i = PVlen; i > 0; i--){
         Takeback(PV[i-1]);

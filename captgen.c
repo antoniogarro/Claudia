@@ -31,7 +31,6 @@
 #include "claudia.h"
 #include "board.h"
 
-
 int CaptureGen(move *poss_moves)
 {
     int nmoves = 0;
@@ -67,8 +66,7 @@ int CaptureGen(move *poss_moves)
             /*Skip dummy board: worth?*/
             if(COLUMN(orig) == H_COLUMN && ROW(orig) != EIGHT_ROW) orig += 8;
         }
-    }
-    else{
+    }else{
         for(unsigned char orig = 0; orig < 0x78; orig++){
             switch (board.squares[orig]){
                 case B_PAWN:
@@ -100,38 +98,33 @@ int CaptureGen(move *poss_moves)
             if(COLUMN(orig) == H_COLUMN && ROW(orig) != EIGHT_ROW) orig += 8;
         }
     }
-
     return nmoves;
 }
 
 
 int WhitePawnCaptures(unsigned char orig, move *captures, int ncapts)
 {
-    unsigned char dest = orig + ROW_UP;
-
     for(int i = 0; w_pawn_capture[i]; i++){
-        dest = orig + w_pawn_capture[i];
+        unsigned char dest = orig + w_pawn_capture[i];
         if(IN_BOARD(dest)){
             if(board.squares[dest] == EMPTY){
-                if(dest == board.en_passant){ /*Captures en Passant.*/
+                if(dest == board.en_passant){   /*Captures en Passant.*/
                     captures[ncapts] = (dest << 8) | orig;
                     ncapts++;
                 }
-            }else{
-                if(GET_COLOR(board.squares[dest]) == BLACK_COLOR){
-                    if(ROW(dest) == EIGHT_ROW){
-                        captures[ncapts] = (W_QUEEN << 16) | (dest << 8) | orig;    
-                        ncapts++;
-                        captures[ncapts] = (W_KNIGHT << 16)|(dest << 8) | orig;
-                        ncapts++;
-                        captures[ncapts] = (W_ROOK << 16) | (dest << 8) | orig;
-                        ncapts++;
-                        captures[ncapts] = (W_BISHOP << 16) | (dest << 8) | orig;
-                        ncapts++;
-                    }else{
-                        captures[ncapts] = (dest << 8)  | orig;
-                        ncapts++;
-                    }
+            }else if(GET_COLOR(board.squares[dest]) == BLACK_COLOR){
+                if(ROW(dest) == EIGHT_ROW){
+                    captures[ncapts] = (W_QUEEN << 16) | (dest << 8) | orig;    
+                    ncapts++;
+                    captures[ncapts] = (W_KNIGHT << 16)|(dest << 8) | orig;
+                    ncapts++;
+                    captures[ncapts] = (W_ROOK << 16) | (dest << 8) | orig;
+                    ncapts++;
+                    captures[ncapts] = (W_BISHOP << 16) | (dest << 8) | orig;
+                    ncapts++;
+                }else{
+                    captures[ncapts] = (dest << 8)  | orig;
+                    ncapts++;
                 }
             }
         }
@@ -141,56 +134,45 @@ int WhitePawnCaptures(unsigned char orig, move *captures, int ncapts)
 
 int BlackPawnCaptures(unsigned char orig, move *captures, int ncapts)
 {
-    unsigned char dest = orig + ROW_DOWN;
-    
     for(int i = 0; b_pawn_capture[i]; i++){
-        dest = orig + b_pawn_capture[i];
+        unsigned char dest = orig + b_pawn_capture[i];
         if(IN_BOARD(dest)){
             if(board.squares[dest] == EMPTY){
                 if(dest == board.en_passant){
                     captures[ncapts] = (dest << 8) | orig;
                     ncapts++;
                 }
-            }else{
-                if(GET_COLOR(board.squares[dest])){
-                    if(ROW(dest) == FIRST_ROW){
-                        captures[ncapts] = (B_QUEEN << 16) | (dest << 8) | orig;    
-                        ncapts++;
-                        captures[ncapts] = (B_KNIGHT << 16)|(dest << 8) | orig;
-                        ncapts++;
-                        captures[ncapts] = (B_ROOK << 16) | (dest << 8) | orig;
-                        ncapts++;
-                        captures[ncapts] = (B_BISHOP << 16) | (dest << 8) | orig;
-                        ncapts++;
-                    }else{
-                        captures[ncapts] = (dest << 8) | orig;
-                        ncapts++;
-                    }
+            }else if(GET_COLOR(board.squares[dest])){
+                if(ROW(dest) == FIRST_ROW){
+                    captures[ncapts] = (B_QUEEN << 16) | (dest << 8) | orig;    
+                    ncapts++;
+                    captures[ncapts] = (B_KNIGHT << 16)|(dest << 8) | orig;
+                    ncapts++;
+                    captures[ncapts] = (B_ROOK << 16) | (dest << 8) | orig;
+                    ncapts++;
+                    captures[ncapts] = (B_BISHOP << 16) | (dest << 8) | orig;
+                    ncapts++;
+                }else{
+                    captures[ncapts] = (dest << 8) | orig;
+                    ncapts++;
                 }
             }
         }
     }
-
     return ncapts;
 }
 
 int SlidingCaptures(unsigned char orig, const char *delta, unsigned char piece_color, move* captures, int ncapts)
 {
-    unsigned char dest;
     for(int i = 0; delta[i]; i++){
-        dest = orig + delta[i];
-        while(1){
-            if(IN_BOARD(dest)){
-                if(board.squares[dest] == EMPTY) dest += delta[i];
-                else{
-                    /*Different color Piece, capture, stop sliding:*/
-                    if(GET_COLOR(board.squares[dest]) != piece_color){
-                        captures[ncapts] = (dest << 8) | orig;
-                        ncapts++;
-                        break;
-                    }else break; /*same color piece, stop sliding.*/
+        for(unsigned char dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){
+            if(board.squares[dest] != EMPTY){
+                if(GET_COLOR(board.squares[dest]) != piece_color){ /*Different color Piece, capture.*/
+                    captures[ncapts] = (dest << 8) | orig;
+                    ncapts++;
                 }
-            }else break; /*Out of Board, stop sliding.*/
+                break; /*piece, stop sliding.*/
+            }
         }
     }
     return ncapts;
@@ -198,15 +180,11 @@ int SlidingCaptures(unsigned char orig, const char *delta, unsigned char piece_c
 
 int NonSlidingCaptures(unsigned char orig, const char *delta, unsigned char piece_color, move *captures, int ncapts)
 {
-    unsigned char dest;
     for(int i = 0; delta[i]; i++){
-        dest = orig + delta[i];
-        if(IN_BOARD(dest)){
-            if(board.squares[dest] != EMPTY &&
-                    GET_COLOR(board.squares[dest]) != piece_color){
-                captures[ncapts] = (dest << 8) | orig;
-                ncapts++;
-            }
+        unsigned char dest = orig + delta[i];
+        if(IN_BOARD(dest) && board.squares[dest] != EMPTY && GET_COLOR(board.squares[dest]) != piece_color){
+            captures[ncapts] = (dest << 8) | orig;
+            ncapts++;
         }
     }
     return ncapts;
@@ -228,7 +206,7 @@ int CheckEscGen(move *pPossibleEsc, const char *checking_sqs, int nchecking)
 
     //Copiamos los escapes en pPossibleEsc.
     //Esto genera pseudo-legal moves, ¡pero el rey aun puede quedar en jaque!
-return ncheck_esc;
+    return ncheck_esc;
 }
 
 int ChecksGen()

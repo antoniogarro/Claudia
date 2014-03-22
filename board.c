@@ -77,9 +77,9 @@ void PrintBoard()
     printf("\n+--+--+--+--+--+--+--+--+     %c %i%i\n",
             board.white_to_move+1, board.bq_castle, board.bk_castle);
     for(int i = 0x70; i>=0; i++){
-        if(!(i&0x88))
+        if(!(i&0x88)){
             printf("| %c", PieceToChar(board.squares[i]));
-        else {
+        }else{
             printf("|\n+--+--+--+--+--+--+--+--+\n");
             i -= 0x19;
         }

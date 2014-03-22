@@ -467,7 +467,7 @@ int PolyglotChooseMove(uint64 key)
         printf(" %s", move_s);
     }
     printf("\n");
-    
+    srand(clock());
     int r = rand()%total_weight;
     int i = 0;
     for(int w = entries[0].weight; w < r; i++){

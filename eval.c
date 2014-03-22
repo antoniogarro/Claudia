@@ -91,38 +91,42 @@ int PawnStaticVal(unsigned char sq, unsigned char color)
     else val += BlackPawnMoves(sq, 0, 0);
     return val;
 }
+
 int KnightStaticVal(unsigned char sq, unsigned char color)
 {
     int val = KNIGHT_VALUE;
     val += N_MOBILITY_BONUS*NonSlidingMoves(sq, knight_delta, color, 0, 0);
     return val;
 }
+
 int BishopStaticVal(unsigned char sq, unsigned char color)
 {
     int val = BISHOP_VALUE;
     val += B_MOBILITY_BONUS*SlidingMoves(sq, bishop_delta, color, 0, 0);
     return val;
 }
+
 int RookStaticVal(unsigned char sq, unsigned char color)
 {
     int val = ROOK_VALUE;
     val += R_MOBILITY_BONUS*SlidingMoves(sq, rook_delta, color, 0, 0);
     return val;
 }
+
 int QueenStaticVal(unsigned char sq, unsigned char color)
 {
     int val = QUEEN_VALUE;
     val += Q_MOBILITY_BONUS*SlidingMoves(sq, king_delta, color, 0, 0);
     return val;
 }
+
 int KingStaticVal(unsigned char sq, unsigned char color)
 {
     int val = KING_VALUE;
     if(color){
         val += CASTLE_BONUS*board.w_castled;
         val += CASTLE_RIGHT_BONUS*(board.wk_castle + board.wq_castle);
-    }
-    else{
+    }else{
         val += CASTLE_BONUS*board.b_castled;
         val += CASTLE_RIGHT_BONUS*(board.bk_castle + board.bq_castle);
     }

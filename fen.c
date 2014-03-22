@@ -36,7 +36,6 @@ int ReadFEN(const char* sFEN)
 {    /*TODO: check FEN validity.*/
     unsigned char fen_pos = 0;
     unsigned char square = 0x70;
-    char on_board = 1;
     board.wk_castle = 0;
     board.bk_castle = 0;
     board.wq_castle = 0;
@@ -44,7 +43,7 @@ int ReadFEN(const char* sFEN)
     board.w_castled = 0;
     board.b_castled = 0;
 
-    for (;on_board;fen_pos++){
+    for(char on_board = 1; on_board; fen_pos++){
         char empty = 0;
         switch (sFEN[fen_pos]){
             case ' ': on_board = 0;
@@ -70,9 +69,7 @@ int ReadFEN(const char* sFEN)
             default:
                 board.squares[square] = CharToPiece(sFEN[fen_pos]);
                 if(board.squares[square] == W_KING) board.wking_pos = square;
-                else{
-                    if(board.squares[square] == B_KING) board.bking_pos = square;
-                }
+                else if(board.squares[square] == B_KING) board.bking_pos = square;
                 square++;
                 break;
         }
@@ -83,7 +80,7 @@ int ReadFEN(const char* sFEN)
     board.white_to_move = (sFEN[fen_pos] == 'w');
     fen_pos+=2;
     
-    for (on_board = 1; on_board; fen_pos++){        /*Castle rights loop.*/
+    for(char on_board = 1; on_board; fen_pos++){        /*Castle rights loop.*/
         switch (sFEN[fen_pos]){            
             case 'K':  board.wk_castle = 1;
                 break;
@@ -99,7 +96,7 @@ int ReadFEN(const char* sFEN)
     }
     /*Store En Passant coordinates. TODO: check.*/
     board.en_passant = 0x00;
-    for (on_board = 1; on_board; fen_pos++){
+    for(char on_board = 1; on_board; fen_pos++){
         switch (sFEN[fen_pos]){            
             case ' ': on_board = 0;
                 break;
@@ -113,6 +110,5 @@ int ReadFEN(const char* sFEN)
     /*TODO: halfmoves and moves.*/
     board.ply = 0;
     InitZobrist();
-
-return fen_pos;
+    return fen_pos;
 }

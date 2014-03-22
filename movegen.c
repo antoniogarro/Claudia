@@ -142,21 +142,19 @@ int WhitePawnMoves(unsigned char orig, move *poss_moves, int nmoves)
                     if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
                     nmoves++;
                 }
-            }else{
-                if(GET_COLOR(board.squares[dest]) == BLACK_COLOR){
-                    if(ROW(dest) == EIGHT_ROW){
-                        if(poss_moves) poss_moves[nmoves] = (W_QUEEN << 16) | (dest << 8) | orig;
-                        nmoves++;
-                        if(poss_moves) poss_moves[nmoves] = (W_KNIGHT << 16)|(dest << 8) | orig;
-                        nmoves++;
-                        if(poss_moves) poss_moves[nmoves] = (W_ROOK << 16) | (dest << 8) | orig;
-                        nmoves++;
-                        if(poss_moves) poss_moves[nmoves] = (W_BISHOP << 16) | (dest << 8) | orig;
-                        nmoves++;
-                    }else{
-                        if(poss_moves) poss_moves[nmoves] = (dest << 8)  | orig;
-                        nmoves++;
-                    }
+            }else if(GET_COLOR(board.squares[dest]) == BLACK_COLOR){
+                if(ROW(dest) == EIGHT_ROW){
+                    if(poss_moves) poss_moves[nmoves] = (W_QUEEN << 16) | (dest << 8) | orig;
+                    nmoves++;
+                    if(poss_moves) poss_moves[nmoves] = (W_KNIGHT << 16)|(dest << 8) | orig;
+                    nmoves++;
+                    if(poss_moves) poss_moves[nmoves] = (W_ROOK << 16) | (dest << 8) | orig;
+                    nmoves++;
+                    if(poss_moves) poss_moves[nmoves] = (W_BISHOP << 16) | (dest << 8) | orig;
+                    nmoves++;
+                }else{
+                    if(poss_moves) poss_moves[nmoves] = (dest << 8)  | orig;
+                    nmoves++;
                 }
             }
         }
@@ -199,21 +197,19 @@ int BlackPawnMoves(unsigned char orig, move *poss_moves, int nmoves)
                     if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
                     nmoves++;
                 }
-            }else{
-                if(GET_COLOR(board.squares[dest])){
-                    if(ROW(dest) == FIRST_ROW){
-                        if(poss_moves) poss_moves[nmoves] = (B_QUEEN << 16) | (dest << 8) | orig;    
-                        nmoves++;
-                        if(poss_moves) poss_moves[nmoves] = (B_KNIGHT << 16)|(dest << 8) | orig;
-                        nmoves++;
-                        if(poss_moves) poss_moves[nmoves] = (B_ROOK << 16) | (dest << 8) | orig;
-                        nmoves++;
-                        if(poss_moves) poss_moves[nmoves] = (B_BISHOP << 16) | (dest << 8) | orig;
-                        nmoves++;
-                    }else{
-                        if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
-                        nmoves++;
-                    }
+            }else if(GET_COLOR(board.squares[dest])){
+                if(ROW(dest) == FIRST_ROW){
+                    if(poss_moves) poss_moves[nmoves] = (B_QUEEN << 16) | (dest << 8) | orig;    
+                    nmoves++;
+                    if(poss_moves) poss_moves[nmoves] = (B_KNIGHT << 16)|(dest << 8) | orig;
+                    nmoves++;
+                    if(poss_moves) poss_moves[nmoves] = (B_ROOK << 16) | (dest << 8) | orig;
+                    nmoves++;
+                    if(poss_moves) poss_moves[nmoves] = (B_BISHOP << 16) | (dest << 8) | orig;
+                    nmoves++;
+                }else{
+                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                    nmoves++;
                 }
             }
         }
@@ -221,26 +217,18 @@ int BlackPawnMoves(unsigned char orig, move *poss_moves, int nmoves)
     return nmoves;
 }
 
-int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, move* poss_moves, int nmoves)
+int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, move *poss_moves, int nmoves)
 {
-    unsigned char dest;
     for(int i = 0; delta[i]; i++){
-        dest = orig + delta[i];
-        while(1){
-            if(IN_BOARD(dest)){
-                if(board.squares[dest] == EMPTY){
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
-                    nmoves++;
-                    dest += delta[i];
-                }else{
-                    /*Different color Piece, capture, stop sliding:*/
-                    if(GET_COLOR(board.squares[dest]) != piece_color){
-                        if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
-                        nmoves++;
-                        break;
-                    }else break;        /*same color piece, stop sliding.*/
-                }
-            }else break;    /*Out of Board, stop sliding.*/
+        for(unsigned char dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){
+            if(board.squares[dest] == EMPTY){
+                if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                nmoves++;
+            }else if(GET_COLOR(board.squares[dest]) != piece_color) {  /*Different color Piece, capture, stop sliding.*/
+                if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                nmoves++;
+                break;
+            }else break;        /*same color piece, stop sliding.*/
         }
     }
     return nmoves;
@@ -248,18 +236,15 @@ int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, 
 
 int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_color, move *poss_moves, int nmoves)
 {
-    unsigned char dest;
     for(int i = 0; delta[i]; i++){
-        dest = orig + delta[i];
+        unsigned char dest = orig + delta[i];
         if(IN_BOARD(dest)){
             if(board.squares[dest] == EMPTY){
                 if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
                 nmoves++;
-            }else{
-                if(GET_COLOR(board.squares[dest]) != piece_color){
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
-                    nmoves++;
-                }
+            }else if(GET_COLOR(board.squares[dest]) != piece_color){
+                if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                nmoves++;
             }
         }
     }
@@ -268,18 +253,17 @@ int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_colo
 
 int GenerateWhiteCastle(move* poss_moves, int nmoves)
 {
-    unsigned char dest;
     if(board.wk_castle && board.squares[0x07] == W_ROOK && board.squares[0x06] == EMPTY
             && board.squares[0x05] == EMPTY && !WhiteInCheck()
             && !IsAttacked(0x05, BLACK_COLOR)){
-        dest = 0x06;
+        unsigned char dest = 0x06;
         if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x04;
         nmoves++;
     }
     if(board.wq_castle && board.squares[0x00] == W_ROOK &&board.squares[0x01] == EMPTY
             && board.squares[0x02] == EMPTY && board.squares[0x03] == EMPTY
             && !WhiteInCheck() && !IsAttacked(0x03, BLACK_COLOR)){
-        dest = 0x02;
+        unsigned char dest = 0x02;
         if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x04;
         nmoves++;
     }
@@ -288,18 +272,17 @@ int GenerateWhiteCastle(move* poss_moves, int nmoves)
 
 int GenerateBlackCastle(move* poss_moves, int nmoves)
 {
-    unsigned char dest;
     if(board.bk_castle && board.squares[0x77] == B_ROOK &&board.squares[0x76] == EMPTY
             && board.squares[0x75] == EMPTY && !BlackInCheck() &&
             !IsAttacked(0x75, WHITE_COLOR)){
-        dest = 0x76;
+        unsigned char dest = 0x76;
         if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x74;
         nmoves++;
     }
     if(board.bq_castle && board.squares[0x70] == B_ROOK &&board.squares[0x71] == EMPTY
             && board.squares[0x72] == EMPTY && board.squares[0x73] == EMPTY
             && !BlackInCheck() && !IsAttacked(0x73, WHITE_COLOR)){
-        dest = 0x72;
+        unsigned char dest = 0x72;
         if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x74;
         nmoves++;
     }

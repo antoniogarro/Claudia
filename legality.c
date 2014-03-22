@@ -47,7 +47,7 @@ char IsLegal(move *curr_move)
             Takeback(*curr_move);
         }
     }
-return 0;
+    return 0;
 }
 
 int Perft(const int depth)
@@ -56,7 +56,7 @@ int Perft(const int depth)
     int nposs_movs = 0;
     move poss_moves [100];
     
-    if(depth > 0){
+    if(depth > 1){
         nposs_movs = MoveGen(poss_moves);
         for(int i = 0; i < nposs_movs; i++){
             MakeMove(&poss_moves[i]);

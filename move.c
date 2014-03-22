@@ -53,10 +53,10 @@ void MakeMove(move *curr_move)
     if(board.squares[dest]){
         *curr_move |= (board.squares[dest] << 20);
         board.rev_plies[board.ply] = 0;
-    }
-    else{
+    }else{
         board.rev_plies[board.ply] = board.rev_plies[board.ply-1]+1;    
     }
+    
     switch (board.squares[orig]){
         case W_PAWN:
             if(ROW(dest) == EIGHT_ROW){            /*Promotion*/
@@ -79,8 +79,7 @@ void MakeMove(move *curr_move)
             if(ROW(dest) == FIRST_ROW){
                 DropPiece(dest, TURN_BLACK(promoted));
                 board.en_passant = 0xF;
-            }
-            else{
+            }else{
                 DropPiece(dest, B_PAWN);
                 if(ROW(dest) == FIFTH_ROW && ROW(orig) == SEVENTH_ROW){
                     board.en_passant = dest + ROW_UP;
@@ -209,13 +208,11 @@ void Takeback(const move prev_move)
                         DropPiece(h1, W_ROOK);
                         board.wk_castle = 1;
                         board.w_castled = 0;
-                    }else{
-                        if(dest == c1){            /*Long castle.*/
-                            RemovePiece(d1);
-                            DropPiece(a1, W_ROOK);
-                            board.wq_castle = 1;
-                            board.w_castled = 0;
-                        }
+                    }else if(dest == c1){            /*Long castle.*/
+                        RemovePiece(d1);
+                        DropPiece(a1, W_ROOK);
+                        board.wq_castle = 1;
+                        board.w_castled = 0;
                     }
                     if(promoted == Q_CASTLE_RIGHT || promoted == BOTH_CASTLES){
                         board.wq_castle = 1;
@@ -235,13 +232,11 @@ void Takeback(const move prev_move)
                         DropPiece(h8, B_ROOK);
                         board.bk_castle = 1;
                         board.b_castled = 0;
-                    }else{
-                        if(dest == c8){
-                            RemovePiece(d8);
-                            DropPiece(a8, B_ROOK);
-                            board.bq_castle = 1;
-                            board.b_castled = 0;
-                        }
+                    }else if(dest == c8){
+                        RemovePiece(d8);
+                        DropPiece(a8, B_ROOK);
+                        board.bq_castle = 1;
+                        board.b_castled = 0;
                     }
                     if(promoted == Q_CASTLE_RIGHT || promoted == BOTH_CASTLES){
                         board.bq_castle = 1;
@@ -257,13 +252,11 @@ void Takeback(const move prev_move)
                     if(promoted == Q_CASTLE_RIGHT){
                         board.wq_castle = 1;
                         DropPiece(orig, W_ROOK);
+                    }else if(promoted == K_CASTLE_RIGHT){
+                        board.wk_castle = 1;
+                        DropPiece(orig, W_ROOK);
                     }else{
-                        if(promoted == K_CASTLE_RIGHT){
-                            board.wk_castle = 1;
-                            DropPiece(orig, W_ROOK);
-                        }else{
-                            DropPiece(orig, W_PAWN);
-                        }
+                        DropPiece(orig, W_PAWN);
                     }
                 }else{
                     DropPiece(orig, W_ROOK);
@@ -275,13 +268,11 @@ void Takeback(const move prev_move)
                     if(promoted == Q_CASTLE_RIGHT){
                         board.bq_castle = 1;
                         DropPiece(orig, B_ROOK);
-                    }else{
-                        if(promoted == K_CASTLE_RIGHT){
-                            board.bk_castle = 1;
-                            DropPiece(orig, B_ROOK);
-                        }else{                
-                            DropPiece(orig, B_PAWN);
-                        }
+                    }else if(promoted == K_CASTLE_RIGHT){
+                        board.bk_castle = 1;
+                        DropPiece(orig, B_ROOK);
+                    }else{                
+                        DropPiece(orig, B_PAWN);
                     }
                 }else{
                     DropPiece(orig, B_ROOK);
