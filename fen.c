@@ -110,5 +110,6 @@ int ReadFEN(const char *sFEN)
     /*TODO: halfmoves and moves.*/
     board.ply = 0;
     InitZobrist();
+    InitMaterial();
     return fen_pos;
 }

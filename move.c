@@ -295,13 +295,32 @@ void Takeback(const move prev_move)
 
 void RemovePiece(unsigned char sq)
 {
-    board.zobrist_key ^= zobkeys.zob_pieces[board.squares[sq]][sq];
+    unsigned char p = board.squares[sq];
+    board.zobrist_key ^= zobkeys.zob_pieces[p][sq];
+    if(p == W_PAWN || p == B_PAWN){
+        board.pawn_material[GET_COLOR(p) >> 3] -= Value(p);
+    }else if(p != EMPTY){
+        board.piece_material[GET_COLOR(p) >> 3] -= Value(p);
+    }
     board.squares[sq] = EMPTY;
 }
 
 void DropPiece(unsigned char sq, unsigned char piece)
 {
-    board.zobrist_key ^= zobkeys.zob_pieces[board.squares[sq]][sq];
+    unsigned char p = board.squares[sq];
+    board.zobrist_key ^= zobkeys.zob_pieces[p][sq];
     board.zobrist_key ^= zobkeys.zob_pieces[piece][sq];
+    
+    if(p == W_PAWN || p == B_PAWN){
+        board.pawn_material[GET_COLOR(p) >> 3] -= Value(p);
+    }else if(p != EMPTY){
+        board.piece_material[GET_COLOR(p) >> 3] -= Value(p);
+    }
+    
+    if(piece == W_PAWN || piece == B_PAWN){
+        board.pawn_material[GET_COLOR(piece) >> 3] += Value(piece);
+    }else if(piece != EMPTY){
+        board.piece_material[GET_COLOR(piece) >> 3] += Value(piece);
+    }
     board.squares[sq] = piece;
 }

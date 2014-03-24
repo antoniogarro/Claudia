@@ -215,7 +215,7 @@ int Quiescent(int alpha, const int beta)
 }
 
 /*This only works because the replacement scheme ensures shallow PV is not overwritten,
-and may fail if the hash table is full. TODO: ensure the best move is stored.*/
+and may fail if the hash table is full.*/
 int RetrievePV(move *PV, const unsigned int depth)
 {
     unsigned int PVlen = 0;

@@ -46,6 +46,8 @@ struct BOARD {
     int rev_plies [500];
     unsigned long long zobrist_key;
     unsigned long long zobrist_history[500];
+    unsigned int piece_material[2];
+    unsigned int pawn_material[2];
 };
 extern struct BOARD board;
 
@@ -59,6 +61,7 @@ extern struct ZOBKEYS zobkeys;
 
 void InitBoard();
 void InitZobrist();
+void InitMaterial();
 
 int ReadFEN(const char*);
 void PrintBoard();

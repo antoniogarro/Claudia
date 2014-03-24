@@ -55,6 +55,8 @@ void InitBoard()
     board.wq_castle = 0;
     board.bq_castle = 0;
     board.en_passant = 0x0F;        /*Invalid square, as there's no en passant pawn initialy.*/
+    board.pawn_material[0] = 0, board.pawn_material[1] = 0;
+    board.piece_material[0] = 0, board.piece_material[1] = 0;
 }
 
 void InitZobrist()
@@ -72,6 +74,22 @@ void InitZobrist()
     if(board.white_to_move) board.zobrist_key ^= zobkeys.zob_side;
 }
 
+void InitMaterial()
+{
+    board.pawn_material[0] = 0, board.pawn_material[1] = 0;
+    board.piece_material[0] = 0, board.piece_material[1] = 0;
+    for (int i = 0; i<128; i++){
+        unsigned char p = board.squares[i];
+        if(IN_BOARD(i) && p != EMPTY){
+            if(TURN_WHITE(p) == W_PAWN){
+                board.pawn_material[GET_COLOR(p) >> 3] += Value(p);
+            }else{
+                board.piece_material[GET_COLOR(p) >> 3] += Value(p);
+            }
+        }
+    }
+}
+
 void PrintBoard()
 {
     printf("\n+--+--+--+--+--+--+--+--+     %c %i%i\n",
@@ -86,4 +104,6 @@ void PrintBoard()
     }
     printf("                                %i%i   Zobrist: %Lu\n",
             board.wq_castle, board.wk_castle, board.zobrist_key);
+    printf("Material: W: %i %i; B: %i %i\n", board.piece_material[1], board.pawn_material[1],
+                                             board.piece_material[0], board.pawn_material[0]);
 }
