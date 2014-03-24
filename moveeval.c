@@ -31,7 +31,7 @@
 #include "claudia.h"
 #include "board.h"
 
-int SEE(move* main_capture)
+int SEE(move *main_capture)
 {
     unsigned char dest = (*main_capture & 0xFFFF) >> 8;
     unsigned char captured, sq;
@@ -76,30 +76,55 @@ int SEE(move* main_capture)
     return val;
 }
 
-void SortMoves(move *moves, const int nmoves)
+void SortMoves(move *moves, int nmoves)
 {
     int eval[200];
-    move temp;
-    int curr_eval;
     move hash_move = GetHashMove(board.zobrist_key);
     /*Evaluate every move, store evaluations:*/
-    for(int i = 0; i < nmoves; i++) eval[i] = EvaluateMove(&moves[i], hash_move);
-    
-    /*Order according to that evaluation:*/
     for(int i = 0; i < nmoves; i++){
-        curr_eval = eval[i];
-        for(int j = i; j < nmoves; j++){
-            if(eval[j] > curr_eval){
-                temp = moves[i];
-                moves[i] = moves[j];
-                moves[j] = temp;
-                curr_eval = eval[j];
-                eval[j] = eval[i];
-
-            }
+        eval[i] = EvaluateMove(&moves[i], hash_move);
+    }
+    
+    /*Order according to that evaluation: insertion sort*/
+    for(int i = 1; i < nmoves; i++){
+        for(int j = i; j > 0 && (eval[j-1] < eval[j]); j--){            
+            move tmp = moves[j-1];
+            moves[j-1] = moves[j];
+            moves[j] = tmp;
+            
+            int ev = eval[j-1];
+            eval[j-1] = eval[j];
+            eval[j] = ev;
         }
     }
-    /*TODO: qsort();*/
+}
+
+int FilterWinning(move *captures, int ncapts)
+{
+    int good_capts = 0;
+    int eval[200];
+   
+    /*evaluate every move, store evaluations:*/
+    for(int i = 0; i < ncapts; i++){
+        eval[i] = SEE(&captures[i]);
+    }
+    for(int i = 1; i < ncapts; i++){
+        for(int j = i; j > 0 && (eval[j-1] < eval[j]); j--){
+            move tmp = captures[j-1];
+            captures[j-1] = captures[j];
+            captures[j] = tmp;
+            
+            int ev = eval[j-1];
+            eval[j-1] = eval[j];
+            eval[j] = ev;
+        }
+    }
+
+    /*Store the number of 'good' captures:*/
+    for(int i = 0; i < ncapts && eval[i] > 0; i++){
+        good_capts++;
+    }
+    return good_capts;
 }
 
 int EvaluateMove(move *curr_move, const move hash_move)
@@ -112,39 +137,6 @@ int EvaluateMove(move *curr_move, const move hash_move)
     unsigned char dest = (*curr_move & 0xFFFF) >> 8;
     if(board.squares[dest] != EMPTY) return SEE(curr_move);
     else return 0;        /*TODO: evaluate non-captures.*/
-}
-
-int FilterWinning(move *captures, int ncapts)
-{
-    int good_capts = ncapts;
-    int eval[200];
-    move temp;
-    int curr_eval;
-    
-    /*evaluate every move, store evaluations:*/
-    for(int i = 0; i < ncapts; i++){
-        eval[i] = SEE(&captures[i]);
-    }
-    /*Store the number of 'good' captures:*/
-    for(int i = 0; i < ncapts; i++){
-        if(eval[i] <= 0){
-            /*captures[i] = 0; Shouldn't be here.*/
-            good_capts--;
-        }
-    }
-    for(int i = 0; i < ncapts; i++){
-        curr_eval = eval[i];
-        for(int j = i; j < ncapts; j++){
-            if(eval[j] > curr_eval){
-                temp = captures[i];
-                captures[i] = captures[j];
-                captures[j] = temp;
-                curr_eval = eval[j];
-                eval[j] = eval[i];
-            }
-        }
-    }
-    return good_capts;
 }
 
 int Value(unsigned char piece)
