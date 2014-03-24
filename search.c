@@ -120,13 +120,21 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
         if(val != ERRORVALUE){
             return val;
         }
+        if(root == 0 && depth > 2 && board.piece_material[board.white_to_move] != 0
+                && !InCheck(checking_sqs)){
+            move null_mv = 0xFFFF;
+            MakeMove(&null_mv);
+            val = -AlphaBeta(depth-3, -beta, -beta+1, -1);
+            Takeback(null_mv);
+            if(val >= beta) return beta;
+        }
         nposs_movs = MoveGen(poss_moves, 1);
         SortMoves(poss_moves, nposs_movs);
         for(int i = 0; i < nposs_movs; i++){
             MakeMove(&poss_moves[i]);
             control.node_count++;
             if(!LeftInCheck()){
-                if(root && depth > 6){
+                if(root== 1 && depth > 6){
                     MoveToAlgeb(poss_moves[i], str_mov);
                     printf("info depth %i hashfull %i currmove %s currmovenumber %i\n",
                         depth, hash_table.full/(hash_table.size/1000), str_mov, i+1);
@@ -158,7 +166,7 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
                     best_move = poss_moves[i];
                     if(root == 1) control.best_move = best_move;
                 }
-                if(root==1 && ((clock() - control.init_time) > control.wish_time*CPMS)){
+                if(root == 1 && ((clock() - control.init_time) > control.wish_time*CPMS)){
                 /*don't search anymore after current move; TODO: continue if fails low?*/
                     control.max_depth = depth;
                     return alpha;
