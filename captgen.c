@@ -162,7 +162,7 @@ int BlackPawnCaptures(unsigned char orig, move *captures, int ncapts)
     return ncapts;
 }
 
-int SlidingCaptures(unsigned char orig, const char *delta, unsigned char piece_color, move* captures, int ncapts)
+int SlidingCaptures(unsigned char orig, const char *delta, unsigned char piece_color, move *captures, int ncapts)
 {
     for(int i = 0; delta[i]; i++){
         for(unsigned char dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){

@@ -53,7 +53,7 @@ typedef struct{
 } HashData;
 
 struct HASHTABLE{
-    HashData* entries;
+    HashData *entries;
     unsigned int size;
     unsigned int full;
 };

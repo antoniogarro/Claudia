@@ -51,6 +51,7 @@ struct CONTROL {
     unsigned int max_depth;
     unsigned long long node_count;
     char uci, stop;
+    move best_move;
 };
 extern struct CONTROL control;
 

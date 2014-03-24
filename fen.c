@@ -32,7 +32,7 @@
 #include "board.h"
 #include "engine.h"
 
-int ReadFEN(const char* sFEN)
+int ReadFEN(const char *sFEN)
 {    /*TODO: check FEN validity.*/
     unsigned char fen_pos = 0;
     unsigned char square = 0x70;

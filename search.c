@@ -74,8 +74,8 @@ void IterativeDeep()
             MoveToAlgeb(iPV[i], str_mov);
             strcat(sPV, str_mov);
         }
-        strncpy(str_mov, sPV, 5);
-        str_mov[5] = 0;
+        MoveToAlgeb(control.best_move, str_mov);
+        //str_mov[5] = 0;
 
         curr_time = (unsigned long long)((clock() - curr_time)/CPMS);
         if(curr_time){
@@ -156,8 +156,9 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
                     alpha = val;
                     hash_flag = HASH_EXACT;
                     best_move = poss_moves[i];
+                    if(root == 1) control.best_move = best_move;
                 }
-                if(root && ((clock() - control.init_time) > control.wish_time*CPMS)){
+                if(root==1 && ((clock() - control.init_time) > control.wish_time*CPMS)){
                 /*don't search anymore after current move; TODO: continue if fails low?*/
                     control.max_depth = depth;
                     return alpha;

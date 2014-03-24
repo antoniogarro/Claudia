@@ -251,7 +251,7 @@ int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_colo
     return nmoves;
 }
 
-int GenerateWhiteCastle(move* poss_moves, int nmoves)
+int GenerateWhiteCastle(move *poss_moves, int nmoves)
 {
     if(board.wk_castle && board.squares[0x07] == W_ROOK && board.squares[0x06] == EMPTY
             && board.squares[0x05] == EMPTY && !WhiteInCheck()
@@ -270,7 +270,7 @@ int GenerateWhiteCastle(move* poss_moves, int nmoves)
     return nmoves;
 }
 
-int GenerateBlackCastle(move* poss_moves, int nmoves)
+int GenerateBlackCastle(move *poss_moves, int nmoves)
 {
     if(board.bk_castle && board.squares[0x77] == B_ROOK &&board.squares[0x76] == EMPTY
             && board.squares[0x75] == EMPTY && !BlackInCheck() &&

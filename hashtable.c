@@ -91,7 +91,7 @@ move GetHashMove(unsigned long long zob_key)
 int GetHashEval(unsigned long long zob_key, int depth, int alpha, int beta)
 {
     int key = zob_key%hash_table.size;
-    const HashData* entry = &hash_table.entries[key];
+    const HashData *entry = &hash_table.entries[key];
     if(entry->zobrist_key == zob_key && DEPTHMASK(entry->data) >= depth){
         int eval = EVALMASK(entry->data);
         char flag = FLAGMASK(entry->data);

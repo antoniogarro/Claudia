@@ -66,32 +66,32 @@ void PrintBoard();
 int MoveGen(move*);
 int CaptureGen(move*);
 
-int WhitePawnMoves(unsigned char, move *, int);
-int BlackPawnMoves(unsigned char, move *, int);
+int WhitePawnMoves(unsigned char, move*, int);
+int BlackPawnMoves(unsigned char, move*, int);
 int SlidingMoves(unsigned char, const char*, const char, move*, int);
-int NonSlidingMoves(unsigned char, const char *, const char, move *, int);
+int NonSlidingMoves(unsigned char, const char *, const char, move*, int);
 int GenerateWhiteCastle(move*, int);
 int GenerateBlackCastle(move*, int);
-int WhitePawnCaptures(unsigned char, move *, int);
-int BlackPawnCaptures(unsigned char, move *, int );
+int WhitePawnCaptures(unsigned char, move*, int);
+int BlackPawnCaptures(unsigned char, move*, int );
 int SlidingCaptures(unsigned char, const char *, unsigned char, move*, int);
-int NonSlidingCaptures(unsigned char, const char *, unsigned char, move *, int);
+int NonSlidingCaptures(unsigned char, const char *, unsigned char, move*, int);
 
 
 char IsAttacked(unsigned char, unsigned char);
-int AttackingPieces(unsigned char, unsigned char, unsigned char *);
+int AttackingPieces(unsigned char, unsigned char, unsigned char*);
 
-void MakeMove(move *);
+void MakeMove(move*);
 void Takeback(const move);
 void RemovePiece(unsigned char);
 void DropPiece(unsigned char, unsigned char);
-char IsLegal(move *);
+char IsLegal(move*);
 
 int Perft(const int);
-int SEE(move *);
-int EvaluateMove(move *, const move);
-void SortMoves(move *, const int);
-int FilterWinning(move *, const int);
+int SEE(move*);
+int EvaluateMove(move*, const move);
+void SortMoves(move*, int);
+int FilterWinning(move*, int);
 int Material();
 int StaticEval();
 int Value(unsigned char);

@@ -42,7 +42,7 @@ struct ZOBKEYS zobkeys;
 struct CONTROL control;
 struct HASHTABLE hash_table;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     InitBoard();
     if(AllocTable(TABLESIZE) == 0){
