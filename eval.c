@@ -87,36 +87,36 @@ int StaticEval()
 int PawnStaticVal(unsigned char sq, unsigned char color)
 {
     int val = PAWN_VALUE;
-    if(color) val += WhitePawnMoves(sq, 0, 0);
-    else val += BlackPawnMoves(sq, 0, 0);
+    if(color) val += WhitePawnMoves(sq, 0, 0, 1);
+    else val += BlackPawnMoves(sq, 0, 0, 1);
     return val;
 }
 
 int KnightStaticVal(unsigned char sq, unsigned char color)
 {
     int val = KNIGHT_VALUE;
-    val += N_MOBILITY_BONUS*NonSlidingMoves(sq, knight_delta, color, 0, 0);
+    val += N_MOBILITY_BONUS*NonSlidingMoves(sq, knight_delta, color, 0, 0, 1);
     return val;
 }
 
 int BishopStaticVal(unsigned char sq, unsigned char color)
 {
     int val = BISHOP_VALUE;
-    val += B_MOBILITY_BONUS*SlidingMoves(sq, bishop_delta, color, 0, 0);
+    val += B_MOBILITY_BONUS*SlidingMoves(sq, bishop_delta, color, 0, 0, 1);
     return val;
 }
 
 int RookStaticVal(unsigned char sq, unsigned char color)
 {
     int val = ROOK_VALUE;
-    val += R_MOBILITY_BONUS*SlidingMoves(sq, rook_delta, color, 0, 0);
+    val += R_MOBILITY_BONUS*SlidingMoves(sq, rook_delta, color, 0, 0, 1);
     return val;
 }
 
 int QueenStaticVal(unsigned char sq, unsigned char color)
 {
     int val = QUEEN_VALUE;
-    val += Q_MOBILITY_BONUS*SlidingMoves(sq, king_delta, color, 0, 0);
+    val += Q_MOBILITY_BONUS*SlidingMoves(sq, king_delta, color, 0, 0, 1);
     return val;
 }
 

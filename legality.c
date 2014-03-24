@@ -33,7 +33,7 @@
 char IsLegal(move *curr_move)
 {
     move poss_moves[100];
-    int nposs_movs = MoveGen(poss_moves);
+    int nposs_movs = MoveGen(poss_moves, 1);
     /*We only compare info about squares to decide legality, not captured piece or previous EP:*/
     move Squares = (*curr_move & 0xFFFF); 
     /*TODO: promoted.*/
@@ -57,7 +57,7 @@ int Perft(const int depth)
     move poss_moves [100];
     
     if(depth > 1){
-        nposs_movs = MoveGen(poss_moves);
+        nposs_movs = MoveGen(poss_moves, 1);
         for(int i = 0; i < nposs_movs; i++){
             MakeMove(&poss_moves[i]);
             if(board.white_to_move){
@@ -68,7 +68,7 @@ int Perft(const int depth)
             Takeback(poss_moves[i]);
         }
     }else{
-        nposs_movs = MoveGen(poss_moves);
+        nposs_movs = MoveGen(poss_moves, 1);
         for(int i = 0; i < nposs_movs; i++){
             MakeMove(&poss_moves[i]);
             if(board.white_to_move){

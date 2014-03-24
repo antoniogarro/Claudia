@@ -120,7 +120,7 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
         if(val != ERRORVALUE){
             return val;
         }
-        nposs_movs = MoveGen(poss_moves);
+        nposs_movs = MoveGen(poss_moves, 1);
         SortMoves(poss_moves, nposs_movs);
         for(int i = 0; i < nposs_movs; i++){
             MakeMove(&poss_moves[i]);

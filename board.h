@@ -63,20 +63,15 @@ void InitZobrist();
 int ReadFEN(const char*);
 void PrintBoard();
 
-int MoveGen(move*);
+int MoveGen(move*, char);
 int CaptureGen(move*);
 
-int WhitePawnMoves(unsigned char, move*, int);
-int BlackPawnMoves(unsigned char, move*, int);
-int SlidingMoves(unsigned char, const char*, const char, move*, int);
-int NonSlidingMoves(unsigned char, const char *, const char, move*, int);
+int WhitePawnMoves(unsigned char, move*, int, char);
+int BlackPawnMoves(unsigned char, move*, int, char);
+int SlidingMoves(unsigned char, const char*, const char, move*, int, char);
+int NonSlidingMoves(unsigned char, const char *, const char, move*, int, char);
 int GenerateWhiteCastle(move*, int);
 int GenerateBlackCastle(move*, int);
-int WhitePawnCaptures(unsigned char, move*, int);
-int BlackPawnCaptures(unsigned char, move*, int );
-int SlidingCaptures(unsigned char, const char *, unsigned char, move*, int);
-int NonSlidingCaptures(unsigned char, const char *, unsigned char, move*, int);
-
 
 char IsAttacked(unsigned char, unsigned char);
 int AttackingPieces(unsigned char, unsigned char, unsigned char*);
