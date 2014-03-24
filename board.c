@@ -80,7 +80,7 @@ void InitMaterial()
     board.piece_material[0] = 0, board.piece_material[1] = 0;
     for (int i = 0; i<128; i++){
         unsigned char p = board.squares[i];
-        if(IN_BOARD(i) && p != EMPTY){
+        if(IN_BOARD(i) && p != EMPTY && p != W_KING && p != B_KING){
             if(TURN_WHITE(p) == W_PAWN){
                 board.pawn_material[GET_COLOR(p) >> 3] += Value(p);
             }else{

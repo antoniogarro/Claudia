@@ -299,7 +299,7 @@ void RemovePiece(unsigned char sq)
     board.zobrist_key ^= zobkeys.zob_pieces[p][sq];
     if(p == W_PAWN || p == B_PAWN){
         board.pawn_material[GET_COLOR(p) >> 3] -= Value(p);
-    }else if(p != EMPTY){
+    }else if(p != EMPTY && p != W_KING && p != B_KING){
         board.piece_material[GET_COLOR(p) >> 3] -= Value(p);
     }
     board.squares[sq] = EMPTY;
@@ -313,13 +313,13 @@ void DropPiece(unsigned char sq, unsigned char piece)
     
     if(p == W_PAWN || p == B_PAWN){
         board.pawn_material[GET_COLOR(p) >> 3] -= Value(p);
-    }else if(p != EMPTY){
+    }else if(p != EMPTY && p != W_KING && p != B_KING){
         board.piece_material[GET_COLOR(p) >> 3] -= Value(p);
     }
     
     if(piece == W_PAWN || piece == B_PAWN){
         board.pawn_material[GET_COLOR(piece) >> 3] += Value(piece);
-    }else if(piece != EMPTY){
+    }else if(piece != EMPTY && piece != W_KING && piece != B_KING){
         board.piece_material[GET_COLOR(piece) >> 3] += Value(piece);
     }
     board.squares[sq] = piece;
