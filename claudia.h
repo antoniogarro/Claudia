@@ -32,32 +32,32 @@
 #define CLAUDIAH
 
 #define NAME  "Claudia"
-#define VERSION "0.1"
+#define VERSION "0.2"
 
+/*white pieces have last bit = 1; black or empty, = 0.*/
 #define EMPTY 0x0            //0000            
-#define W_PAWN 0x9            //1001            
-#define B_PAWN 0x1            //0001            
-#define W_KNIGHT 0xA        //1010        
-#define B_KNIGHT 0x2        //0010    
-#define W_BISHOP 0xB        //1011    
-#define B_BISHOP 0x3        //0011    
-#define W_ROOK 0xC            //1100    
-#define B_ROOK 0x4            //0100
-#define W_QUEEN 0xE            //1110
-#define B_QUEEN 0x6            //0110
-#define W_KING 0xF            //1111
-#define B_KING 0x7            //0111
-#define K_CASTLE_RIGHT 0x5    //0101
-#define Q_CASTLE_RIGHT 0x8    //1000
-#define BOTH_CASTLES 0xD    //1101
+#define W_PAWN 0x9           //1001            
+#define B_PAWN 0x1           //0001            
+#define W_KNIGHT 0xA         //1010        
+#define B_KNIGHT 0x2         //0010    
+#define W_BISHOP 0xB         //1011    
+#define B_BISHOP 0x3         //0011    
+#define W_ROOK 0xC           //1100    
+#define B_ROOK 0x4           //0100
+#define W_QUEEN 0xE          //1110
+#define B_QUEEN 0x6          //0110
+#define W_KING 0xF           //1111
+#define B_KING 0x7           //0111
+#define K_CASTLE_RIGHT 0x5   //0101
+#define Q_CASTLE_RIGHT 0x8   //1000
+#define BOTH_CASTLES 0xD     //1101
 
 #define WHITE_COLOR 0x8
 #define BLACK_COLOR 0x0
 #define TURN_BLACK(piece) (piece & 0x7)
 #define TURN_WHITE(piece) (piece | 0x8)
 #define BLACK_TO_COLOR(blackpiece, color) (blackpiece | color)
-#define GET_COLOR(piece) (piece & 0x8)            /*white pieces have last bit = 1; black or empty, = 0.*/
-/*#define EMPTY(square) (board.squares[square] == EMPTY)*/
+#define GET_COLOR(piece) (piece & 0x8)
 
 #define FIRST_ROW 0x00
 #define SECOND_ROW 0x10
@@ -127,7 +127,7 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 #define MATE_VALUE -100000
 #define HASHMOVE_VALUE 100000
 
-#define ERRORVALUE -2000000001
+#define ERRORVALUE -1000000001
 
 #define N_MOBILITY_BONUS 5
 #define B_MOBILITY_BONUS 4
@@ -144,7 +144,8 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 
 /*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED:bits 16-19,
 CAPTURED:bits 20-23, CASTLE RIGHTS, PAWN_EP:bits 24-31*/
-typedef unsigned int move;
+typedef unsigned int MOVE;
+#define SQSMASK(move)  (move & 0xFFFF)
 #define ORIGMASK(move) (move & 0xFF)
 #define DESTMASK(move) ((move & 0xFFFF) >> 8)
 #define PROMMASK(move) ((move & 0xFFFFF) >> 16)

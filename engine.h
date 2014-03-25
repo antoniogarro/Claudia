@@ -51,14 +51,14 @@ struct CONTROL {
     unsigned int max_depth;
     unsigned long long node_count;
     char uci, stop;
-    move best_move;
+    MOVE best_move;
 };
 extern struct CONTROL control;
 
 void IterativeDeep();
 int AlphaBeta(const unsigned int, int, const int, const int);
 int Quiescent(int, const int);
-int RetrievePV(move*, const unsigned int);
+int RetrievePV(MOVE*, const unsigned int);
 
 int ParseCommand(const char*);
 int Command(const char *);

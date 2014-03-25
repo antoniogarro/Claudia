@@ -35,7 +35,7 @@
 'MakeMove()' modifies curr_move to update information depending on the position (captured, catle, EP...).
 'MakeMove()' does NOT verify legality!
 */
-void MakeMove(move *curr_move)
+void MakeMove(MOVE *curr_move)
 {
     unsigned char orig = ORIGMASK(*curr_move);
     unsigned char dest = DESTMASK(*curr_move);
@@ -176,7 +176,7 @@ void MakeMove(move *curr_move)
 
 }
 
-void Takeback(const move prev_move)
+void Takeback(const MOVE prev_move)
 {
     unsigned char orig = ORIGMASK(prev_move);
     unsigned char dest = DESTMASK(prev_move);

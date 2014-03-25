@@ -31,13 +31,17 @@
 #include "claudia.h"
 #include "board.h"
 
+MOVE Move(unsigned char piece, unsigned char dest, unsigned char orig)
+{
+    return (piece << 16) | (dest << 8) | orig;
+}
 
-int CaptureGen(move *poss_moves)
+int CaptureGen(MOVE *poss_moves)
 {
     return MoveGen(poss_moves, 0);
 }
 
-int MoveGen(move *poss_moves, char noncaptures)
+int MoveGen(MOVE *poss_moves, char noncaptures)
 {
     int nmoves = 0;
     if(board.white_to_move){
@@ -65,7 +69,7 @@ int MoveGen(move *poss_moves, char noncaptures)
 
                 case W_KING:
                     nmoves = NonSlidingMoves(orig, king_delta, WHITE_COLOR, poss_moves, nmoves, noncaptures);
-                    if(orig == 0x04 && noncaptures){
+                    if(orig == e1 && noncaptures){
                         nmoves = GenerateWhiteCastle(poss_moves, nmoves);
                     }
                     break;
@@ -99,7 +103,7 @@ int MoveGen(move *poss_moves, char noncaptures)
 
                 case B_KING:
                     nmoves = NonSlidingMoves(orig, king_delta, BLACK_COLOR, poss_moves, nmoves, noncaptures);
-                    if(orig == 0x74 && noncaptures){
+                    if(orig == e8 && noncaptures){
                         nmoves = GenerateBlackCastle(poss_moves, nmoves);
                     }
                     break;
@@ -114,26 +118,26 @@ int MoveGen(move *poss_moves, char noncaptures)
 }
 
 /*TODO: merge White and Black pawns generators?*/
-int WhitePawnMoves(unsigned char orig, move *poss_moves, int nmoves, char noncaptures)
+int WhitePawnMoves(unsigned char orig, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     unsigned char dest = orig + ROW_UP;
     if(noncaptures && IN_BOARD(dest) && board.squares[dest] == EMPTY){
         if(ROW(dest) == EIGHT_ROW){            /*Promotions.*/
-            if(poss_moves) poss_moves[nmoves] = (W_QUEEN << 16) | (dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(W_QUEEN, dest, orig);
             nmoves++;
-            if(poss_moves) poss_moves[nmoves] = (W_KNIGHT << 16)|(dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(W_KNIGHT, dest, orig);
             nmoves++;
-            if(poss_moves) poss_moves[nmoves] = (W_ROOK << 16) | (dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(W_ROOK, dest, orig);
             nmoves++;
-            if(poss_moves) poss_moves[nmoves] = (W_BISHOP << 16) | (dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(W_BISHOP, dest, orig);
             nmoves++;
         }else{
-            if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
             nmoves++;
             if(ROW(dest) == THIRD_ROW){
                 dest = dest + ROW_UP;
                 if(IN_BOARD(dest) && board.squares[dest] == EMPTY){
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
             }
@@ -144,21 +148,21 @@ int WhitePawnMoves(unsigned char orig, move *poss_moves, int nmoves, char noncap
         if(IN_BOARD(dest)){
             if(board.squares[dest] == EMPTY){
                 if(dest == board.en_passant){        /*Captures en Passant.*/
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
             }else if(GET_COLOR(board.squares[dest]) == BLACK_COLOR){
                 if(ROW(dest) == EIGHT_ROW){
-                    if(poss_moves) poss_moves[nmoves] = (W_QUEEN << 16) | (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(W_QUEEN, dest, orig);
                     nmoves++;
-                    if(poss_moves) poss_moves[nmoves] = (W_KNIGHT << 16)|(dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(W_KNIGHT, dest, orig);
                     nmoves++;
-                    if(poss_moves) poss_moves[nmoves] = (W_ROOK << 16) | (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(W_ROOK, dest, orig);
                     nmoves++;
-                    if(poss_moves) poss_moves[nmoves] = (W_BISHOP << 16) | (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(W_BISHOP, dest, orig);
                     nmoves++;
                 }else{
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8)  | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
             }
@@ -167,27 +171,27 @@ int WhitePawnMoves(unsigned char orig, move *poss_moves, int nmoves, char noncap
     return nmoves;
 }
 
-int BlackPawnMoves(unsigned char orig, move *poss_moves, int nmoves, char noncaptures)
+int BlackPawnMoves(unsigned char orig, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     unsigned char dest = orig + ROW_DOWN;
     if(noncaptures && IN_BOARD(dest) && board.squares[dest] == EMPTY){
         if(ROW(dest) == FIRST_ROW){
-            if(poss_moves) poss_moves[nmoves] = (B_QUEEN << 16) | (dest << 8) | orig;    
+            if(poss_moves) poss_moves[nmoves] = Move(B_QUEEN, dest, orig);
             nmoves++;
-            if(poss_moves) poss_moves[nmoves] = (B_KNIGHT << 16)|(dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(B_KNIGHT, dest, orig);
             nmoves++;
-            if(poss_moves) poss_moves[nmoves] = (B_ROOK << 16) | (dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(B_ROOK, dest, orig);
             nmoves++;
-            if(poss_moves) poss_moves[nmoves] = (B_BISHOP << 16) | (dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(B_BISHOP, dest, orig);
             nmoves++;
         }else{
-            if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+            if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
             nmoves++;
             if(ROW(dest) == SIXTH_ROW){
                 dest = dest + ROW_DOWN;
                 if(IN_BOARD(dest)){
                     if(board.squares[dest] == EMPTY){
-                        if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                        if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                         nmoves++;
                     }
                 }
@@ -199,21 +203,21 @@ int BlackPawnMoves(unsigned char orig, move *poss_moves, int nmoves, char noncap
         if(IN_BOARD(dest)){
             if(board.squares[dest] == EMPTY){
                 if(dest == board.en_passant){
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
             }else if(GET_COLOR(board.squares[dest])){
                 if(ROW(dest) == FIRST_ROW){
-                    if(poss_moves) poss_moves[nmoves] = (B_QUEEN << 16) | (dest << 8) | orig;    
+                    if(poss_moves) poss_moves[nmoves] = Move(B_QUEEN, dest, orig);   
                     nmoves++;
-                    if(poss_moves) poss_moves[nmoves] = (B_KNIGHT << 16)|(dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(B_KNIGHT, dest, orig);
                     nmoves++;
-                    if(poss_moves) poss_moves[nmoves] = (B_ROOK << 16) | (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(B_ROOK, dest, orig);
                     nmoves++;
-                    if(poss_moves) poss_moves[nmoves] = (B_BISHOP << 16) | (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(B_BISHOP, dest, orig);
                     nmoves++;
                 }else{
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
             }
@@ -222,17 +226,17 @@ int BlackPawnMoves(unsigned char orig, move *poss_moves, int nmoves, char noncap
     return nmoves;
 }
 
-int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, move *poss_moves, int nmoves, char noncaptures)
+int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
         for(unsigned char dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){
             if(board.squares[dest] == EMPTY){
                 if(noncaptures){
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
             }else if(GET_COLOR(board.squares[dest]) != piece_color) {  /*Different color Piece, capture, stop sliding.*/
-                if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                 nmoves++;
                 break;
             }else break;        /*same color piece, stop sliding.*/
@@ -241,18 +245,18 @@ int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, 
     return nmoves;
 }
 
-int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_color, move *poss_moves, int nmoves, char noncaptures)
+int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
         unsigned char dest = orig + delta[i];
         if(IN_BOARD(dest)){
             if(board.squares[dest] == EMPTY){
                 if(noncaptures){
-                    if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                    if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
             }else if(GET_COLOR(board.squares[dest]) != piece_color){
-                if(poss_moves) poss_moves[nmoves] = (dest << 8) | orig;
+                if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                 nmoves++;
             }
         }
@@ -260,39 +264,35 @@ int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_colo
     return nmoves;
 }
 
-int GenerateWhiteCastle(move *poss_moves, int nmoves)
+int GenerateWhiteCastle(MOVE *poss_moves, int nmoves)
 {
-    if(board.wk_castle && board.squares[0x07] == W_ROOK && board.squares[0x06] == EMPTY
-            && board.squares[0x05] == EMPTY && !WhiteInCheck()
-            && !IsAttacked(0x05, BLACK_COLOR)){
-        unsigned char dest = 0x06;
-        if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x04;
+    if(board.wk_castle && board.squares[h1] == W_ROOK && board.squares[g1] == EMPTY
+            && board.squares[f1] == EMPTY && !WhiteInCheck()
+            && !IsAttacked(f1, BLACK_COLOR)){
+        if(poss_moves) poss_moves[nmoves] = Move(0, g1, e1);
         nmoves++;
     }
-    if(board.wq_castle && board.squares[0x00] == W_ROOK &&board.squares[0x01] == EMPTY
-            && board.squares[0x02] == EMPTY && board.squares[0x03] == EMPTY
-            && !WhiteInCheck() && !IsAttacked(0x03, BLACK_COLOR)){
-        unsigned char dest = 0x02;
-        if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x04;
+    if(board.wq_castle && board.squares[a1] == W_ROOK &&board.squares[b1] == EMPTY
+            && board.squares[c1] == EMPTY && board.squares[d1] == EMPTY
+            && !WhiteInCheck() && !IsAttacked(d1, BLACK_COLOR)){
+        if(poss_moves) poss_moves[nmoves] = Move(0, c1, e1);
         nmoves++;
     }
     return nmoves;
 }
 
-int GenerateBlackCastle(move *poss_moves, int nmoves)
+int GenerateBlackCastle(MOVE *poss_moves, int nmoves)
 {
-    if(board.bk_castle && board.squares[0x77] == B_ROOK &&board.squares[0x76] == EMPTY
-            && board.squares[0x75] == EMPTY && !BlackInCheck() &&
-            !IsAttacked(0x75, WHITE_COLOR)){
-        unsigned char dest = 0x76;
-        if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x74;
+    if(board.bk_castle && board.squares[h8] == B_ROOK &&board.squares[g8] == EMPTY
+            && board.squares[f8] == EMPTY && !BlackInCheck() &&
+            !IsAttacked(f8, WHITE_COLOR)){
+        if(poss_moves) poss_moves[nmoves] = Move(0, g8, e8);
         nmoves++;
     }
-    if(board.bq_castle && board.squares[0x70] == B_ROOK &&board.squares[0x71] == EMPTY
-            && board.squares[0x72] == EMPTY && board.squares[0x73] == EMPTY
-            && !BlackInCheck() && !IsAttacked(0x73, WHITE_COLOR)){
-        unsigned char dest = 0x72;
-        if(poss_moves) poss_moves[nmoves] = (dest << 8) | 0x74;
+    if(board.bq_castle && board.squares[a8] == B_ROOK &&board.squares[b8] == EMPTY
+            && board.squares[c8] == EMPTY && board.squares[d8] == EMPTY
+            && !BlackInCheck() && !IsAttacked(d8, WHITE_COLOR)){
+        if(poss_moves) poss_moves[nmoves] = Move(0, c8, e8);
         nmoves++;
     }
     return nmoves;

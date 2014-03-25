@@ -50,7 +50,7 @@ static int AssesDraw()
 void IterativeDeep()
 {
     const int iLen = 100;
-    move iPV[iLen];
+    MOVE iPV[iLen];
     const int sLen = 600;
     char sPV[sLen];
     char str_mov[7];
@@ -108,8 +108,8 @@ void IterativeDeep()
 int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int root)
 {
     int nposs_movs, nlegal = 0;
-    move poss_moves [200];    /*TODO: could overflow.*/
-    move best_move = 0;
+    MOVE poss_moves [200];    /*TODO: could overflow.*/
+    MOVE best_move = 0;
     char str_mov[7];
     unsigned char checking_sqs[5];
     int val = ERRORVALUE;
@@ -122,7 +122,7 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
         }
         if(root == 0 && depth > 2 && board.piece_material[board.white_to_move] != 0
                 && !InCheck(checking_sqs)){
-            move null_mv = 0xFFFF;
+            MOVE null_mv = 0xFFFF;
             MakeMove(&null_mv);
             val = -AlphaBeta(depth-3, -beta, -beta+1, -1);
             Takeback(null_mv);
@@ -194,7 +194,7 @@ int Quiescent(int alpha, const int beta)
 {
     int nposs_movs, nlegal = 0;
     int val;
-    move poss_moves [200];
+    MOVE poss_moves [200];
     val = StaticEval();
     UpdateTable(board.zobrist_key, val, 0, 0, HASH_EXACT);
 
@@ -224,10 +224,10 @@ int Quiescent(int alpha, const int beta)
 
 /*This only works because the replacement scheme ensures shallow PV is not overwritten,
 and may fail if the hash table is full.*/
-int RetrievePV(move *PV, const unsigned int depth)
+int RetrievePV(MOVE *PV, const unsigned int depth)
 {
     unsigned int PVlen = 0;
-    move mov = GetHashMove(board.zobrist_key);
+    MOVE mov = GetHashMove(board.zobrist_key);
     while(mov && PVlen <= depth && IsLegal(&mov)){
         PV[PVlen] = mov;
         PVlen++;

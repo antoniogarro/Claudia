@@ -41,7 +41,7 @@
 #define PUT_HASH_DEPTH(depth) (((unsigned long long)depth & 0x3FF)<< 52);
 #define PUT_HASH_FLAG(flag) ((unsigned long long)flag << 62);
 
-#define MOVEMASK(data) (move)(data & 0xFFFFF)
+#define MOVEMASK(data) (MOVE)(data & 0xFFFFF)
 #define EVALMASK(data) (int)(data >> 20)
 #define DEPTHMASK(data) (int)((data >> 52) & 0x3FF)
 #define FLAGMASK(data) (char)(data >> 62)
@@ -62,8 +62,8 @@ extern struct HASHTABLE hash_table;
 int AllocTable(int);
 void DeleteTable();
 void ClearHashTable();
-void UpdateTable(unsigned long long, int, move, int, int);
-move GetHashMove(unsigned long long);
+void UpdateTable(unsigned long long, int, MOVE, int, int);
+MOVE GetHashMove(unsigned long long);
 int GetHashEval(unsigned long long, int, int, int);
 
 #endif

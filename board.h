@@ -66,30 +66,30 @@ void InitMaterial();
 int ReadFEN(const char*);
 void PrintBoard();
 
-int MoveGen(move*, char);
-int CaptureGen(move*);
+int MoveGen(MOVE*, char);
+int CaptureGen(MOVE*);
 
-int WhitePawnMoves(unsigned char, move*, int, char);
-int BlackPawnMoves(unsigned char, move*, int, char);
-int SlidingMoves(unsigned char, const char*, const char, move*, int, char);
-int NonSlidingMoves(unsigned char, const char *, const char, move*, int, char);
-int GenerateWhiteCastle(move*, int);
-int GenerateBlackCastle(move*, int);
+int WhitePawnMoves(unsigned char, MOVE*, int, char);
+int BlackPawnMoves(unsigned char, MOVE*, int, char);
+int SlidingMoves(unsigned char, const char*, const char, MOVE*, int, char);
+int NonSlidingMoves(unsigned char, const char *, const char, MOVE*, int, char);
+int GenerateWhiteCastle(MOVE*, int);
+int GenerateBlackCastle(MOVE*, int);
 
 char IsAttacked(unsigned char, unsigned char);
 int AttackingPieces(unsigned char, unsigned char, unsigned char*);
 
-void MakeMove(move*);
-void Takeback(const move);
+void MakeMove(MOVE*);
+void Takeback(const MOVE);
 void RemovePiece(unsigned char);
 void DropPiece(unsigned char, unsigned char);
-char IsLegal(move*);
+char IsLegal(MOVE*);
 
 int Perft(const int);
-int SEE(move*);
-int EvaluateMove(move*, const move);
-void SortMoves(move*, int);
-int FilterWinning(move*, int);
+int SEE(MOVE*);
+int EvaluateMove(MOVE*, const MOVE);
+void SortMoves(MOVE*, int);
+int FilterWinning(MOVE*, int);
 int Material();
 int StaticEval();
 int Value(unsigned char);
@@ -125,6 +125,6 @@ char PieceToChar(const char);
 char CharToCoordinate(const char);
 char RowCoordinateToChar(const char);
 char ColumnCoordinateToChar(const char);
-move AlgebToMove(const char*);
-void MoveToAlgeb(const move, char*);
+MOVE AlgebToMove(const char*);
+void MoveToAlgeb(const MOVE, char*);
 #endif

@@ -93,7 +93,7 @@ int make_move(char *input)
 {
     char *str_param = strtok(input, " \n\t");
     if(str_param){
-        move curr_move = AlgebToMove(str_param);
+        MOVE curr_move = AlgebToMove(str_param);
         if(IsLegal(&curr_move)) MakeMove(&curr_move);
     }
     return 1;
@@ -213,7 +213,7 @@ int position(char *input)
     str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "moves"*/
     str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "e2e4"*/
     while(str_param){
-        move curr_move = AlgebToMove(str_param);
+        MOVE curr_move = AlgebToMove(str_param);
         if(IsLegal(&curr_move)) MakeMove(&curr_move);
         else return 0;
         str_param = strtok(NULL, " \n\t");

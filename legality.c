@@ -30,15 +30,15 @@
 
 #include "board.h"
 
-char IsLegal(move *curr_move)
+char IsLegal(MOVE *curr_move)
 {
-    move poss_moves[100];
+    MOVE poss_moves[100];
     int nposs_movs = MoveGen(poss_moves, 1);
     /*We only compare info about squares to decide legality, not captured piece or previous EP:*/
-    move Squares = (*curr_move & 0xFFFF); 
+    MOVE sqs = SQSMASK(*curr_move); 
     /*TODO: promoted.*/
     for(int i = 0; i < nposs_movs; i++){
-        if(Squares == (poss_moves[i] & 0xFFFF)){    /*curr_move is possible.*/
+        if(sqs == SQSMASK(poss_moves[i])){    /*curr_move is possible.*/
             MakeMove(curr_move);
             if(!LeftInCheck()){
                 Takeback(*curr_move);
@@ -54,7 +54,7 @@ int Perft(const int depth)
 {
     int val = 0;
     int nposs_movs = 0;
-    move poss_moves [100];
+    MOVE poss_moves [100];
     
     if(depth > 1){
         nposs_movs = MoveGen(poss_moves, 1);

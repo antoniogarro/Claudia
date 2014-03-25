@@ -59,7 +59,7 @@ void ClearHashTable()
 }
 
 void UpdateTable(unsigned long long zob_key, int eval,
-                    move best_move, int depth, int flag)
+                    MOVE best_move, int depth, int flag)
 {
     int key = zob_key%hash_table.size;
     HashData *entry = &hash_table.entries[key];
@@ -80,7 +80,7 @@ void UpdateTable(unsigned long long zob_key, int eval,
     entry->data |=  PUT_HASH_FLAG(flag);
 }
 
-move GetHashMove(unsigned long long zob_key)
+MOVE GetHashMove(unsigned long long zob_key)
 {
     int key = zob_key%hash_table.size;
     if(hash_table.entries[key].zobrist_key == zob_key){

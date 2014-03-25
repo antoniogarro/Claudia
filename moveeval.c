@@ -31,18 +31,18 @@
 #include "claudia.h"
 #include "board.h"
 
-int SEE(move *main_capture)
+int SEE(MOVE *main_capture)
 {
-    unsigned char dest = (*main_capture & 0xFFFF) >> 8;
+    unsigned char dest = DESTMASK(*main_capture);
     unsigned char captured, sq;
     unsigned char attacking_sqs[10];
     unsigned char *less_attack_sq;
-    int attackers, depth = 0, val = 0;
-    move move_hist[20];
+    int depth = 0, val = 0;
+    MOVE move_hist[20];
     
     MakeMove(main_capture);
     /*Note that color is 0x8(1000) or 0000; ugly.*/
-    attackers = AttackingPieces(dest, (board.white_to_move << 3), attacking_sqs);
+    int attackers = AttackingPieces(dest, (board.white_to_move << 3), attacking_sqs);
 
     while(attackers){
         less_attack_sq = attacking_sqs;
@@ -54,8 +54,8 @@ int SEE(move *main_capture)
         }
 
         move_hist[depth] = (dest << 8) | *less_attack_sq;
-        if((board.squares[*less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
-                    || (board.squares[*less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW)){
+        if( (board.squares[*less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
+                || (board.squares[*less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW) ){
             move_hist[depth] |= (B_QUEEN << 16);
         }
         MakeMove(&move_hist[depth]);
@@ -64,22 +64,22 @@ int SEE(move *main_capture)
     }
 
     while(depth--){
-        captured = (move_hist[depth] & 0xFFFFFF) >> 20;
+        captured = CAPTMASK(move_hist[depth]);
         if(val + Value(captured) > 0) val = -(val + Value(captured));
         else val = 0;
         Takeback(move_hist[depth]);
     }
-    captured = (*main_capture & 0xFFFFFF) >> 20;
+    captured = CAPTMASK(*main_capture);
     val = val + Value(captured);
     Takeback(*main_capture);
 
     return val;
 }
 
-void SortMoves(move *moves, int nmoves)
+void SortMoves(MOVE *moves, int nmoves)
 {
     int eval[200];
-    move hash_move = GetHashMove(board.zobrist_key);
+    MOVE hash_move = GetHashMove(board.zobrist_key);
     /*Evaluate every move, store evaluations:*/
     for(int i = 0; i < nmoves; i++){
         eval[i] = EvaluateMove(&moves[i], hash_move);
@@ -88,7 +88,7 @@ void SortMoves(move *moves, int nmoves)
     /*Order according to that evaluation: insertion sort*/
     for(int i = 1; i < nmoves; i++){
         for(int j = i; j > 0 && (eval[j-1] < eval[j]); j--){            
-            move tmp = moves[j-1];
+            MOVE tmp = moves[j-1];
             moves[j-1] = moves[j];
             moves[j] = tmp;
             
@@ -99,7 +99,7 @@ void SortMoves(move *moves, int nmoves)
     }
 }
 
-int FilterWinning(move *captures, int ncapts)
+int FilterWinning(MOVE *captures, int ncapts)
 {
     int good_capts = 0;
     int eval[200];
@@ -110,7 +110,7 @@ int FilterWinning(move *captures, int ncapts)
     }
     for(int i = 1; i < ncapts; i++){
         for(int j = i; j > 0 && (eval[j-1] < eval[j]); j--){
-            move tmp = captures[j-1];
+            MOVE tmp = captures[j-1];
             captures[j-1] = captures[j];
             captures[j] = tmp;
             
@@ -127,14 +127,14 @@ int FilterWinning(move *captures, int ncapts)
     return good_capts;
 }
 
-int EvaluateMove(move *curr_move, const move hash_move)
+int EvaluateMove(MOVE *curr_move, const MOVE hash_move)
 {
     /*Compare with hash_move, using only orig, des; curr_move may not have captured or ep info.*/
-    if((*curr_move & 0xFFFF) == (hash_move & 0xFFFF)){
+    if(SQSMASK(*curr_move) == SQSMASK(hash_move)){
         return HASHMOVE_VALUE;        /*search HashMove first.*/
     }
     /*Evaluate captures with SEE:*/
-    unsigned char dest = (*curr_move & 0xFFFF) >> 8;
+    unsigned char dest = DESTMASK(*curr_move);
     if(board.squares[dest] != EMPTY) return SEE(curr_move);
     else return 0;        /*TODO: evaluate non-captures.*/
 }
