@@ -31,6 +31,13 @@
 #include "board.h"
 #include "claudia.h"
 
+int LazyEval()
+{
+    unsigned char side = board.white_to_move;
+    return board.piece_material[side] - board.piece_material[1-side]
+         + board.pawn_material[side] - board.pawn_material[1-side];
+}
+
 int StaticEval()
 {
     int val = 0;

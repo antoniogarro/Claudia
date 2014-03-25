@@ -284,8 +284,8 @@ int GenerateWhiteCastle(MOVE *poss_moves, int nmoves)
 int GenerateBlackCastle(MOVE *poss_moves, int nmoves)
 {
     if(board.bk_castle && board.squares[h8] == B_ROOK &&board.squares[g8] == EMPTY
-            && board.squares[f8] == EMPTY && !BlackInCheck() &&
-            !IsAttacked(f8, WHITE_COLOR)){
+            && board.squares[f8] == EMPTY && !BlackInCheck()
+            && !IsAttacked(f8, WHITE_COLOR)){
         if(poss_moves) poss_moves[nmoves] = Move(0, g8, e8);
         nmoves++;
     }

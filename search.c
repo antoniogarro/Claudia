@@ -195,6 +195,11 @@ int Quiescent(int alpha, const int beta)
     int nposs_movs, nlegal = 0;
     int val;
     MOVE poss_moves [200];
+
+    val = LazyEval();
+    if(val-ROOK_VALUE >= beta) return beta;
+    if(val+QUEEN_VALUE < alpha) return alpha;
+
     val = StaticEval();
     UpdateTable(board.zobrist_key, val, 0, 0, HASH_EXACT);
 

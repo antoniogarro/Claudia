@@ -13,7 +13,7 @@
 
 * Time control				-			done
 
-* Null move heuristic			medium			ongoing
+* Null move heuristic			-			done
 
 * Check extensions			-			done
 
@@ -25,7 +25,7 @@
 
 * Ponder				low			pending
 
-* Get rid of global variables		medium			pending
+* Get rid of global variables		high			pending
 
 * Multithreading			low			pending
 
@@ -38,3 +38,5 @@
 * Ending knowledge			medium			pending
 
 * Tidy up parser			-			done
+
+* Lazy evaluation			high			ongoing

@@ -91,6 +91,7 @@ int EvaluateMove(MOVE*, const MOVE);
 void SortMoves(MOVE*, int);
 int FilterWinning(MOVE*, int);
 int Material();
+int LazyEval();
 int StaticEval();
 int Value(unsigned char);
 
