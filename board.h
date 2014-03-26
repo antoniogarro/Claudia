@@ -76,8 +76,8 @@ int NonSlidingMoves(SQUARE, const char*, char, MOVE*, int, char);
 int GenerateWhiteCastle(MOVE*, int);
 int GenerateBlackCastle(MOVE*, int);
 
-char IsAttacked(SQUARE, unsigned char);
-int AttackingPieces(SQUARE, unsigned char, SQUARE*);
+char IsAttacked(SQUARE, COLOR);
+int AttackingPieces(SQUARE, COLOR, SQUARE*);
 
 void MakeMove(MOVE*);
 void Takeback(const MOVE);
@@ -95,12 +95,12 @@ int LazyEval();
 int StaticEval();
 int Value(PIECE);
 
-int PawnStaticVal(SQUARE, unsigned char);
-int KnightStaticVal(SQUARE, unsigned char);
-int BishopStaticVal(SQUARE, unsigned char);
-int RookStaticVal(SQUARE, unsigned char);
-int QueenStaticVal(SQUARE, unsigned char);
-int KingStaticVal(SQUARE, unsigned char);
+int PawnStaticVal(SQUARE, COLOR);
+int KnightStaticVal(SQUARE, COLOR);
+int BishopStaticVal(SQUARE, COLOR);
+int RookStaticVal(SQUARE, COLOR);
+int QueenStaticVal(SQUARE, COLOR);
+int KingStaticVal(SQUARE, COLOR);
 
 static char WhiteInCheck(){
     return IsAttacked(board.wking_pos, BLACK);

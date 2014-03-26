@@ -41,7 +41,7 @@ int SEE(MOVE *main_capture)
     MOVE move_hist[20];
     
     MakeMove(main_capture);
-    /*Note that color is 0x8(1000) or 0000; ugly.*/
+    
     int attackers = AttackingPieces(dest, (board.white_to_move << 3), attacking_sqs);
 
     while(attackers){
@@ -52,7 +52,6 @@ int SEE(MOVE *main_capture)
                 less_attack_sq = &attacking_sqs[i];
             }
         }
-
         
         if( (board.squares[*less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
                 || (board.squares[*less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW) ){
@@ -141,7 +140,7 @@ int EvaluateMove(MOVE *curr_move, const MOVE hash_move)
     else return 0;        /*TODO: evaluate non-captures.*/
 }
 
-int Value(unsigned char piece)
+int Value(PIECE piece)
 {
         switch(piece){
 

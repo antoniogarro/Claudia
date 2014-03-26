@@ -155,6 +155,8 @@ typedef unsigned long long KEY;
 
 typedef unsigned char SQUARE;
 typedef unsigned char PIECE;
+typedef char COLOR;
+
 #define SQSMASK(move)  (move & 0xFFFF)
 #define ORIGMASK(move) (move & 0xFF)
 #define DESTMASK(move) ((move & 0xFFFF) >> 8)
