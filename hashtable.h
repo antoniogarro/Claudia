@@ -36,10 +36,10 @@
 #define HASH_BETA 1
 #define HASH_ALPHA 2
 
-#define PUT_HASH_MOVE(move) ((unsigned long long)(move & 0xFFFFF));
-#define PUT_HASH_EVAL(eval) (((unsigned long long)eval & 0xFFFFFFFF) << 20);
-#define PUT_HASH_DEPTH(depth) (((unsigned long long)depth & 0x3FF)<< 52);
-#define PUT_HASH_FLAG(flag) ((unsigned long long)flag << 62);
+#define PUT_HASH_MOVE(move) ((KEY)(move & 0xFFFFF));
+#define PUT_HASH_EVAL(eval) (((KEY)eval & 0xFFFFFFFF) << 20);
+#define PUT_HASH_DEPTH(depth) (((KEY)depth & 0x3FF)<< 52);
+#define PUT_HASH_FLAG(flag) ((KEY)flag << 62);
 
 #define MOVEMASK(data) (MOVE)(data & 0xFFFFF)
 #define EVALMASK(data) (int)(data >> 20)
@@ -47,9 +47,9 @@
 #define FLAGMASK(data) (char)(data >> 62)
 
 typedef struct{
-    unsigned long long zobrist_key;
+    KEY zobrist_key;
     /*bits 0-19: hash_move; bits 20-51: eval; bits 52-61: depth; 62-63: flags.*/
-    unsigned long long data;
+    KEY data;
 } HashData;
 
 struct HASHTABLE{
@@ -62,8 +62,8 @@ extern struct HASHTABLE hash_table;
 int AllocTable(int);
 void DeleteTable();
 void ClearHashTable();
-void UpdateTable(unsigned long long, int, MOVE, int, int);
-MOVE GetHashMove(unsigned long long);
-int GetHashEval(unsigned long long, int, int, int);
+void UpdateTable(KEY, int, MOVE, int, int);
+MOVE GetHashMove(KEY);
+int GetHashEval(KEY, int, int, int);
 
 #endif

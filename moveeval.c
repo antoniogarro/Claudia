@@ -33,10 +33,10 @@
 
 int SEE(MOVE *main_capture)
 {
-    unsigned char dest = DESTMASK(*main_capture);
-    unsigned char captured, sq;
-    unsigned char attacking_sqs[10];
-    unsigned char *less_attack_sq;
+    SQUARE dest = DESTMASK(*main_capture);
+    SQUARE captured, sq;
+    SQUARE attacking_sqs[10];
+    SQUARE *less_attack_sq;
     int depth = 0, val = 0;
     MOVE move_hist[20];
     
@@ -134,7 +134,7 @@ int EvaluateMove(MOVE *curr_move, const MOVE hash_move)
         return HASHMOVE_VALUE;        /*search HashMove first.*/
     }
     /*Evaluate captures with SEE:*/
-    unsigned char dest = DESTMASK(*curr_move);
+    SQUARE dest = DESTMASK(*curr_move);
     if(board.squares[dest] != EMPTY) return SEE(curr_move);
     else return 0;        /*TODO: evaluate non-captures.*/
 }

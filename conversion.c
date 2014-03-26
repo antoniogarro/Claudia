@@ -31,7 +31,7 @@
 #include "claudia.h"
 #include "board.h"
 
-char CharToPiece (const char fen)
+char CharToPiece(const char fen)
 {
     char piece = 0;
     switch (fen) {
@@ -65,7 +65,7 @@ char CharToPiece (const char fen)
     return piece;
 }
 
-char PieceToChar (const char piece)
+char PieceToChar(const char piece)
 {
     char char_piece = 0;
     switch (piece){
@@ -101,7 +101,7 @@ char PieceToChar (const char piece)
     return char_piece;
 }
 
-char CharToCoordinate (const char fen)
+char CharToCoordinate(const char fen)
 {
     char coord = 0x77;
     switch (fen){
@@ -143,7 +143,7 @@ char CharToCoordinate (const char fen)
     return coord;
 }
 
-char RowCoordinateToChar (const char coord)
+char RowCoordinateToChar(const char coord)
 {
     char row;
     switch (coord){
@@ -169,7 +169,7 @@ char RowCoordinateToChar (const char coord)
     return row;
 }
 
-char ColumnCoordinateToChar (const char coord)
+char ColumnCoordinateToChar(const char coord)
 {
     char column;
     switch (coord){

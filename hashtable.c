@@ -58,7 +58,7 @@ void ClearHashTable()
     hash_table.full = 0;
 }
 
-void UpdateTable(unsigned long long zob_key, int eval,
+void UpdateTable(KEY zob_key, int eval,
                     MOVE best_move, int depth, int flag)
 {
     int key = zob_key%hash_table.size;
@@ -80,7 +80,7 @@ void UpdateTable(unsigned long long zob_key, int eval,
     entry->data |=  PUT_HASH_FLAG(flag);
 }
 
-MOVE GetHashMove(unsigned long long zob_key)
+MOVE GetHashMove(KEY zob_key)
 {
     int key = zob_key%hash_table.size;
     if(hash_table.entries[key].zobrist_key == zob_key){
@@ -88,7 +88,7 @@ MOVE GetHashMove(unsigned long long zob_key)
     }else return 0;
 }
 
-int GetHashEval(unsigned long long zob_key, int depth, int alpha, int beta)
+int GetHashEval(KEY zob_key, int depth, int alpha, int beta)
 {
     int key = zob_key%hash_table.size;
     const HashData *entry = &hash_table.entries[key];

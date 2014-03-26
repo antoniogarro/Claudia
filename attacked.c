@@ -31,9 +31,9 @@
 #include "board.h"
 #include "claudia.h"
 
-char IsAttacked(unsigned char square, unsigned char attacking_color)
+char IsAttacked(SQUARE square, unsigned char attacking_color)
 {
-    unsigned char attacking_sq = 0;
+    SQUARE attacking_sq = 0;
     if(attacking_color){
         for(int i = 0; w_pawn_capture[i]; i++){
             attacking_sq = square - w_pawn_capture[i];
@@ -93,10 +93,10 @@ char IsAttacked(unsigned char square, unsigned char attacking_color)
     return 0;
 }
 
-int AttackingPieces(unsigned char square, unsigned char attacking_color, unsigned char * attacking_sqs)
+int AttackingPieces(SQUARE square, unsigned char attacking_color, SQUARE *attacking_sqs)
 {
     int attackers = 0;
-    unsigned char attacking_sq = 0;
+    SQUARE attacking_sq = 0;
     if(attacking_color){
         for(int i = 0; w_pawn_capture[i]; i++){
             attacking_sq = square - w_pawn_capture[i];

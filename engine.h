@@ -33,7 +33,6 @@
 
 #include <time.h>
 #include "board.h"
-#include "book.h"
 
 static const clock_t CPMS = CLOCKS_PER_SEC/1000;
 
@@ -61,8 +60,10 @@ int Quiescent(int, int);
 int RetrievePV(MOVE*, unsigned int);
 
 int ParseCommand(const char*);
-int Command(const char *);
+int Command(const char*);
 
+KEY PolyglotKey();
+int PolyglotChooseMove(KEY key);
 
 static void think(void *pparams)
 {

@@ -41,7 +41,7 @@ int LazyEval()
 int StaticEval()
 {
     int val = 0;
-    for(unsigned char sq = 0; sq<0x78; sq++){
+    for(SQUARE sq = 0; sq<0x78; sq++){
         switch(board.squares[sq]){
             case EMPTY:
                 break;
@@ -91,7 +91,7 @@ int StaticEval()
     else return -val;
 }
 
-int PawnStaticVal(unsigned char sq, unsigned char color)
+int PawnStaticVal(SQUARE sq, unsigned char color)
 {
     int val = PAWN_VALUE;
     if(color) val += WhitePawnMoves(sq, 0, 0, 1);
@@ -99,35 +99,35 @@ int PawnStaticVal(unsigned char sq, unsigned char color)
     return val;
 }
 
-int KnightStaticVal(unsigned char sq, unsigned char color)
+int KnightStaticVal(SQUARE sq, unsigned char color)
 {
     int val = KNIGHT_VALUE;
     val += N_MOBILITY_BONUS*NonSlidingMoves(sq, knight_delta, color, 0, 0, 1);
     return val;
 }
 
-int BishopStaticVal(unsigned char sq, unsigned char color)
+int BishopStaticVal(SQUARE sq, unsigned char color)
 {
     int val = BISHOP_VALUE;
     val += B_MOBILITY_BONUS*SlidingMoves(sq, bishop_delta, color, 0, 0, 1);
     return val;
 }
 
-int RookStaticVal(unsigned char sq, unsigned char color)
+int RookStaticVal(SQUARE sq, unsigned char color)
 {
     int val = ROOK_VALUE;
     val += R_MOBILITY_BONUS*SlidingMoves(sq, rook_delta, color, 0, 0, 1);
     return val;
 }
 
-int QueenStaticVal(unsigned char sq, unsigned char color)
+int QueenStaticVal(SQUARE sq, unsigned char color)
 {
     int val = QUEEN_VALUE;
     val += Q_MOBILITY_BONUS*SlidingMoves(sq, king_delta, color, 0, 0, 1);
     return val;
 }
 
-int KingStaticVal(unsigned char sq, unsigned char color)
+int KingStaticVal(SQUARE sq, unsigned char color)
 {
     int val = KING_VALUE;
     if(color){

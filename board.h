@@ -35,27 +35,27 @@
 #include "hashtable.h"
 
 struct BOARD {
-    unsigned char squares[128];
+    PIECE squares[128];
     /*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
-    unsigned char en_passant;
+    SQUARE en_passant;
     unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
     unsigned char w_castled, b_castled;
-    unsigned char wking_pos, bking_pos;
+    SQUARE wking_pos, bking_pos;
     unsigned char white_to_move;
     int ply;
     int rev_plies [500];
-    unsigned long long zobrist_key;
-    unsigned long long zobrist_history[500];
+    KEY zobrist_key;
+    KEY zobrist_history[500];
     unsigned int piece_material[2];
     unsigned int pawn_material[2];
 };
 extern struct BOARD board;
 
 struct ZOBKEYS {
-    unsigned long long zob_pieces[16][128];
-    unsigned long long zob_enpass[128];
-    unsigned long long zob_castle[4];
-    unsigned long long zob_side;
+    KEY zob_pieces[16][128];
+    KEY zob_enpass[128];
+    KEY zob_castle[4];
+    KEY zob_side;
 };
 extern struct ZOBKEYS zobkeys;
 
@@ -69,20 +69,20 @@ void PrintBoard();
 int MoveGen(MOVE*, char);
 int CaptureGen(MOVE*);
 
-int WhitePawnMoves(unsigned char, MOVE*, int, char);
-int BlackPawnMoves(unsigned char, MOVE*, int, char);
-int SlidingMoves(unsigned char, const char*, char, MOVE*, int, char);
-int NonSlidingMoves(unsigned char, const char *, char, MOVE*, int, char);
+int WhitePawnMoves(SQUARE, MOVE*, int, char);
+int BlackPawnMoves(SQUARE, MOVE*, int, char);
+int SlidingMoves(SQUARE, const char*, char, MOVE*, int, char);
+int NonSlidingMoves(SQUARE, const char*, char, MOVE*, int, char);
 int GenerateWhiteCastle(MOVE*, int);
 int GenerateBlackCastle(MOVE*, int);
 
-char IsAttacked(unsigned char, unsigned char);
-int AttackingPieces(unsigned char, unsigned char, unsigned char*);
+char IsAttacked(SQUARE, unsigned char);
+int AttackingPieces(SQUARE, unsigned char, SQUARE*);
 
 void MakeMove(MOVE*);
 void Takeback(const MOVE);
-void RemovePiece(unsigned char);
-void DropPiece(unsigned char, unsigned char);
+void RemovePiece(SQUARE);
+void DropPiece(SQUARE, PIECE);
 char IsLegal(MOVE*);
 
 int Perft(int);
@@ -93,14 +93,14 @@ int FilterWinning(MOVE*, int);
 int Material();
 int LazyEval();
 int StaticEval();
-int Value(unsigned char);
+int Value(PIECE);
 
-int PawnStaticVal(unsigned char, unsigned char);
-int KnightStaticVal(unsigned char, unsigned char);
-int BishopStaticVal(unsigned char, unsigned char);
-int RookStaticVal(unsigned char, unsigned char);
-int QueenStaticVal(unsigned char, unsigned char);
-int KingStaticVal(unsigned char, unsigned char);
+int PawnStaticVal(SQUARE, unsigned char);
+int KnightStaticVal(SQUARE, unsigned char);
+int BishopStaticVal(SQUARE, unsigned char);
+int RookStaticVal(SQUARE, unsigned char);
+int QueenStaticVal(SQUARE, unsigned char);
+int KingStaticVal(SQUARE, unsigned char);
 
 static char WhiteInCheck(){
     return IsAttacked(board.wking_pos, BLACK_COLOR);
@@ -110,7 +110,7 @@ static char BlackInCheck(){
     return IsAttacked(board.bking_pos, WHITE_COLOR);
 }
 
-static int InCheck(unsigned char * attacking_sqs){
+static int InCheck(SQUARE *attacking_sqs){
     if(board.white_to_move) return AttackingPieces(board.wking_pos, BLACK_COLOR, attacking_sqs);
     else return AttackingPieces(board.bking_pos, WHITE_COLOR, attacking_sqs);
 }

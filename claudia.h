@@ -148,6 +148,12 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 /*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED:bits 16-19,
 CAPTURED:bits 20-23, CASTLE RIGHTS, PAWN_EP:bits 24-31*/
 typedef unsigned int MOVE;
+
+/*Zobrist keys*/
+typedef unsigned long long KEY;
+
+typedef unsigned char SQUARE;
+typedef unsigned char PIECE;
 #define SQSMASK(move)  (move & 0xFFFF)
 #define ORIGMASK(move) (move & 0xFF)
 #define DESTMASK(move) ((move & 0xFFFF) >> 8)

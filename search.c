@@ -110,7 +110,7 @@ int AlphaBeta(unsigned int depth, int alpha, int beta, int root)
     MOVE poss_moves[MAXMOVES];
     MOVE best_move = 0;
     char str_mov[7];
-    unsigned char checking_sqs[5];
+    SQUARE checking_sqs[5];
     int val = ERRORVALUE;
     char hash_flag = HASH_ALPHA;
 

@@ -31,7 +31,7 @@
 #include "claudia.h"
 #include "board.h"
 
-MOVE Move(unsigned char piece, unsigned char dest, unsigned char orig)
+MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
 {
     return (piece << 16) | (dest << 8) | orig;
 }
@@ -45,7 +45,7 @@ int MoveGen(MOVE *poss_moves, char noncaptures)
 {
     int nmoves = 0;
     if(board.white_to_move){
-        for(unsigned char orig = 0; orig < 0x78; orig++){
+        for(SQUARE orig = 0; orig < 0x78; orig++){
             switch (board.squares[orig]){
                 case W_PAWN:
                     nmoves = WhitePawnMoves(orig, poss_moves, nmoves, noncaptures);
@@ -79,7 +79,7 @@ int MoveGen(MOVE *poss_moves, char noncaptures)
             if(COLUMN(orig) == H_COLUMN && ROW(orig) != EIGHT_ROW) orig += 8;
         }
     }else{
-        for(unsigned char orig = 0; orig < 0x78; orig++){
+        for(SQUARE orig = 0; orig < 0x78; orig++){
             switch (board.squares[orig]){
                 case B_PAWN:
                     nmoves = BlackPawnMoves(orig, poss_moves, nmoves, noncaptures);
@@ -118,9 +118,9 @@ int MoveGen(MOVE *poss_moves, char noncaptures)
 }
 
 /*TODO: merge White and Black pawns generators?*/
-int WhitePawnMoves(unsigned char orig, MOVE *poss_moves, int nmoves, char noncaptures)
+int WhitePawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
 {
-    unsigned char dest = orig + ROW_UP;
+    SQUARE dest = orig + ROW_UP;
     if(noncaptures && IN_BOARD(dest) && board.squares[dest] == EMPTY){
         if(ROW(dest) == EIGHT_ROW){            /*Promotions.*/
             if(poss_moves) poss_moves[nmoves] = Move(W_QUEEN, dest, orig);
@@ -171,9 +171,9 @@ int WhitePawnMoves(unsigned char orig, MOVE *poss_moves, int nmoves, char noncap
     return nmoves;
 }
 
-int BlackPawnMoves(unsigned char orig, MOVE *poss_moves, int nmoves, char noncaptures)
+int BlackPawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
 {
-    unsigned char dest = orig + ROW_DOWN;
+    SQUARE dest = orig + ROW_DOWN;
     if(noncaptures && IN_BOARD(dest) && board.squares[dest] == EMPTY){
         if(ROW(dest) == FIRST_ROW){
             if(poss_moves) poss_moves[nmoves] = Move(B_QUEEN, dest, orig);
@@ -226,10 +226,10 @@ int BlackPawnMoves(unsigned char orig, MOVE *poss_moves, int nmoves, char noncap
     return nmoves;
 }
 
-int SlidingMoves(unsigned char orig, const char *delta, char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
+int SlidingMoves(SQUARE orig, const char *delta, char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
-        for(unsigned char dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){
+        for(SQUARE dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){
             if(board.squares[dest] == EMPTY){
                 if(noncaptures){
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
@@ -245,10 +245,10 @@ int SlidingMoves(unsigned char orig, const char *delta, char piece_color, MOVE *
     return nmoves;
 }
 
-int NonSlidingMoves(unsigned char orig, const char *delta, const char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
+int NonSlidingMoves(SQUARE orig, const char *delta, char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
-        unsigned char dest = orig + delta[i];
+        SQUARE dest = orig + delta[i];
         if(IN_BOARD(dest)){
             if(board.squares[dest] == EMPTY){
                 if(noncaptures){
