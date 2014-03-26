@@ -103,21 +103,26 @@ int QueenStaticVal(SQUARE, unsigned char);
 int KingStaticVal(SQUARE, unsigned char);
 
 static char WhiteInCheck(){
-    return IsAttacked(board.wking_pos, BLACK_COLOR);
+    return IsAttacked(board.wking_pos, BLACK);
 }
 
 static char BlackInCheck(){
-    return IsAttacked(board.bking_pos, WHITE_COLOR);
+    return IsAttacked(board.bking_pos, WHITE);
 }
 
 static int InCheck(SQUARE *attacking_sqs){
-    if(board.white_to_move) return AttackingPieces(board.wking_pos, BLACK_COLOR, attacking_sqs);
-    else return AttackingPieces(board.bking_pos, WHITE_COLOR, attacking_sqs);
+    if(board.white_to_move) return AttackingPieces(board.wking_pos, BLACK, attacking_sqs);
+    else return AttackingPieces(board.bking_pos, WHITE, attacking_sqs);
 }
 
 static char LeftInCheck(){
-    if(board.white_to_move) return IsAttacked(board.bking_pos, WHITE_COLOR);
-    else return IsAttacked(board.wking_pos, BLACK_COLOR);
+    if(board.white_to_move) return IsAttacked(board.bking_pos, WHITE);
+    else return IsAttacked(board.wking_pos, BLACK);
+}
+
+static inline MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
+{
+    return (piece << 16) | (dest << 8) | orig;
 }
 
 /* Some methods to convert coordinates to algebraic notation, and the other way round.*/

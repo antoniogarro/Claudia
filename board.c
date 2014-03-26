@@ -41,7 +41,7 @@ void InitBoard()
     board.zobrist_key = 0;
     for(int i = 0; i<128; i++) {
         board.squares [i] = EMPTY;
-        /*Note the j = 1; we want zobrist keys for EMPTY to be 0:*/
+        /*Note j = 1; we want zobrist keys for EMPTY to be 0:*/
         /*TODO: pre-generate*/
         for (int j = 1; j <= 0xF; j++){
             zobkeys.zob_pieces[j][i] = genrand64_int64();
@@ -82,9 +82,9 @@ void InitMaterial()
         PIECE p = board.squares[i];
         if(IN_BOARD(i) && p != EMPTY && p != W_KING && p != B_KING){
             if(TURN_WHITE(p) == W_PAWN){
-                board.pawn_material[GET_COLOR(p) >> 3] += Value(p);
+                board.pawn_material[GET_SIDE(p)] += Value(p);
             }else{
-                board.piece_material[GET_COLOR(p) >> 3] += Value(p);
+                board.piece_material[GET_SIDE(p)] += Value(p);
             }
         }
     }

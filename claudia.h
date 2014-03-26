@@ -52,12 +52,13 @@
 #define Q_CASTLE_RIGHT 0x8   //1000
 #define BOTH_CASTLES 0xD     //1101
 
-#define WHITE_COLOR 0x8
-#define BLACK_COLOR 0x0
+#define WHITE 0x8
+#define BLACK 0x0
 #define TURN_BLACK(piece) (piece & 0x7)
 #define TURN_WHITE(piece) (piece | 0x8)
 #define BLACK_TO_COLOR(blackpiece, color) (blackpiece | color)
-#define GET_COLOR(piece) (piece & 0x8)
+#define GET_COLOR(piece) (piece & 0x8)  // WHITE or BLACK
+#define GET_SIDE(piece) ((piece & 0x8) >> 3)    // 1 or 0
 
 #define FIRST_ROW 0x00
 #define SECOND_ROW 0x10

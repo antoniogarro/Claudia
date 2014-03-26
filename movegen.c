@@ -31,11 +31,6 @@
 #include "claudia.h"
 #include "board.h"
 
-MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
-{
-    return (piece << 16) | (dest << 8) | orig;
-}
-
 int CaptureGen(MOVE *poss_moves)
 {
     return MoveGen(poss_moves, 0);
@@ -52,23 +47,23 @@ int MoveGen(MOVE *poss_moves, char noncaptures)
                     break;
 
                 case W_KNIGHT:
-                    nmoves = NonSlidingMoves(orig, knight_delta, WHITE_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(orig, knight_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_BISHOP:
-                    nmoves = SlidingMoves(orig, bishop_delta, WHITE_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(orig, bishop_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_ROOK:
-                    nmoves = SlidingMoves(orig, rook_delta, WHITE_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(orig, rook_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_QUEEN:
-                    nmoves = SlidingMoves(orig, king_delta, WHITE_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(orig, king_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_KING:
-                    nmoves = NonSlidingMoves(orig, king_delta, WHITE_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(orig, king_delta, WHITE, poss_moves, nmoves, noncaptures);
                     if(orig == e1 && noncaptures){
                         nmoves = GenerateWhiteCastle(poss_moves, nmoves);
                     }
@@ -86,23 +81,23 @@ int MoveGen(MOVE *poss_moves, char noncaptures)
                     break;
 
                 case B_KNIGHT:
-                    nmoves = NonSlidingMoves(orig, knight_delta, BLACK_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(orig, knight_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_BISHOP:
-                    nmoves = SlidingMoves(orig, bishop_delta, BLACK_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(orig, bishop_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_ROOK:
-                    nmoves = SlidingMoves(orig, rook_delta, BLACK_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(orig, rook_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_QUEEN:
-                    nmoves = SlidingMoves(orig, king_delta, BLACK_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(orig, king_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_KING:
-                    nmoves = NonSlidingMoves(orig, king_delta, BLACK_COLOR, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(orig, king_delta, BLACK, poss_moves, nmoves, noncaptures);
                     if(orig == e8 && noncaptures){
                         nmoves = GenerateBlackCastle(poss_moves, nmoves);
                     }
@@ -151,7 +146,7 @@ int WhitePawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
-            }else if(GET_COLOR(board.squares[dest]) == BLACK_COLOR){
+            }else if(GET_COLOR(board.squares[dest]) == BLACK){
                 if(ROW(dest) == EIGHT_ROW){
                     if(poss_moves) poss_moves[nmoves] = Move(W_QUEEN, dest, orig);
                     nmoves++;
@@ -268,13 +263,13 @@ int GenerateWhiteCastle(MOVE *poss_moves, int nmoves)
 {
     if(board.wk_castle && board.squares[h1] == W_ROOK && board.squares[g1] == EMPTY
             && board.squares[f1] == EMPTY && !WhiteInCheck()
-            && !IsAttacked(f1, BLACK_COLOR)){
+            && !IsAttacked(f1, BLACK)){
         if(poss_moves) poss_moves[nmoves] = Move(0, g1, e1);
         nmoves++;
     }
     if(board.wq_castle && board.squares[a1] == W_ROOK &&board.squares[b1] == EMPTY
             && board.squares[c1] == EMPTY && board.squares[d1] == EMPTY
-            && !WhiteInCheck() && !IsAttacked(d1, BLACK_COLOR)){
+            && !WhiteInCheck() && !IsAttacked(d1, BLACK)){
         if(poss_moves) poss_moves[nmoves] = Move(0, c1, e1);
         nmoves++;
     }
@@ -285,13 +280,13 @@ int GenerateBlackCastle(MOVE *poss_moves, int nmoves)
 {
     if(board.bk_castle && board.squares[h8] == B_ROOK &&board.squares[g8] == EMPTY
             && board.squares[f8] == EMPTY && !BlackInCheck()
-            && !IsAttacked(f8, WHITE_COLOR)){
+            && !IsAttacked(f8, WHITE)){
         if(poss_moves) poss_moves[nmoves] = Move(0, g8, e8);
         nmoves++;
     }
     if(board.bq_castle && board.squares[a8] == B_ROOK &&board.squares[b8] == EMPTY
             && board.squares[c8] == EMPTY && board.squares[d8] == EMPTY
-            && !BlackInCheck() && !IsAttacked(d8, WHITE_COLOR)){
+            && !BlackInCheck() && !IsAttacked(d8, WHITE)){
         if(poss_moves) poss_moves[nmoves] = Move(0, c8, e8);
         nmoves++;
     }

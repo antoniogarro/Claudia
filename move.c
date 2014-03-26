@@ -35,6 +35,20 @@
 'MakeMove()' modifies curr_move to update information depending on the position (captured, catle, EP...).
 'MakeMove()' does NOT verify legality!
 */
+
+inline void RememberCaptured(MOVE *move, PIECE captured)
+{
+    *move |= (captured << 20);
+}
+inline void RememberEP(MOVE* move, SQUARE en_passant)
+{
+    *move |= (en_passant << 24);
+}
+inline void RememberCastleRight(MOVE *move, unsigned char rights)
+{
+    *move |= (rights << 16);
+}
+
 void MakeMove(MOVE *curr_move)
 {
     SQUARE orig = ORIGMASK(*curr_move);
@@ -43,7 +57,8 @@ void MakeMove(MOVE *curr_move)
     /*Piecepromoted stores only piece type, NOT correct color, because it comes
     from CharToPiece, and algebraic notation does not ensure Q != q.*/
 
-    *curr_move |= (board.en_passant << 24);        /*stores PAWN_EP in order to undo.*/
+    /*stores PAWN_EP in order to undo.*/
+    RememberEP(curr_move, board.en_passant);
     
     /*don't update 'castle rights' or 'en passant' board.zobrist_key, too expensive?.*/
     /*if(IN_BOARD(board.en_passant)) board.zobrist_key ^= zobkeys.zob_enpass[board.en_passant];*/
@@ -51,7 +66,7 @@ void MakeMove(MOVE *curr_move)
     board.ply++;
     /*captured piece: bits 20-23; 0 if EMPTY, o en passant capture:*/
     if(board.squares[dest]){
-        *curr_move |= (board.squares[dest] << 20);
+        RememberCaptured(curr_move, board.squares[dest]);
         board.rev_plies[board.ply] = 0;
     }else{
         board.rev_plies[board.ply] = board.rev_plies[board.ply-1]+1;    
@@ -106,8 +121,8 @@ void MakeMove(MOVE *curr_move)
                     board.w_castled = 1;
                 }
 
-                if(board.wq_castle) *curr_move |= (Q_CASTLE_RIGHT << 16);
-                if(board.wk_castle) *curr_move |= (K_CASTLE_RIGHT << 16);
+                if(board.wq_castle) RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
+                if(board.wk_castle) RememberCastleRight(curr_move, K_CASTLE_RIGHT);
                 /*Stores lost castle rights: 'bits promoted' set to 8 if long castle is lost, 5 if short, 13 if both.*/
             }
             board.wk_castle = 0, board.wq_castle = 0;
@@ -129,8 +144,8 @@ void MakeMove(MOVE *curr_move)
                     board.b_castled = 1;
                 }
 
-                if(board.bq_castle) *curr_move |= (Q_CASTLE_RIGHT << 16);
-                if(board.bk_castle) *curr_move |= (K_CASTLE_RIGHT << 16);
+                if(board.bq_castle) RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
+                if(board.bk_castle) RememberCastleRight(curr_move, K_CASTLE_RIGHT);
             }
             board.bk_castle = 0, board.bq_castle = 0;
             board.en_passant = 0xF;
@@ -138,11 +153,11 @@ void MakeMove(MOVE *curr_move)
 
         case W_ROOK:
             if(board.wq_castle && orig == a1) {
-                *curr_move |= (Q_CASTLE_RIGHT << 16);
+                RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
                 board.wq_castle = 0;
             }
             if(board.wk_castle && orig == h1) {
-                *curr_move |= (K_CASTLE_RIGHT << 16);    
+                RememberCastleRight(curr_move, K_CASTLE_RIGHT);
                 board.wk_castle = 0;
             }
             DropPiece(dest, W_ROOK);
@@ -151,11 +166,11 @@ void MakeMove(MOVE *curr_move)
 
         case B_ROOK:
             if(board.bq_castle && orig == a8) {
-                *curr_move |= (Q_CASTLE_RIGHT << 16);
+                RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
                 board.bq_castle = 0;
             }
             if(board.bk_castle && orig == h8) {
-                *curr_move |= (K_CASTLE_RIGHT << 16);
+                RememberCastleRight(curr_move, K_CASTLE_RIGHT);
                 board.bk_castle = 0;
             }
             DropPiece(dest, B_ROOK);
@@ -298,9 +313,9 @@ void RemovePiece(SQUARE sq)
     PIECE p = board.squares[sq];
     board.zobrist_key ^= zobkeys.zob_pieces[p][sq];
     if(p == W_PAWN || p == B_PAWN){
-        board.pawn_material[GET_COLOR(p) >> 3] -= Value(p);
+        board.pawn_material[GET_SIDE(p)] -= Value(p);
     }else if(p != EMPTY && p != W_KING && p != B_KING){
-        board.piece_material[GET_COLOR(p) >> 3] -= Value(p);
+        board.piece_material[GET_SIDE(p)] -= Value(p);
     }
     board.squares[sq] = EMPTY;
 }
@@ -312,15 +327,15 @@ void DropPiece(SQUARE sq, PIECE piece)
     board.zobrist_key ^= zobkeys.zob_pieces[piece][sq];
     
     if(p == W_PAWN || p == B_PAWN){
-        board.pawn_material[GET_COLOR(p) >> 3] -= Value(p);
+        board.pawn_material[GET_SIDE(p)] -= Value(p);
     }else if(p != EMPTY && p != W_KING && p != B_KING){
-        board.piece_material[GET_COLOR(p) >> 3] -= Value(p);
+        board.piece_material[GET_SIDE(p)] -= Value(p);
     }
     
     if(piece == W_PAWN || piece == B_PAWN){
-        board.pawn_material[GET_COLOR(piece) >> 3] += Value(piece);
+        board.pawn_material[GET_SIDE(piece)] += Value(piece);
     }else if(piece != EMPTY && piece != W_KING && piece != B_KING){
-        board.piece_material[GET_COLOR(piece) >> 3] += Value(piece);
+        board.piece_material[GET_SIDE(piece)] += Value(piece);
     }
     board.squares[sq] = piece;
 }

@@ -46,41 +46,41 @@ int StaticEval()
             case EMPTY:
                 break;
             case W_PAWN:
-                val += PawnStaticVal(sq, WHITE_COLOR);
+                val += PawnStaticVal(sq, WHITE);
                 break;
             case W_KNIGHT:
-                val += KnightStaticVal(sq, WHITE_COLOR);
+                val += KnightStaticVal(sq, WHITE);
                 break;
             case W_BISHOP:
-                val += BishopStaticVal(sq, WHITE_COLOR);
+                val += BishopStaticVal(sq, WHITE);
                 break;
             case W_ROOK:
-                val += RookStaticVal(sq, WHITE_COLOR);
+                val += RookStaticVal(sq, WHITE);
                 break;
             case W_QUEEN:
-                val += QueenStaticVal(sq, WHITE_COLOR);
+                val += QueenStaticVal(sq, WHITE);
                 break;
             case W_KING:
-                val += KingStaticVal(sq, WHITE_COLOR);
+                val += KingStaticVal(sq, WHITE);
                 break;
 
             case B_PAWN:
-                val -= PawnStaticVal(sq, BLACK_COLOR);
+                val -= PawnStaticVal(sq, BLACK);
                 break;
             case B_KNIGHT:
-                val -= KnightStaticVal(sq, BLACK_COLOR);
+                val -= KnightStaticVal(sq, BLACK);
                 break;
             case B_BISHOP:
-                val -= BishopStaticVal(sq, BLACK_COLOR);
+                val -= BishopStaticVal(sq, BLACK);
                 break;
             case B_ROOK:
-                val -= RookStaticVal(sq, BLACK_COLOR);
+                val -= RookStaticVal(sq, BLACK);
                 break;
             case B_QUEEN:
-                val -= QueenStaticVal(sq, BLACK_COLOR);
+                val -= QueenStaticVal(sq, BLACK);
                 break;
             case B_KING:
-                val -= KingStaticVal(sq, BLACK_COLOR);
+                val -= KingStaticVal(sq, BLACK);
                 break;
             default:
                 break;

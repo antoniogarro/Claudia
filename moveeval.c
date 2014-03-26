@@ -53,11 +53,13 @@ int SEE(MOVE *main_capture)
             }
         }
 
-        move_hist[depth] = (dest << 8) | *less_attack_sq;
+        
         if( (board.squares[*less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
                 || (board.squares[*less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW) ){
-            move_hist[depth] |= (B_QUEEN << 16);
+            move_hist[depth] = Move(B_QUEEN, dest, *less_attack_sq);
         }
+        else move_hist[depth] = Move(0, dest, *less_attack_sq);
+        
         MakeMove(&move_hist[depth]);
         depth++;
         attackers = AttackingPieces(dest, (board.white_to_move << 3), attacking_sqs);
