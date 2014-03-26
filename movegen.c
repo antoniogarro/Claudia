@@ -226,7 +226,7 @@ int BlackPawnMoves(unsigned char orig, MOVE *poss_moves, int nmoves, char noncap
     return nmoves;
 }
 
-int SlidingMoves(unsigned char orig, const char *delta, const char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
+int SlidingMoves(unsigned char orig, const char *delta, char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
         for(unsigned char dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){

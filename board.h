@@ -71,8 +71,8 @@ int CaptureGen(MOVE*);
 
 int WhitePawnMoves(unsigned char, MOVE*, int, char);
 int BlackPawnMoves(unsigned char, MOVE*, int, char);
-int SlidingMoves(unsigned char, const char*, const char, MOVE*, int, char);
-int NonSlidingMoves(unsigned char, const char *, const char, MOVE*, int, char);
+int SlidingMoves(unsigned char, const char*, char, MOVE*, int, char);
+int NonSlidingMoves(unsigned char, const char *, char, MOVE*, int, char);
 int GenerateWhiteCastle(MOVE*, int);
 int GenerateBlackCastle(MOVE*, int);
 
@@ -85,7 +85,7 @@ void RemovePiece(unsigned char);
 void DropPiece(unsigned char, unsigned char);
 char IsLegal(MOVE*);
 
-int Perft(const int);
+int Perft(int);
 int SEE(MOVE*);
 int EvaluateMove(MOVE*, const MOVE);
 void SortMoves(MOVE*, int);

@@ -34,9 +34,6 @@
 #ifndef BOOKH
 #define BOOKH
 
-#include <stdio.h>
-#include <string.h>
-
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;

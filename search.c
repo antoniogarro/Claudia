@@ -49,10 +49,10 @@ static int AssesDraw()
 
 void IterativeDeep()
 {
-    const int iLen = 100;
-    MOVE iPV[iLen];
-    const int sLen = 600;
-    char sPV[sLen];
+    const int iLEN = 100;
+    MOVE iPV[iLEN];
+    const int sLEN = 6*iLEN;
+    char sPV[sLEN];
     char str_mov[7];
     unsigned long long curr_time;
     int eval = 0;
@@ -62,7 +62,7 @@ void IterativeDeep()
     
     for(unsigned int depth = 1; depth <= control.max_depth;){
         curr_time = clock();
-        memset(sPV, 0, sLen);
+        memset(sPV, 0, sLEN);
         control.node_count = 0;
         
         eval = AlphaBeta(depth, alpha, beta, 1);
@@ -75,7 +75,6 @@ void IterativeDeep()
             strcat(sPV, str_mov);
         }
         MoveToAlgeb(control.best_move, str_mov);
-        //str_mov[5] = 0;
 
         curr_time = (unsigned long long)((clock() - curr_time)/CPMS);
         if(curr_time){
@@ -105,10 +104,10 @@ void IterativeDeep()
     printf("bestmove %s\n", str_mov);
 }
 
-int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int root)
+int AlphaBeta(unsigned int depth, int alpha, int beta, int root)
 {
     int nposs_movs, nlegal = 0;
-    MOVE poss_moves [200];    /*TODO: could overflow.*/
+    MOVE poss_moves[MAXMOVES];
     MOVE best_move = 0;
     char str_mov[7];
     unsigned char checking_sqs[5];
@@ -190,15 +189,15 @@ int AlphaBeta(const unsigned int depth, int alpha, const int beta, const int roo
     return alpha;
 }
 
-int Quiescent(int alpha, const int beta)
+int Quiescent(int alpha, int beta)
 {
     int nposs_movs, nlegal = 0;
     int val;
-    MOVE poss_moves [200];
+    MOVE poss_moves[MAXMOVES];
 
     val = LazyEval();
-    if(val-ROOK_VALUE >= beta) return beta;
-    if(val+QUEEN_VALUE < alpha) return alpha;
+    if(val-LAZYBETA >= beta) return beta;
+    if(val+LAZYALPHA < alpha) return alpha;
 
     val = StaticEval();
     UpdateTable(board.zobrist_key, val, 0, 0, HASH_EXACT);
@@ -229,7 +228,7 @@ int Quiescent(int alpha, const int beta)
 
 /*This only works because the replacement scheme ensures shallow PV is not overwritten,
 and may fail if the hash table is full.*/
-int RetrievePV(MOVE *PV, const unsigned int depth)
+int RetrievePV(MOVE *PV, unsigned int depth)
 {
     unsigned int PVlen = 0;
     MOVE mov = GetHashMove(board.zobrist_key);

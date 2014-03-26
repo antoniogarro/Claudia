@@ -32,7 +32,7 @@
 
 char IsLegal(MOVE *curr_move)
 {
-    MOVE poss_moves[100];
+    MOVE poss_moves[MAXMOVES];
     int nposs_movs = MoveGen(poss_moves, 1);
     /*We only compare info about squares to decide legality, not captured piece or previous EP:*/
     MOVE sqs = SQSMASK(*curr_move); 
@@ -50,11 +50,11 @@ char IsLegal(MOVE *curr_move)
     return 0;
 }
 
-int Perft(const int depth)
+int Perft(int depth)
 {
     int val = 0;
     int nposs_movs = 0;
-    MOVE poss_moves [100];
+    MOVE poss_moves[MAXMOVES];
     
     if(depth > 1){
         nposs_movs = MoveGen(poss_moves, 1);

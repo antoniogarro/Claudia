@@ -78,7 +78,7 @@ int SEE(MOVE *main_capture)
 
 void SortMoves(MOVE *moves, int nmoves)
 {
-    int eval[200];
+    int eval[MAXMOVES];
     MOVE hash_move = GetHashMove(board.zobrist_key);
     /*Evaluate every move, store evaluations:*/
     for(int i = 0; i < nmoves; i++){
@@ -102,7 +102,7 @@ void SortMoves(MOVE *moves, int nmoves)
 int FilterWinning(MOVE *captures, int ncapts)
 {
     int good_capts = 0;
-    int eval[200];
+    int eval[MAXMOVES];
    
     /*evaluate every move, store evaluations:*/
     for(int i = 0; i < ncapts; i++){

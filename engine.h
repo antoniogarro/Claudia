@@ -56,9 +56,9 @@ struct CONTROL {
 extern struct CONTROL control;
 
 void IterativeDeep();
-int AlphaBeta(const unsigned int, int, const int, const int);
-int Quiescent(int, const int);
-int RetrievePV(MOVE*, const unsigned int);
+int AlphaBeta(unsigned int, int, int, int);
+int Quiescent(int, int);
+int RetrievePV(MOVE*, unsigned int);
 
 int ParseCommand(const char*);
 int Command(const char *);
