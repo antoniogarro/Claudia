@@ -257,12 +257,12 @@ typedef struct {
 #define ROW7(sq) (sq)
 #define COLUMN7(sq) (sq)
 
-KEY PolyglotKey()
+KEY PolyglotKey(const BOARD *board)
 {
     KEY key = 0;
     for (int i = 0; i<128; i++){
         int p = 0;
-        switch(board.squares[i]){
+        switch(board->squares[i]){
             case B_PAWN:
                 p = 0;
                 break;
@@ -305,27 +305,27 @@ KEY PolyglotKey()
         if(IN_BOARD(i) && p < 12) key ^= RandomPiece[64*p+8*(ROW(i)/0x10)+COLUMN(i)];
     }
 
-    if(board.wk_castle) key ^= RandomCastle[0];
-    if(board.wq_castle) key ^= RandomCastle[1];
-    if(board.bk_castle) key ^= RandomCastle[2];
-    if(board.bq_castle) key ^= RandomCastle[3];
+    if(board->wk_castle) key ^= RandomCastle[0];
+    if(board->wq_castle) key ^= RandomCastle[1];
+    if(board->bk_castle) key ^= RandomCastle[2];
+    if(board->bq_castle) key ^= RandomCastle[3];
 
-    if(IN_BOARD(board.en_passant)){
-        int r = ROW(board.en_passant);
-        int c = COLUMN(board.en_passant);
+    if(IN_BOARD(board->en_passant)){
+        int r = ROW(board->en_passant);
+        int c = COLUMN(board->en_passant);
         if(r == THIRD_ROW){
-            if((IN_BOARD(r + ROW_UP + c + 1) && board.squares[r + ROW_UP + c + 1] == B_PAWN)||
-               (IN_BOARD(r + ROW_UP + c + 1) && board.squares[r + ROW_UP + c - 1] == B_PAWN)){
+            if((IN_BOARD(r + ROW_UP + c + 1) && board->squares[r + ROW_UP + c + 1] == B_PAWN)||
+               (IN_BOARD(r + ROW_UP + c + 1) && board->squares[r + ROW_UP + c - 1] == B_PAWN)){
                 key ^= RandomEnPassant[c];
             }
         }else{
-            if((IN_BOARD(r + ROW_DOWN + c + 1) && board.squares[r + ROW_DOWN + c + 1] == W_PAWN)||
-               (IN_BOARD(r + ROW_DOWN + c + 1) && board.squares[r + ROW_DOWN + c - 1] == W_PAWN)){
+            if((IN_BOARD(r + ROW_DOWN + c + 1) && board->squares[r + ROW_DOWN + c + 1] == W_PAWN)||
+               (IN_BOARD(r + ROW_DOWN + c + 1) && board->squares[r + ROW_DOWN + c - 1] == W_PAWN)){
                 key ^= RandomEnPassant[c];
             }
         }
     }
-    if(board.white_to_move) key ^= RandomTurn[0];
+    if(board->white_to_move) key ^= RandomTurn[0];
     return key;
 }
 
@@ -484,7 +484,6 @@ int PolyglotChooseMove(KEY key)
     }
     
     PolyglotMoveToString(move_s, entries[i].move);
-    control.stop = 1;
     printf("bestmove %s\n", move_s);
     return 1;
 }

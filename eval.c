@@ -31,111 +31,135 @@
 #include "board.h"
 #include "claudia.h"
 
-int LazyEval()
+int PawnStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 {
-    unsigned char side = board.white_to_move;
-    return board.piece_material[side] - board.piece_material[1-side]
-         + board.pawn_material[side] - board.pawn_material[1-side];
+    int val = PAWN_VALUE;
+    if(color) val += WhitePawnMoves(board, sq, 0, 0, 1);
+    else val += BlackPawnMoves(board, sq, 0, 0, 1);
+    return val;
 }
 
-int StaticEval()
+int KnightStaticVal(const BOARD *board, SQUARE sq, COLOR color)
+{
+    int val = KNIGHT_VALUE;
+    val += N_MOBILITY_BONUS*NonSlidingMoves(board, sq, knight_delta, color, 0, 0, 1);
+    return val;
+}
+
+int BishopStaticVal(const BOARD *board, SQUARE sq, COLOR color)
+{
+    int val = BISHOP_VALUE;
+    val += B_MOBILITY_BONUS*SlidingMoves(board, sq, bishop_delta, color, 0, 0, 1);
+    return val;
+}
+
+int RookStaticVal(const BOARD *board, SQUARE sq, COLOR color)
+{
+    int val = ROOK_VALUE;
+    val += R_MOBILITY_BONUS*SlidingMoves(board, sq, rook_delta, color, 0, 0, 1);
+    return val;
+}
+
+int QueenStaticVal(const BOARD *board, SQUARE sq, COLOR color)
+{
+    int val = QUEEN_VALUE;
+    val += Q_MOBILITY_BONUS*SlidingMoves(board, sq, king_delta, color, 0, 0, 1);
+    return val;
+}
+
+int KingStaticVal(const BOARD *board, SQUARE sq, COLOR color)
+{
+    int val = KING_VALUE;
+    if(color){
+        val += CASTLE_BONUS*board->w_castled;
+        val += CASTLE_RIGHT_BONUS*(board->wk_castle + board->wq_castle);
+    }else{
+        val += CASTLE_BONUS*board->b_castled;
+        val += CASTLE_RIGHT_BONUS*(board->bk_castle + board->bq_castle);
+    }
+    return val;
+}
+
+int LazyEval(const BOARD* board)
+{
+    unsigned char side = board->white_to_move;
+    return board->piece_material[side] - board->piece_material[1-side]
+         + board->pawn_material[side] - board->pawn_material[1-side];
+}
+
+int StaticEval(const BOARD* board)
 {
     int val = 0;
     for(SQUARE sq = 0; sq<0x78; sq++){
-        switch(board.squares[sq]){
+        switch(board->squares[sq]){
             case EMPTY:
                 break;
             case W_PAWN:
-                val += PawnStaticVal(sq, WHITE);
+                val += PawnStaticVal(board, sq, WHITE);
                 break;
             case W_KNIGHT:
-                val += KnightStaticVal(sq, WHITE);
+                val += KnightStaticVal(board, sq, WHITE);
                 break;
             case W_BISHOP:
-                val += BishopStaticVal(sq, WHITE);
+                val += BishopStaticVal(board, sq, WHITE);
                 break;
             case W_ROOK:
-                val += RookStaticVal(sq, WHITE);
+                val += RookStaticVal(board, sq, WHITE);
                 break;
             case W_QUEEN:
-                val += QueenStaticVal(sq, WHITE);
+                val += QueenStaticVal(board, sq, WHITE);
                 break;
             case W_KING:
-                val += KingStaticVal(sq, WHITE);
+                val += KingStaticVal(board, sq, WHITE);
                 break;
 
             case B_PAWN:
-                val -= PawnStaticVal(sq, BLACK);
+                val -= PawnStaticVal(board, sq, BLACK);
                 break;
             case B_KNIGHT:
-                val -= KnightStaticVal(sq, BLACK);
+                val -= KnightStaticVal(board, sq, BLACK);
                 break;
             case B_BISHOP:
-                val -= BishopStaticVal(sq, BLACK);
+                val -= BishopStaticVal(board, sq, BLACK);
                 break;
             case B_ROOK:
-                val -= RookStaticVal(sq, BLACK);
+                val -= RookStaticVal(board, sq, BLACK);
                 break;
             case B_QUEEN:
-                val -= QueenStaticVal(sq, BLACK);
+                val -= QueenStaticVal(board, sq, BLACK);
                 break;
             case B_KING:
-                val -= KingStaticVal(sq, BLACK);
+                val -= KingStaticVal(board, sq, BLACK);
                 break;
             default:
                 break;
         }
         if(COLUMN(sq) == H_COLUMN && ROW(sq) != EIGHT_ROW) sq += 8;
     }
-    if(board.white_to_move) return val;
+    if(board->white_to_move) return val;
     else return -val;
 }
 
-int PawnStaticVal(SQUARE sq, COLOR color)
+int Value(PIECE piece)
 {
-    int val = PAWN_VALUE;
-    if(color) val += WhitePawnMoves(sq, 0, 0, 1);
-    else val += BlackPawnMoves(sq, 0, 0, 1);
-    return val;
-}
+    switch(piece){
 
-int KnightStaticVal(SQUARE sq, COLOR color)
-{
-    int val = KNIGHT_VALUE;
-    val += N_MOBILITY_BONUS*NonSlidingMoves(sq, knight_delta, color, 0, 0, 1);
-    return val;
-}
+        case W_PAWN: return PAWN_VALUE;
+        case B_PAWN: return PAWN_VALUE;
 
-int BishopStaticVal(SQUARE sq, COLOR color)
-{
-    int val = BISHOP_VALUE;
-    val += B_MOBILITY_BONUS*SlidingMoves(sq, bishop_delta, color, 0, 0, 1);
-    return val;
-}
+        case W_KNIGHT: return KNIGHT_VALUE;
+        case W_BISHOP: return BISHOP_VALUE;
+        case W_ROOK: return ROOK_VALUE;
 
-int RookStaticVal(SQUARE sq, COLOR color)
-{
-    int val = ROOK_VALUE;
-    val += R_MOBILITY_BONUS*SlidingMoves(sq, rook_delta, color, 0, 0, 1);
-    return val;
-}
+        case B_KNIGHT: return KNIGHT_VALUE;
+        case B_BISHOP: return BISHOP_VALUE;
+        case B_ROOK: return ROOK_VALUE;
+        
+        case W_QUEEN: return QUEEN_VALUE;
+        case B_QUEEN: return QUEEN_VALUE;
+        case W_KING: return KING_VALUE;
+        case B_KING: return KING_VALUE;
 
-int QueenStaticVal(SQUARE sq, COLOR color)
-{
-    int val = QUEEN_VALUE;
-    val += Q_MOBILITY_BONUS*SlidingMoves(sq, king_delta, color, 0, 0, 1);
-    return val;
-}
-
-int KingStaticVal(SQUARE sq, COLOR color)
-{
-    int val = KING_VALUE;
-    if(color){
-        val += CASTLE_BONUS*board.w_castled;
-        val += CASTLE_RIGHT_BONUS*(board.wk_castle + board.wq_castle);
-    }else{
-        val += CASTLE_BONUS*board.b_castled;
-        val += CASTLE_RIGHT_BONUS*(board.bk_castle + board.bq_castle);
+        default: return 0;
     }
-    return val;
 }

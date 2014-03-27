@@ -34,8 +34,11 @@
 #include "claudia.h"
 #include "hashtable.h"
 
-struct BOARD {
-    PIECE squares[128];
+#define HISTLEN 500
+#define BOARDSIZE 0x80
+
+typedef struct BOARD {
+    PIECE squares[BOARDSIZE];
     /*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
     SQUARE en_passant;
     unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
@@ -43,81 +46,86 @@ struct BOARD {
     SQUARE wking_pos, bking_pos;
     unsigned char white_to_move;
     int ply;
-    int rev_plies [500];
+    int rev_plies [HISTLEN];
     KEY zobrist_key;
-    KEY zobrist_history[500];
+    KEY zobrist_history[HISTLEN];
     unsigned int piece_material[2];
     unsigned int pawn_material[2];
-};
-extern struct BOARD board;
+} BOARD;
 
 struct ZOBKEYS {
-    KEY zob_pieces[16][128];
-    KEY zob_enpass[128];
+    KEY zob_pieces[16][BOARDSIZE];
+    KEY zob_enpass[BOARDSIZE];
     KEY zob_castle[4];
     KEY zob_side;
 };
 extern struct ZOBKEYS zobkeys;
 
-void InitBoard();
+KEY PolyglotKey(const BOARD*);
+
+void InitBoard(BOARD*);
 void InitZobrist();
-void InitMaterial();
+void InitMaterial(BOARD*);
+void PrintBoard(const BOARD*);
+int ReadFEN(const char*, BOARD*);
 
-int ReadFEN(const char*);
-void PrintBoard();
+int MoveGen(const BOARD*, MOVE*, char);
+int CaptureGen(const BOARD*, MOVE*);
 
-int MoveGen(MOVE*, char);
-int CaptureGen(MOVE*);
+int WhitePawnMoves(const BOARD*, SQUARE, MOVE*, int, char);
+int BlackPawnMoves(const BOARD*, SQUARE, MOVE*, int, char);
+int SlidingMoves(const BOARD*, SQUARE, const char*, COLOR, MOVE*, int, char);
+int NonSlidingMoves(const BOARD*, SQUARE, const char*, COLOR, MOVE*, int, char);
+int GenerateWhiteCastle(const BOARD*, MOVE*, int);
+int GenerateBlackCastle(const BOARD*, MOVE*, int);
 
-int WhitePawnMoves(SQUARE, MOVE*, int, char);
-int BlackPawnMoves(SQUARE, MOVE*, int, char);
-int SlidingMoves(SQUARE, const char*, char, MOVE*, int, char);
-int NonSlidingMoves(SQUARE, const char*, char, MOVE*, int, char);
-int GenerateWhiteCastle(MOVE*, int);
-int GenerateBlackCastle(MOVE*, int);
+int IsAttacked(const BOARD*, SQUARE, COLOR);
+int AttackingPieces(const BOARD*, SQUARE, COLOR, SQUARE*);
 
-char IsAttacked(SQUARE, COLOR);
-int AttackingPieces(SQUARE, COLOR, SQUARE*);
+void MakeMove(BOARD*, MOVE*);
+void Takeback(BOARD*, const MOVE);
+/*
+void RemovePiece(BOARD*, SQUARE);
+void DropPiece(BOARD*, SQUARE, PIECE);
+*/
+char IsLegal(BOARD*, MOVE*);
+int Perft(BOARD*, int);
 
-void MakeMove(MOVE*);
-void Takeback(const MOVE);
-void RemovePiece(SQUARE);
-void DropPiece(SQUARE, PIECE);
-char IsLegal(MOVE*);
+/*
+int SEE(BOARD*, MOVE*);
+int EvaluateMove(BOARD*, MOVE*, const MOVE);
+*/
+void SortMoves(BOARD*, MOVE*, int);
+int FilterWinning(BOARD*, MOVE*, int);
 
-int Perft(int);
-int SEE(MOVE*);
-int EvaluateMove(MOVE*, const MOVE);
-void SortMoves(MOVE*, int);
-int FilterWinning(MOVE*, int);
-int Material();
-int LazyEval();
-int StaticEval();
+int LazyEval(const BOARD*);
+int StaticEval(const BOARD*);
+/*
+int PawnStaticVal(const BOARD*, SQUARE, COLOR);
+int KnightStaticVal(const BOARD*, SQUARE, COLOR);
+int BishopStaticVal(const BOARD*, SQUARE, COLOR);
+int RookStaticVal(const BOARD*, SQUARE, COLOR);
+int QueenStaticVal(const BOARD*, SQUARE, COLOR);
+int KingStaticVal(const BOARD*, SQUARE, COLOR);
+*/
 int Value(PIECE);
 
-int PawnStaticVal(SQUARE, COLOR);
-int KnightStaticVal(SQUARE, COLOR);
-int BishopStaticVal(SQUARE, COLOR);
-int RookStaticVal(SQUARE, COLOR);
-int QueenStaticVal(SQUARE, COLOR);
-int KingStaticVal(SQUARE, COLOR);
-
-static char WhiteInCheck(){
-    return IsAttacked(board.wking_pos, BLACK);
+static char WhiteInCheck(const BOARD* board){
+    return IsAttacked(board, board->wking_pos, BLACK);
 }
 
-static char BlackInCheck(){
-    return IsAttacked(board.bking_pos, WHITE);
+static char BlackInCheck(const BOARD* board){
+    return IsAttacked(board, board->bking_pos, WHITE);
 }
 
-static int InCheck(SQUARE *attacking_sqs){
-    if(board.white_to_move) return AttackingPieces(board.wking_pos, BLACK, attacking_sqs);
-    else return AttackingPieces(board.bking_pos, WHITE, attacking_sqs);
+static int InCheck(const BOARD* board, SQUARE *attacking_sqs){
+    if(board->white_to_move) return AttackingPieces(board, board->wking_pos, BLACK, attacking_sqs);
+    else return AttackingPieces(board, board->bking_pos, WHITE, attacking_sqs);
 }
 
-static char LeftInCheck(){
-    if(board.white_to_move) return IsAttacked(board.bking_pos, WHITE);
-    else return IsAttacked(board.wking_pos, BLACK);
+static char LeftInCheck(const BOARD* board){
+    if(board->white_to_move) return IsAttacked(board, board->bking_pos, WHITE);
+    else return IsAttacked(board, board->wking_pos, BLACK);
 }
 
 static inline MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)

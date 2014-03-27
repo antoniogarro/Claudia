@@ -33,77 +33,76 @@
 #include "board.h"
 #include "random.h"
 
-void InitBoard()
+void InitBoard(BOARD *board)
 {
     unsigned long long init[4]={0x12345ULL,0x23456ULL,0x34567ULL,0x45678ULL};
     unsigned long long length = 4;
     init_by_array64(init, length);
-    board.zobrist_key = 0;
-    for(int i = 0; i<128; i++) {
-        board.squares [i] = EMPTY;
+    board->zobrist_key = 0;
+    for(SQUARE sq = 0; sq < BOARDSIZE; sq++) {
+        board->squares[sq] = EMPTY;
         /*Note j = 1; we want zobrist keys for EMPTY to be 0:*/
-        /*TODO: pre-generate*/
         for (int j = 1; j <= 0xF; j++){
-            zobkeys.zob_pieces[j][i] = genrand64_int64();
+            zobkeys.zob_pieces[j][sq] = genrand64_int64();
         }
-        zobkeys.zob_enpass[i] = genrand64_int64();
+        zobkeys.zob_enpass[sq] = genrand64_int64();
     }
     for(int i = 0; i < 4; i++) zobkeys.zob_castle[i] = genrand64_int64();
     zobkeys.zob_side = genrand64_int64();
-    board.wk_castle = 0;
-    board.bk_castle = 0;
-    board.wq_castle = 0;
-    board.bq_castle = 0;
-    board.en_passant = 0x0F;        /*Invalid square, as there's no en passant pawn initialy.*/
-    board.pawn_material[0] = 0, board.pawn_material[1] = 0;
-    board.piece_material[0] = 0, board.piece_material[1] = 0;
+    board->wk_castle = 0;
+    board->bk_castle = 0;
+    board->wq_castle = 0;
+    board->bq_castle = 0;
+    board->en_passant = INVALID_SQ;    /*there's no en passant pawn initialy.*/
+    board->pawn_material[0] = 0, board->pawn_material[1] = 0;
+    board->piece_material[0] = 0, board->piece_material[1] = 0;
 }
 
-void InitZobrist()
+void InitZobrist(BOARD *board)
 {
-    board.zobrist_key = 0;
-    for (int i = 0; i<128; i++){
-        if(IN_BOARD(i)) board.zobrist_key ^= zobkeys.zob_pieces[board.squares[i]][i];
+    board->zobrist_key = 0;
+    for (int i = 0; i < BOARDSIZE; i++){
+        if(IN_BOARD(i)) board->zobrist_key ^= zobkeys.zob_pieces[board->squares[i]][i];
     }
-    if(board.wk_castle) board.zobrist_key ^= zobkeys.zob_castle[0];
-    if(board.wq_castle) board.zobrist_key ^= zobkeys.zob_castle[1];
-    if(board.bk_castle) board.zobrist_key ^= zobkeys.zob_castle[2];
-    if(board.bq_castle) board.zobrist_key ^= zobkeys.zob_castle[3];
+    if(board->wk_castle) board->zobrist_key ^= zobkeys.zob_castle[0];
+    if(board->wq_castle) board->zobrist_key ^= zobkeys.zob_castle[1];
+    if(board->bk_castle) board->zobrist_key ^= zobkeys.zob_castle[2];
+    if(board->bq_castle) board->zobrist_key ^= zobkeys.zob_castle[3];
 
-    if(IN_BOARD(board.en_passant)) board.zobrist_key ^= zobkeys.zob_enpass[board.en_passant];
-    if(board.white_to_move) board.zobrist_key ^= zobkeys.zob_side;
+    if(IN_BOARD(board->en_passant)) board->zobrist_key ^= zobkeys.zob_enpass[board->en_passant];
+    if(board->white_to_move) board->zobrist_key ^= zobkeys.zob_side;
 }
 
-void InitMaterial()
+void InitMaterial(BOARD *board)
 {
-    board.pawn_material[0] = 0, board.pawn_material[1] = 0;
-    board.piece_material[0] = 0, board.piece_material[1] = 0;
-    for (int i = 0; i<128; i++){
-        PIECE p = board.squares[i];
-        if(IN_BOARD(i) && p != EMPTY && p != W_KING && p != B_KING){
-            if(TURN_WHITE(p) == W_PAWN){
-                board.pawn_material[GET_SIDE(p)] += Value(p);
+    board->pawn_material[0] = 0, board->pawn_material[1] = 0;
+    board->piece_material[0] = 0, board->piece_material[1] = 0;
+    for (int sq = 0; sq < BOARDSIZE; sq++){
+        PIECE p = board->squares[sq];
+        if(IN_BOARD(sq) && p != EMPTY && p != W_KING && p != B_KING){
+            if(p == W_PAWN || p == B_PAWN){
+                board->pawn_material[GET_SIDE(p)] += Value(p);
             }else{
-                board.piece_material[GET_SIDE(p)] += Value(p);
+                board->piece_material[GET_SIDE(p)] += Value(p);
             }
         }
     }
 }
 
-void PrintBoard()
+void PrintBoard(const BOARD *board)
 {
     printf("\n+--+--+--+--+--+--+--+--+     %c %i%i\n",
-            board.white_to_move+1, board.bq_castle, board.bk_castle);
-    for(int i = 0x70; i>=0; i++){
+            board->white_to_move+1, board->bq_castle, board->bk_castle);
+    for(int i = 0x70; i >= 0; i++){
         if(!(i&0x88)){
-            printf("| %c", PieceToChar(board.squares[i]));
+            printf("| %c", PieceToChar(board->squares[i]));
         }else{
             printf("|\n+--+--+--+--+--+--+--+--+\n");
             i -= 0x19;
         }
     }
     printf("                                %i%i   Zobrist: %Lu\n",
-            board.wq_castle, board.wk_castle, board.zobrist_key);
-    printf("Material: W: %i %i; B: %i %i\n", board.piece_material[1], board.pawn_material[1],
-                                             board.piece_material[0], board.pawn_material[0]);
+            board->wq_castle, board->wk_castle, board->zobrist_key);
+    printf("Material: W: %i %i; B: %i %i\n", board->piece_material[1], board->pawn_material[1],
+                                             board->piece_material[0], board->pawn_material[0]);
 }

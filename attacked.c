@@ -31,38 +31,44 @@
 #include "board.h"
 #include "claudia.h"
 
-char IsAttacked(SQUARE square, COLOR attacking_color)
+int IsAttacked(const BOARD* board, SQUARE square, COLOR attacking_color)
 {
-    return AttackingPieces(square, attacking_color, 0);
+    return AttackingPieces(board, square, attacking_color, 0);
 }
 
-int AttackingPieces(SQUARE square, COLOR attacking_color, SQUARE *attacking_sqs)
+int AttackingPieces(const BOARD* board, SQUARE square, COLOR attacking_color, SQUARE *attacking_sqs)
 {
     int attackers = 0;
     SQUARE attacking_sq = 0;
+    
+    PIECE N_attacker, B_attacker, R_attacker, Q_attacker, K_attacker;
+    
     if(attacking_color){
         for(int i = 0; w_pawn_capture[i]; i++){
             attacking_sq = square - w_pawn_capture[i];
-            /*There should be no PAWN outside the board, but happens.*/
-            if(IN_BOARD(attacking_sq) && board.squares[attacking_sq] == W_PAWN){
+            if(IN_BOARD(attacking_sq) && board->squares[attacking_sq] == W_PAWN){
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
             }
         }
+        N_attacker = W_KNIGHT, B_attacker = W_BISHOP, R_attacker = W_ROOK,
+        Q_attacker = W_QUEEN, K_attacker = W_KING;
     }else{
         for(int i = 0; b_pawn_capture[i]; i++){
             attacking_sq = square - b_pawn_capture[i];
-            if(IN_BOARD(attacking_sq) && board.squares[attacking_sq] == B_PAWN){
+            if(IN_BOARD(attacking_sq) && board->squares[attacking_sq] == B_PAWN){
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
             }
         }
+        N_attacker = B_KNIGHT, B_attacker = B_BISHOP, R_attacker = B_ROOK,
+        Q_attacker = B_QUEEN, K_attacker = B_KING;
     }
 
     for(int i = 0; knight_delta[i]; i++){
         attacking_sq = square + knight_delta[i];
         if(IN_BOARD(attacking_sq)){
-            if(board.squares[attacking_sq] == BLACK_TO_COLOR(B_KNIGHT, attacking_color)){
+            if(board->squares[attacking_sq] == N_attacker){
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
             }
@@ -71,13 +77,13 @@ int AttackingPieces(SQUARE square, COLOR attacking_color, SQUARE *attacking_sqs)
 
     for(int i = 0; bishop_delta[i]; i++){
         for(attacking_sq = square + bishop_delta[i]; IN_BOARD(attacking_sq); attacking_sq += bishop_delta[i]){
-            if(board.squares[attacking_sq] == EMPTY){
+            if(board->squares[attacking_sq] == EMPTY){
                 continue;
-            }else if(board.squares[attacking_sq] == BLACK_TO_COLOR(B_BISHOP, attacking_color)) {
+            }else if(board->squares[attacking_sq] == B_attacker) {
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
                 break;
-            }else if(board.squares[attacking_sq] == BLACK_TO_COLOR(B_QUEEN, attacking_color)){
+            }else if(board->squares[attacking_sq] == Q_attacker){
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
                 break;
@@ -87,23 +93,24 @@ int AttackingPieces(SQUARE square, COLOR attacking_color, SQUARE *attacking_sqs)
 
     for(int i = 0; rook_delta[i]; i++){
         for(attacking_sq = square + rook_delta[i]; IN_BOARD(attacking_sq); attacking_sq += rook_delta[i]){
-            if(board.squares[attacking_sq] == EMPTY){
+            if(board->squares[attacking_sq] == EMPTY){
                 continue;
-            }else if(board.squares[attacking_sq] == BLACK_TO_COLOR(B_ROOK, attacking_color)){
+            }else if(board->squares[attacking_sq] == R_attacker){
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
                 break;
-            }else if(board.squares[attacking_sq] == BLACK_TO_COLOR(B_QUEEN, attacking_color)){
+            }else if(board->squares[attacking_sq] == Q_attacker){
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
                 break;
             }else break;
         }
     }
+    
     for(int i = 0; king_delta[i]; i++){
         attacking_sq = square + king_delta[i];
         if(IN_BOARD(attacking_sq)){
-            if(board.squares[attacking_sq] == BLACK_TO_COLOR(B_KING, attacking_color)){
+            if(board->squares[attacking_sq] == K_attacker){
                 if(attacking_sqs) attacking_sqs[attackers++] = attacking_sq;
                 else return 1;
                 break;

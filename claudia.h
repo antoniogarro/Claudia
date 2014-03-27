@@ -56,7 +56,7 @@
 #define BLACK 0x0
 #define TURN_BLACK(piece) (piece & 0x7)
 #define TURN_WHITE(piece) (piece | 0x8)
-#define BLACK_TO_COLOR(blackpiece, color) (blackpiece | color)
+#define BLACK_TO_COLOR(blackpiece, piece) ((blackpiece)|(piece & 0x8))
 #define GET_COLOR(piece) (piece & 0x8)  // WHITE or BLACK
 #define GET_SIDE(piece) ((piece & 0x8) >> 3)    // 1 or 0
 
@@ -82,6 +82,8 @@
 #define ROW(square) ((square) & 0xF0)
 #define SQUARE(row, column) (row + column)
 #define IN_BOARD(square) !((square) & 0x88)
+#define INVALID_SQ 0xFF
+#define NULL_MOVE 0xFFFF
 
 #define a1 0x00
 #define b1 0x01
@@ -162,6 +164,6 @@ typedef char COLOR;
 #define DESTMASK(move) ((move & 0xFFFF) >> 8)
 #define PROMMASK(move) ((move & 0xFFFFF) >> 16)
 #define CAPTMASK(move) ((move & 0xFFFFFF) >> 20)
-#define EPMASK(move) (move >> 24)
+#define EPMASK(move)   (move >> 24)
 
 #endif

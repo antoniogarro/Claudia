@@ -31,41 +31,41 @@
 #include "claudia.h"
 #include "board.h"
 
-int CaptureGen(MOVE *poss_moves)
+int CaptureGen(const BOARD *board, MOVE *poss_moves)
 {
-    return MoveGen(poss_moves, 0);
+    return MoveGen(board, poss_moves, 0);
 }
 
-int MoveGen(MOVE *poss_moves, char noncaptures)
+int MoveGen(const BOARD *board, MOVE *poss_moves, char noncaptures)
 {
     int nmoves = 0;
-    if(board.white_to_move){
-        for(SQUARE orig = 0; orig < 0x78; orig++){
-            switch (board.squares[orig]){
+    if(board->white_to_move){
+        for(SQUARE orig = a1; orig <= h8; orig++){
+            switch (board->squares[orig]){
                 case W_PAWN:
-                    nmoves = WhitePawnMoves(orig, poss_moves, nmoves, noncaptures);
+                    nmoves = WhitePawnMoves(board, orig, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_KNIGHT:
-                    nmoves = NonSlidingMoves(orig, knight_delta, WHITE, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(board, orig, knight_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_BISHOP:
-                    nmoves = SlidingMoves(orig, bishop_delta, WHITE, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(board, orig, bishop_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_ROOK:
-                    nmoves = SlidingMoves(orig, rook_delta, WHITE, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(board, orig, rook_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_QUEEN:
-                    nmoves = SlidingMoves(orig, king_delta, WHITE, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(board, orig, king_delta, WHITE, poss_moves, nmoves, noncaptures);
                     break;
 
                 case W_KING:
-                    nmoves = NonSlidingMoves(orig, king_delta, WHITE, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(board, orig, king_delta, WHITE, poss_moves, nmoves, noncaptures);
                     if(orig == e1 && noncaptures){
-                        nmoves = GenerateWhiteCastle(poss_moves, nmoves);
+                        nmoves = GenerateWhiteCastle(board, poss_moves, nmoves);
                     }
                     break;
 
@@ -74,32 +74,32 @@ int MoveGen(MOVE *poss_moves, char noncaptures)
             if(COLUMN(orig) == H_COLUMN && ROW(orig) != EIGHT_ROW) orig += 8;
         }
     }else{
-        for(SQUARE orig = 0; orig < 0x78; orig++){
-            switch (board.squares[orig]){
+        for(SQUARE orig = a1; orig <= h8; orig++){
+            switch (board->squares[orig]){
                 case B_PAWN:
-                    nmoves = BlackPawnMoves(orig, poss_moves, nmoves, noncaptures);
+                    nmoves = BlackPawnMoves(board, orig, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_KNIGHT:
-                    nmoves = NonSlidingMoves(orig, knight_delta, BLACK, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(board, orig, knight_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_BISHOP:
-                    nmoves = SlidingMoves(orig, bishop_delta, BLACK, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(board, orig, bishop_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_ROOK:
-                    nmoves = SlidingMoves(orig, rook_delta, BLACK, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(board, orig, rook_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_QUEEN:
-                    nmoves = SlidingMoves(orig, king_delta, BLACK, poss_moves, nmoves, noncaptures);
+                    nmoves = SlidingMoves(board, orig, king_delta, BLACK, poss_moves, nmoves, noncaptures);
                     break;
 
                 case B_KING:
-                    nmoves = NonSlidingMoves(orig, king_delta, BLACK, poss_moves, nmoves, noncaptures);
+                    nmoves = NonSlidingMoves(board, orig, king_delta, BLACK, poss_moves, nmoves, noncaptures);
                     if(orig == e8 && noncaptures){
-                        nmoves = GenerateBlackCastle(poss_moves, nmoves);
+                        nmoves = GenerateBlackCastle(board, poss_moves, nmoves);
                     }
                     break;
 
@@ -113,10 +113,10 @@ int MoveGen(MOVE *poss_moves, char noncaptures)
 }
 
 /*TODO: merge White and Black pawns generators?*/
-int WhitePawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
+int WhitePawnMoves(const BOARD *board, SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     SQUARE dest = orig + ROW_UP;
-    if(noncaptures && IN_BOARD(dest) && board.squares[dest] == EMPTY){
+    if(noncaptures && IN_BOARD(dest) && board->squares[dest] == EMPTY){
         if(ROW(dest) == EIGHT_ROW){            /*Promotions.*/
             if(poss_moves) poss_moves[nmoves] = Move(W_QUEEN, dest, orig);
             nmoves++;
@@ -131,7 +131,7 @@ int WhitePawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
             nmoves++;
             if(ROW(dest) == THIRD_ROW){
                 dest = dest + ROW_UP;
-                if(IN_BOARD(dest) && board.squares[dest] == EMPTY){
+                if(IN_BOARD(dest) && board->squares[dest] == EMPTY){
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
@@ -141,12 +141,12 @@ int WhitePawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
     for(int i = 0; w_pawn_capture[i]; i++){
         dest = orig + w_pawn_capture[i];
         if(IN_BOARD(dest)){
-            if(board.squares[dest] == EMPTY){
-                if(dest == board.en_passant){        /*Captures en Passant.*/
+            if(board->squares[dest] == EMPTY){
+                if(dest == board->en_passant){        /*Captures en Passant.*/
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
-            }else if(GET_COLOR(board.squares[dest]) == BLACK){
+            }else if(GET_COLOR(board->squares[dest]) == BLACK){
                 if(ROW(dest) == EIGHT_ROW){
                     if(poss_moves) poss_moves[nmoves] = Move(W_QUEEN, dest, orig);
                     nmoves++;
@@ -166,10 +166,10 @@ int WhitePawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
     return nmoves;
 }
 
-int BlackPawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
+int BlackPawnMoves(const BOARD *board, SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     SQUARE dest = orig + ROW_DOWN;
-    if(noncaptures && IN_BOARD(dest) && board.squares[dest] == EMPTY){
+    if(noncaptures && IN_BOARD(dest) && board->squares[dest] == EMPTY){
         if(ROW(dest) == FIRST_ROW){
             if(poss_moves) poss_moves[nmoves] = Move(B_QUEEN, dest, orig);
             nmoves++;
@@ -185,7 +185,7 @@ int BlackPawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
             if(ROW(dest) == SIXTH_ROW){
                 dest = dest + ROW_DOWN;
                 if(IN_BOARD(dest)){
-                    if(board.squares[dest] == EMPTY){
+                    if(board->squares[dest] == EMPTY){
                         if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                         nmoves++;
                     }
@@ -196,12 +196,12 @@ int BlackPawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
     for(int i = 0; b_pawn_capture[i]; i++){
         dest = orig + b_pawn_capture[i];
         if(IN_BOARD(dest)){
-            if(board.squares[dest] == EMPTY){
-                if(dest == board.en_passant){
+            if(board->squares[dest] == EMPTY){
+                if(dest == board->en_passant){
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
-            }else if(GET_COLOR(board.squares[dest])){
+            }else if(GET_COLOR(board->squares[dest])){
                 if(ROW(dest) == FIRST_ROW){
                     if(poss_moves) poss_moves[nmoves] = Move(B_QUEEN, dest, orig);   
                     nmoves++;
@@ -221,16 +221,16 @@ int BlackPawnMoves(SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
     return nmoves;
 }
 
-int SlidingMoves(SQUARE orig, const char *delta, char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
+int SlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
         for(SQUARE dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){
-            if(board.squares[dest] == EMPTY){
+            if(board->squares[dest] == EMPTY){
                 if(noncaptures){
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
-            }else if(GET_COLOR(board.squares[dest]) != piece_color) {  /*Different color Piece, capture, stop sliding.*/
+            }else if(GET_COLOR(board->squares[dest]) != piece_color) {  /*Different color Piece, capture, stop sliding.*/
                 if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                 nmoves++;
                 break;
@@ -240,17 +240,17 @@ int SlidingMoves(SQUARE orig, const char *delta, char piece_color, MOVE *poss_mo
     return nmoves;
 }
 
-int NonSlidingMoves(SQUARE orig, const char *delta, char piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
+int NonSlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
         SQUARE dest = orig + delta[i];
         if(IN_BOARD(dest)){
-            if(board.squares[dest] == EMPTY){
+            if(board->squares[dest] == EMPTY){
                 if(noncaptures){
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
-            }else if(GET_COLOR(board.squares[dest]) != piece_color){
+            }else if(GET_COLOR(board->squares[dest]) != piece_color){
                 if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                 nmoves++;
             }
@@ -259,34 +259,34 @@ int NonSlidingMoves(SQUARE orig, const char *delta, char piece_color, MOVE *poss
     return nmoves;
 }
 
-int GenerateWhiteCastle(MOVE *poss_moves, int nmoves)
+int GenerateWhiteCastle(const BOARD *board, MOVE *poss_moves, int nmoves)
 {
-    if(board.wk_castle && board.squares[h1] == W_ROOK && board.squares[g1] == EMPTY
-            && board.squares[f1] == EMPTY && !WhiteInCheck()
-            && !IsAttacked(f1, BLACK)){
+    if(board->wk_castle && board->squares[h1] == W_ROOK && board->squares[g1] == EMPTY
+            && board->squares[f1] == EMPTY && !WhiteInCheck(board)
+            && !IsAttacked(board, f1, BLACK)){
         if(poss_moves) poss_moves[nmoves] = Move(0, g1, e1);
         nmoves++;
     }
-    if(board.wq_castle && board.squares[a1] == W_ROOK &&board.squares[b1] == EMPTY
-            && board.squares[c1] == EMPTY && board.squares[d1] == EMPTY
-            && !WhiteInCheck() && !IsAttacked(d1, BLACK)){
+    if(board->wq_castle && board->squares[a1] == W_ROOK &&board->squares[b1] == EMPTY
+            && board->squares[c1] == EMPTY && board->squares[d1] == EMPTY
+            && !WhiteInCheck(board) && !IsAttacked(board, d1, BLACK)){
         if(poss_moves) poss_moves[nmoves] = Move(0, c1, e1);
         nmoves++;
     }
     return nmoves;
 }
 
-int GenerateBlackCastle(MOVE *poss_moves, int nmoves)
+int GenerateBlackCastle(const BOARD *board, MOVE *poss_moves, int nmoves)
 {
-    if(board.bk_castle && board.squares[h8] == B_ROOK &&board.squares[g8] == EMPTY
-            && board.squares[f8] == EMPTY && !BlackInCheck()
-            && !IsAttacked(f8, WHITE)){
+    if(board->bk_castle && board->squares[h8] == B_ROOK &&board->squares[g8] == EMPTY
+            && board->squares[f8] == EMPTY && !BlackInCheck(board)
+            && !IsAttacked(board, f8, WHITE)){
         if(poss_moves) poss_moves[nmoves] = Move(0, g8, e8);
         nmoves++;
     }
-    if(board.bq_castle && board.squares[a8] == B_ROOK &&board.squares[b8] == EMPTY
-            && board.squares[c8] == EMPTY && board.squares[d8] == EMPTY
-            && !BlackInCheck() && !IsAttacked(d8, WHITE)){
+    if(board->bq_castle && board->squares[a8] == B_ROOK &&board->squares[b8] == EMPTY
+            && board->squares[c8] == EMPTY && board->squares[d8] == EMPTY
+            && !BlackInCheck(board) && !IsAttacked(board, d8, WHITE)){
         if(poss_moves) poss_moves[nmoves] = Move(0, c8, e8);
         nmoves++;
     }

@@ -31,7 +31,7 @@
 #include "claudia.h"
 #include "board.h"
 
-int SEE(MOVE *main_capture)
+int SEE(BOARD *board, MOVE *main_capture)
 {
     SQUARE dest = DESTMASK(*main_capture);
     SQUARE captured, sq;
@@ -40,50 +40,62 @@ int SEE(MOVE *main_capture)
     int depth = 0, val = 0;
     MOVE move_hist[20];
     
-    MakeMove(main_capture);
+    MakeMove(board, main_capture);
     
-    int attackers = AttackingPieces(dest, (board.white_to_move << 3), attacking_sqs);
+    int attackers = AttackingPieces(board, dest, board->white_to_move, attacking_sqs);
 
     while(attackers){
         less_attack_sq = attacking_sqs;
         for(int i = 0; i < attackers; i++){
             sq = attacking_sqs[i];
-            if(board.squares[*less_attack_sq] > board.squares[sq]) {
+            if(board->squares[*less_attack_sq] > board->squares[sq]) {
                 less_attack_sq = &attacking_sqs[i];
             }
         }
         
-        if( (board.squares[*less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
-                || (board.squares[*less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW) ){
+        if( (board->squares[*less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
+                || (board->squares[*less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW) ){
             move_hist[depth] = Move(B_QUEEN, dest, *less_attack_sq);
         }
         else move_hist[depth] = Move(0, dest, *less_attack_sq);
         
-        MakeMove(&move_hist[depth]);
+        MakeMove(board, &move_hist[depth]);
         depth++;
-        attackers = AttackingPieces(dest, (board.white_to_move << 3), attacking_sqs);
+        attackers = AttackingPieces(board, dest, board->white_to_move, attacking_sqs);
     }
 
     while(depth--){
         captured = CAPTMASK(move_hist[depth]);
         if(val + Value(captured) > 0) val = -(val + Value(captured));
         else val = 0;
-        Takeback(move_hist[depth]);
+        Takeback(board, move_hist[depth]);
     }
     captured = CAPTMASK(*main_capture);
     val = val + Value(captured);
-    Takeback(*main_capture);
+    Takeback(board, *main_capture);
 
     return val;
 }
 
-void SortMoves(MOVE *moves, int nmoves)
+int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move)
+{
+    /*Compare with hash_move, using only orig, des; curr_move may not have captured or ep info.*/
+    if(SQSMASK(*curr_move) == SQSMASK(hash_move)){
+        return HASHMOVE_VALUE;        /*search HashMove first.*/
+    }
+    /*Evaluate captures with SEE:*/
+    SQUARE dest = DESTMASK(*curr_move);
+    if(board->squares[dest] != EMPTY) return SEE(board, curr_move);
+    else return 0;        /*TODO: evaluate non-captures.*/
+}
+
+void SortMoves(BOARD *board, MOVE *moves, int nmoves)
 {
     int eval[MAXMOVES];
-    MOVE hash_move = GetHashMove(board.zobrist_key);
+    MOVE hash_move = GetHashMove(board->zobrist_key);
     /*Evaluate every move, store evaluations:*/
     for(int i = 0; i < nmoves; i++){
-        eval[i] = EvaluateMove(&moves[i], hash_move);
+        eval[i] = EvaluateMove(board, &moves[i], hash_move);
     }
     
     /*Order according to that evaluation: insertion sort*/
@@ -100,14 +112,14 @@ void SortMoves(MOVE *moves, int nmoves)
     }
 }
 
-int FilterWinning(MOVE *captures, int ncapts)
+int FilterWinning(BOARD *board, MOVE *captures, int ncapts)
 {
     int good_capts = 0;
     int eval[MAXMOVES];
    
     /*evaluate every move, store evaluations:*/
     for(int i = 0; i < ncapts; i++){
-        eval[i] = SEE(&captures[i]);
+        eval[i] = SEE(board, &captures[i]);
     }
     for(int i = 1; i < ncapts; i++){
         for(int j = i; j > 0 && (eval[j-1] < eval[j]); j--){
@@ -126,40 +138,4 @@ int FilterWinning(MOVE *captures, int ncapts)
         good_capts++;
     }
     return good_capts;
-}
-
-int EvaluateMove(MOVE *curr_move, const MOVE hash_move)
-{
-    /*Compare with hash_move, using only orig, des; curr_move may not have captured or ep info.*/
-    if(SQSMASK(*curr_move) == SQSMASK(hash_move)){
-        return HASHMOVE_VALUE;        /*search HashMove first.*/
-    }
-    /*Evaluate captures with SEE:*/
-    SQUARE dest = DESTMASK(*curr_move);
-    if(board.squares[dest] != EMPTY) return SEE(curr_move);
-    else return 0;        /*TODO: evaluate non-captures.*/
-}
-
-int Value(PIECE piece)
-{
-        switch(piece){
-
-            case W_PAWN: return PAWN_VALUE;
-            case B_PAWN: return PAWN_VALUE;
-
-            case W_KNIGHT: return KNIGHT_VALUE;
-            case W_BISHOP: return BISHOP_VALUE;
-            case W_ROOK: return ROOK_VALUE;
-
-            case B_KNIGHT: return KNIGHT_VALUE;
-            case B_BISHOP: return BISHOP_VALUE;
-            case B_ROOK: return ROOK_VALUE;
-            
-            case W_QUEEN: return QUEEN_VALUE;
-            case B_QUEEN: return QUEEN_VALUE;
-            case W_KING: return KING_VALUE;
-            case B_KING: return KING_VALUE;
-
-            default: return 0;
-        }
 }

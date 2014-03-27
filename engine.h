@@ -36,39 +36,49 @@
 
 static const clock_t CPMS = CLOCKS_PER_SEC/1000;
 
-/*UCI commands*/
-typedef int CMDFN(char*);
-
-struct UCI_COMMAND{
-    char *name;
-    CMDFN *cmd;
-};
-
-struct CONTROL {
+typedef struct CONTROL {
     int wtime, btime, wtime_inc, btime_inc;
     clock_t init_time, wish_time, max_time;
     unsigned int max_depth;
     unsigned long long node_count;
     char uci, stop;
     MOVE best_move;
-};
-extern struct CONTROL control;
+} CONTROL;
 
-void IterativeDeep();
-int AlphaBeta(unsigned int, int, int, int);
-int Quiescent(int, int);
-int RetrievePV(MOVE*, unsigned int);
+typedef struct ENGINE_STATE{
+    BOARD *board;
+    CONTROL *control;
+} ENGINE_STATE;
+
+/*UCI commands*/
+typedef int CMDFN(char*, ENGINE_STATE*);
+
+struct UCI_COMMAND{
+    char *name;
+    CMDFN *cmd;
+};
+
+void IterativeDeep(BOARD*, CONTROL*);
+int AlphaBeta(BOARD*, unsigned int, int, int, int, CONTROL*);
+int Quiescent(BOARD*, int, int, CONTROL*);
+int RetrievePV(BOARD*, MOVE*, unsigned int);
 
 int ParseCommand(const char*);
-int Command(const char*);
+int Command(const char*, ENGINE_STATE*);
 
-KEY PolyglotKey();
 int PolyglotChooseMove(KEY key);
 
 static void think(void *pparams)
-{
-    if(PolyglotChooseMove(PolyglotKey())) return;
-    IterativeDeep();
+{   
+    BOARD *board = ((ENGINE_STATE*)pparams)->board;
+    CONTROL *control = ((ENGINE_STATE*)pparams)->control;
+    
+    if(PolyglotChooseMove(PolyglotKey(board))){
+        control->stop = 1;
+        return;
+    }
+    IterativeDeep(board, control);
+    control->stop = 1;
     return;
 }
 

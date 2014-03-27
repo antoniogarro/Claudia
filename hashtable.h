@@ -46,6 +46,8 @@
 #define DEPTHMASK(data) (int)((data >> 52) & 0x3FF)
 #define FLAGMASK(data) (char)(data >> 62)
 
+#define TABLESIZE 32
+
 typedef struct{
     KEY zobrist_key;
     /*bits 0-19: hash_move; bits 20-51: eval; bits 52-61: depth; 62-63: flags.*/
