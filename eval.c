@@ -114,7 +114,7 @@ int PawnStructureEval(const BOARD *board)
     dp_bonus *= DOUBLED_PAWN_BONUS;
     isl_bonus *= ISOLATED_PAWN_BONUS;
     
-    float pawn_stage = (STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
+    float pawn_stage = (float)(STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
     return (dp_bonus + isl_bonus)*pawn_stage;
 }
 
