@@ -54,11 +54,11 @@ typedef struct{
     KEY data;
 } HashData;
 
-struct HASHTABLE{
+typedef struct HASHTABLE{
     HashData *entries;
     unsigned int size;
     unsigned int full;
-};
+} HASHTABLE;
 extern struct HASHTABLE hash_table;
 
 int AllocTable(int);

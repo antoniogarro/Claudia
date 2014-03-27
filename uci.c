@@ -44,16 +44,16 @@
 CMDFN make_move, quit, go, stop, perft, position, uci, isready, setoption, ucinewgame, showboard;
 
 const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
-                                            {"quit", &quit},
-                                            {"go", &go},
-                                            {"stop", &stop},
-                                            {"perft", &perft},
-                                            {"position", &position},
-                                            {"uci", &uci},
-                                            {"isready", &isready},
-                                            {"setoption", &setoption},
-                                            {"ucinewgame", &ucinewgame},
-                                            {"showboard", &showboard}};
+                                           {"quit", &quit},
+                                           {"go", &go},
+                                           {"stop", &stop},
+                                           {"perft", &perft},
+                                           {"position", &position},
+                                           {"uci", &uci},
+                                           {"isready", &isready},
+                                           {"setoption", &setoption},
+                                           {"ucinewgame", &ucinewgame},
+                                           {"showboard", &showboard}};
                                          
 int ParseCommand(const char *command)
 {   if(command == 0) return 0; 
@@ -176,7 +176,7 @@ int go(char *input, ENGINE_STATE *stat)
         pthread_t thread_id;
         pthread_create(&thread_id, &tattr, (void *)(think), stat);
 #elif defined _WIN32
-        _beginthread(think, 0, NULL);
+        _beginthread(think, 0, stat);
 #endif
     }
     return 1;
@@ -226,7 +226,7 @@ int uci(char *input, ENGINE_STATE *stat)
     stat->control->uci = 1;
     printf("id name %s v. %s\n", NAME, VERSION);
     printf("id author Antonio Garro\n");
-    printf("option name Hash type spin default 32 min 32 max 2048\n");
+    printf("option name Hash type spin default %i min 32 max 2048\n", TABLESIZE);
     printf("uciok\n");
     return 1;
 }

@@ -53,13 +53,14 @@ typedef struct BOARD {
     unsigned int pawn_material[2];
 } BOARD;
 
-struct ZOBKEYS {
+typedef struct ZOBKEYS {
     KEY zob_pieces[16][BOARDSIZE];
     KEY zob_enpass[BOARDSIZE];
     KEY zob_castle[4];
     KEY zob_side;
-};
-extern struct ZOBKEYS zobkeys;
+} ZOBKEYS;
+
+extern ZOBKEYS zobkeys;
 
 KEY PolyglotKey(const BOARD*);
 

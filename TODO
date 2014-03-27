@@ -25,7 +25,7 @@
 
 * Ponder				low			pending
 
-* Get rid of global variables		high			pending
+* Get rid of global board		-			done
 
 * Multithreading			low			pending
 
@@ -35,7 +35,7 @@
 
 * UCI options				low			pending
 
-* Ending knowledge			medium			pending
+* Ending knowledge			medium			ongoing
 
 * Tidy up parser			-			done
 

@@ -80,6 +80,14 @@ int KingStaticVal(const BOARD *board, SQUARE sq, COLOR color)
     return val;
 }
 
+int MaterialDraw(const BOARD *board)
+{
+    unsigned char side = board->white_to_move;
+    if(board->pawn_material[side] || board->pawn_material[1-side]) return 0;
+    if(board->piece_material[side] >= ROOK_VALUE || board->piece_material[1-side] >= ROOK_VALUE) return 0;
+    return 1;
+}
+
 int LazyEval(const BOARD* board)
 {
     unsigned char side = board->white_to_move;
@@ -87,8 +95,9 @@ int LazyEval(const BOARD* board)
          + board->pawn_material[side] - board->pawn_material[1-side];
 }
 
-int StaticEval(const BOARD* board)
+int StaticEval(const BOARD *board)
 {
+    if(MaterialDraw(board)) return DRAW_VALUE;
     int val = 0;
     for(SQUARE sq = 0; sq<0x78; sq++){
         switch(board->squares[sq]){

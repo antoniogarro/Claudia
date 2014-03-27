@@ -35,14 +35,15 @@
 #include "board.h"
 
 /*Globals.*/
-struct ZOBKEYS zobkeys;
-struct HASHTABLE hash_table;
+HASHTABLE hash_table;
+ZOBKEYS zobkeys;
 
 int main(int argc, char *argv[])
 {
     BOARD main_board;
     InitBoard(&main_board);
-    ReadFEN(STARTPOS, &main_board);        /*or ReadFEN("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");*/
+    ReadFEN(STARTPOS, &main_board);
+    /*ReadFEN("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");*/
     
     CONTROL engine_control;
     engine_control.stop = 1;
