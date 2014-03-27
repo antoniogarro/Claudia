@@ -21,7 +21,7 @@
 
 * King safety evaluation		medium			pending
 
-* Pawn structure evaluation		medium			pending
+* Pawn structure evaluation		medium			ongoing
 
 * Ponder				low			pending
 
@@ -40,3 +40,5 @@
 * Tidy up parser			-			done
 
 * Lazy evaluation			-			done
+
+* Killer moves				medium			ongoing

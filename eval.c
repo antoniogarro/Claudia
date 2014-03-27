@@ -33,9 +33,15 @@
 
 int PawnStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 {
+    float pawn_stage = (STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
     int val = PAWN_VALUE;
-    if(color) val += WhitePawnMoves(board, sq, 0, 0, 1);
-    else val += BlackPawnMoves(board, sq, 0, 0, 1);
+    if(color){
+        val += ROW(sq)*pawn_stage*PAWN_PUSH_BONUS;
+        val += WhitePawnMoves(board, sq, 0, 0, 1);
+    }else{
+        val += (EIGHT_ROW - ROW(sq))*pawn_stage*PAWN_PUSH_BONUS;
+        val += BlackPawnMoves(board, sq, 0, 0, 1);
+    }
     return val;
 }
 
@@ -80,6 +86,38 @@ int KingStaticVal(const BOARD *board, SQUARE sq, COLOR color)
     return val;
 }
 
+int PawnStructureEval(const BOARD *board)
+{
+    int dp_bonus = 0, isl_bonus = 0, chain[2] = {0,0}, npawns[2] = {0,0};
+    for (int c = 0; c < 8; c++){ 
+        
+        npawns[1] = board->pawn_column[1][c];
+        if(npawns[1] == 0) chain[1] = 0;
+        else if (npawns[1] == 1){
+            isl_bonus += chain[1];
+            chain[1]++;
+        }else{
+            chain[1]++;
+            dp_bonus -= npawns[1] * npawns[1];
+        }
+        
+        npawns[0] = board->pawn_column[0][c];
+        if(npawns[0] == 0) chain[0] = 0;
+        else if (npawns[0] == 1){
+            isl_bonus -= chain[0];
+            chain[0]++;
+        }else{
+            chain[0]++;
+            dp_bonus += npawns[0] * npawns[0];
+        }
+    }
+    dp_bonus *= DOUBLED_PAWN_BONUS;
+    isl_bonus *= ISOLATED_PAWN_BONUS;
+    
+    float pawn_stage = (STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
+    return (dp_bonus + isl_bonus)*pawn_stage;
+}
+
 int MaterialDraw(const BOARD *board)
 {
     unsigned char side = board->white_to_move;
@@ -90,9 +128,13 @@ int MaterialDraw(const BOARD *board)
 
 int LazyEval(const BOARD *board)
 {
+    if(MaterialDraw(board)) return DRAW_VALUE;
     unsigned char side = board->white_to_move;
-    return board->piece_material[side] - board->piece_material[1-side]
-         + board->pawn_material[side] - board->pawn_material[1-side];
+    int lazy = board->piece_material[1] - board->piece_material[0]
+                + board->pawn_material[1] - board->pawn_material[0]
+                + PawnStructureEval(board);
+    if(side) return lazy;
+    else return -lazy;
 }
 
 int StaticEval(const BOARD *board)
@@ -145,6 +187,8 @@ int StaticEval(const BOARD *board)
         }
         if(COLUMN(sq) == H_COLUMN && ROW(sq) != EIGHT_ROW) sq += 8;
     }
+    val += PawnStructureEval(board);
+    
     if(board->white_to_move) return val;
     else return -val;
 }

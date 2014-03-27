@@ -106,6 +106,8 @@
 
 #define STARTPOS "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n"
 
+#define STARTPAWNS 1600
+
 #define ROW_UP 0x10
 #define ROW_DOWN -0x10
 
@@ -132,6 +134,10 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 #define MATE_VALUE -100000
 #define HASHMOVE_VALUE 100000
 #define KILLER_VALUE 50
+
+#define DOUBLED_PAWN_BONUS 20
+#define ISOLATED_PAWN_BONUS 10
+#define PAWN_PUSH_BONUS 1
 
 #define ERRORVALUE -1000000001
 
