@@ -51,6 +51,7 @@ typedef struct BOARD {
     KEY zobrist_history[HISTLEN];
     unsigned int piece_material[2];
     unsigned int pawn_material[2];
+    unsigned int pawn_column[2][8];
 } BOARD;
 
 typedef struct ZOBKEYS {

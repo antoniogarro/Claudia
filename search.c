@@ -106,7 +106,7 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     printf("bestmove %s\n", str_mov);
 }
 
-int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, CONTROL* control, MOVE *killers)
+int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, CONTROL *control, MOVE *killers)
 {
     int nposs_movs, nlegal = 0;
     MOVE poss_moves[MAXMOVES];

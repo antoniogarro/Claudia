@@ -56,6 +56,7 @@ void RemovePiece(BOARD* board, SQUARE sq)
     board->zobrist_key ^= zobkeys.zob_pieces[p][sq];
     if(p == W_PAWN || p == B_PAWN){
         board->pawn_material[GET_SIDE(p)] -= Value(p);
+        board->pawn_column[GET_SIDE(p)][COLUMN(sq)]--;
     }else if(p != EMPTY && p != W_KING && p != B_KING){
         board->piece_material[GET_SIDE(p)] -= Value(p);
     }
@@ -70,12 +71,14 @@ void DropPiece(BOARD* board, SQUARE sq, PIECE piece)
     
     if(p == W_PAWN || p == B_PAWN){
         board->pawn_material[GET_SIDE(p)] -= Value(p);
+        board->pawn_column[GET_SIDE(p)][COLUMN(sq)]--;
     }else if(p != EMPTY && p != W_KING && p != B_KING){
         board->piece_material[GET_SIDE(p)] -= Value(p);
     }
     
     if(piece == W_PAWN || piece == B_PAWN){
         board->pawn_material[GET_SIDE(piece)] += Value(piece);
+        board->pawn_column[GET_SIDE(piece)][COLUMN(sq)]++;
     }else if(piece != EMPTY && piece != W_KING && piece != B_KING){
         board->piece_material[GET_SIDE(piece)] += Value(piece);
     }

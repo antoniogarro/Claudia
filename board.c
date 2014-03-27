@@ -77,11 +77,15 @@ void InitMaterial(BOARD *board)
 {
     board->pawn_material[0] = 0, board->pawn_material[1] = 0;
     board->piece_material[0] = 0, board->piece_material[1] = 0;
+    for(int c = 0; c < 8; c++){
+        board->pawn_column[0][c] = 0, board->pawn_column[1][c] = 0;
+    }
     for (int sq = 0; sq < BOARDSIZE; sq++){
         PIECE p = board->squares[sq];
         if(IN_BOARD(sq) && p != EMPTY && p != W_KING && p != B_KING){
             if(p == W_PAWN || p == B_PAWN){
                 board->pawn_material[GET_SIDE(p)] += Value(p);
+                board->pawn_column[GET_SIDE(p)][COLUMN(sq)]++;
             }else{
                 board->piece_material[GET_SIDE(p)] += Value(p);
             }
@@ -91,6 +95,8 @@ void InitMaterial(BOARD *board)
 
 void PrintBoard(const BOARD *board)
 {
+    printf("\n");
+    for(int c = 0; c < 8; c++) printf("% i ", board->pawn_column[0][c]);
     printf("\n+--+--+--+--+--+--+--+--+     %c %i%i\n",
             board->white_to_move+1, board->bq_castle, board->bk_castle);
     for(int i = 0x70; i >= 0; i++){
@@ -101,8 +107,9 @@ void PrintBoard(const BOARD *board)
             i -= 0x19;
         }
     }
-    printf("                                %i%i   Zobrist: %Lu\n",
+    for(int c = 0; c < 8; c++) printf("% i ", board->pawn_column[1][c]);
+    printf("Material: W: %i %i; B: %i %i;  %i%i   Zobrist: %Lu\n",
+            board->piece_material[1], board->pawn_material[1],
+            board->piece_material[0], board->pawn_material[0],
             board->wq_castle, board->wk_castle, board->zobrist_key);
-    printf("Material: W: %i %i; B: %i %i\n", board->piece_material[1], board->pawn_material[1],
-                                             board->piece_material[0], board->pawn_material[0]);
 }

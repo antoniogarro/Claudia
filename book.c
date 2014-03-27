@@ -253,10 +253,6 @@ typedef struct {
     uint32 learn;
 } entry_t;
 
-
-#define ROW7(sq) (sq)
-#define COLUMN7(sq) (sq)
-
 KEY PolyglotKey(const BOARD *board)
 {
     KEY key = 0;

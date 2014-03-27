@@ -53,7 +53,7 @@ const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
                                            {"isready", &isready},
                                            {"setoption", &setoption},
                                            {"ucinewgame", &ucinewgame},
-                                           {"showboard", &showboard}};
+                                           {"show", &showboard}};
                                          
 int ParseCommand(const char *command)
 {   if(command == 0) return 0; 

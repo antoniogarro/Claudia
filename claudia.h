@@ -85,6 +85,8 @@
 #define INVALID_SQ 0xFF
 #define NULL_MOVE 0xFFFF
 
+#define ROW8(sq) ((sq) >> 4)
+
 #define a1 0x00
 #define b1 0x01
 #define c1 0x02
