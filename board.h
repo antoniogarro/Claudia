@@ -65,7 +65,7 @@ extern ZOBKEYS zobkeys;
 KEY PolyglotKey(const BOARD*);
 
 void InitBoard(BOARD*);
-void InitZobrist();
+void InitZobrist(BOARD*);
 void InitMaterial(BOARD*);
 void PrintBoard(const BOARD*);
 int ReadFEN(const char*, BOARD*);
@@ -96,7 +96,7 @@ int Perft(BOARD*, int);
 int SEE(BOARD*, MOVE*);
 int EvaluateMove(BOARD*, MOVE*, const MOVE);
 */
-void SortMoves(BOARD*, MOVE*, int);
+void SortMoves(BOARD*, MOVE*, int, MOVE);
 int FilterWinning(BOARD*, MOVE*, int);
 
 int LazyEval(const BOARD*);

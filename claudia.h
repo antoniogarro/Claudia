@@ -129,6 +129,7 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 #define DRAW_VALUE 0
 #define MATE_VALUE -100000
 #define HASHMOVE_VALUE 100000
+#define KILLER_VALUE 50
 
 #define ERRORVALUE -1000000001
 
@@ -146,6 +147,7 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 #define LAZYBETA 400
 #define LAZYALPHA 1000
 #define MAXMOVES 250
+#define MAXDEPTH 70
 #endif
 
 /*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED:bits 16-19,

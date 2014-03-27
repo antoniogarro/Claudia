@@ -88,7 +88,7 @@ int MaterialDraw(const BOARD *board)
     return 1;
 }
 
-int LazyEval(const BOARD* board)
+int LazyEval(const BOARD *board)
 {
     unsigned char side = board->white_to_move;
     return board->piece_material[side] - board->piece_material[1-side]

@@ -107,7 +107,7 @@ int quit(char *input, ENGINE_STATE *stat)
 
 int go(char *input, ENGINE_STATE *stat)
 {    
-    stat->control->max_depth = 70;
+    stat->control->max_depth = MAXDEPTH;
     stat->control->max_time = INFINITE;
     stat->control->wish_time = INFINITE;
     stat->control->stop = 1;

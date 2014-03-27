@@ -59,7 +59,7 @@ struct UCI_COMMAND{
 };
 
 void IterativeDeep(BOARD*, CONTROL*);
-int AlphaBeta(BOARD*, unsigned int, int, int, int, CONTROL*);
+int AlphaBeta(BOARD*, unsigned int, int, int, int, CONTROL*, MOVE*);
 int Quiescent(BOARD*, int, int, CONTROL*);
 int RetrievePV(BOARD*, MOVE*, unsigned int);
 
