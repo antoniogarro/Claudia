@@ -60,10 +60,10 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     int alpha = -INFINITE;
     int beta = INFINITE;
     unsigned long long nps = 0;
+    MOVE killers[MAXDEPTH] = {0};
     
     for(unsigned int depth = 1; depth <= control->max_depth;){
         unsigned long long curr_time = clock();
-        MOVE killers[MAXDEPTH] = {0};
         memset(sPV, 0, SPVLEN);
         control->node_count = 0;
         

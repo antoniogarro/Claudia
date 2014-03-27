@@ -36,7 +36,7 @@ int SEE(BOARD *board, MOVE *main_capture)
     SQUARE dest = DESTMASK(*main_capture);
     SQUARE captured, sq;
     SQUARE attacking_sqs[10];
-    SQUARE *less_attack_sq;
+    SQUARE less_attack_sq;
     int depth = 0, val = 0;
     MOVE move_hist[20];
     
@@ -45,19 +45,19 @@ int SEE(BOARD *board, MOVE *main_capture)
     int attackers = AttackingPieces(board, dest, board->white_to_move, attacking_sqs);
 
     while(attackers){
-        less_attack_sq = attacking_sqs;
+        less_attack_sq = attacking_sqs[0];
         for(int i = 0; i < attackers; i++){
             sq = attacking_sqs[i];
-            if(board->squares[*less_attack_sq] > board->squares[sq]) {
-                less_attack_sq = &attacking_sqs[i];
+            if(board->squares[less_attack_sq] > board->squares[sq]) {
+                less_attack_sq = attacking_sqs[i];
             }
         }
         
-        if( (board->squares[*less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
-                || (board->squares[*less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW) ){
-            move_hist[depth] = Move(B_QUEEN, dest, *less_attack_sq);
+        if( (board->squares[less_attack_sq] == B_PAWN && ROW(dest) == FIRST_ROW)
+                || (board->squares[less_attack_sq] == W_PAWN && ROW(dest) == EIGHT_ROW) ){
+            move_hist[depth] = Move(B_QUEEN, dest, less_attack_sq);
         }
-        else move_hist[depth] = Move(0, dest, *less_attack_sq);
+        else move_hist[depth] = Move(0, dest, less_attack_sq);
         
         MakeMove(board, &move_hist[depth]);
         depth++;
