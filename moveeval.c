@@ -77,13 +77,14 @@ int SEE(BOARD *board, MOVE *main_capture)
     return val;
 }
 
-int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, const MOVE killer)
+int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, const MOVE killers[])
 {
     /*Compare with hash_move, using only orig, des; curr_move may not have captured or ep info.*/
     if(SQSMASK(*curr_move) == SQSMASK(hash_move)){
         return HASHMOVE_VALUE;        /*search HashMove first.*/
     }
-    if(SQSMASK(*curr_move) == SQSMASK(killer)){
+    if(SQSMASK(*curr_move) == SQSMASK(killers[0]) 
+          || SQSMASK(*curr_move) == SQSMASK(killers[1])){
         return KILLER_VALUE;
     }
     /*Evaluate captures with SEE:*/
@@ -92,13 +93,13 @@ int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, const MOVE
     else return 0;
 }
 
-void SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killer)
+void SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killers[])
 {
     int eval[MAXMOVES];
     MOVE hash_move = GetHashMove(board->zobrist_key);
     /*Evaluate every move, store evaluations:*/
     for(int i = 0; i < nmoves; i++){
-        eval[i] = EvaluateMove(board, &moves[i], hash_move, killer);
+        eval[i] = EvaluateMove(board, &moves[i], hash_move, killers);
     }
     
     /*Order according to that evaluation: insertion sort*/

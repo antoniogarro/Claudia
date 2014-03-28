@@ -60,14 +60,14 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     int alpha = -INFINITE;
     int beta = INFINITE;
     unsigned long long nps = 0;
-    MOVE killers[MAXDEPTH] = {0};
+    MOVE killers[MAXDEPTH][2];
     
     for(unsigned int depth = 1; depth <= control->max_depth;){
         unsigned long long curr_time = clock();
         memset(sPV, 0, SPVLEN);
         control->node_count = 0;
         
-        eval = AlphaBeta(board, depth, alpha, beta, 1, control, killers);
+        eval = AlphaBeta(board, depth, alpha, beta, 0, control, 1, killers);
         if(control->stop){
             break;
         }
@@ -106,7 +106,8 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     printf("bestmove %s\n", str_mov);
 }
 
-int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, CONTROL *control, MOVE *killers)
+int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
+               int root, CONTROL *control, char skip_null, MOVE killers[][2])
 {
     int nposs_movs, nlegal = 0;
     MOVE poss_moves[MAXMOVES];
@@ -121,22 +122,22 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, C
         if(val != ERRORVALUE){
             return val;
         }
-        if(root == 0 && depth > 2
+        if(!skip_null && depth > 2 
                 && board->piece_material[board->white_to_move] != 0
                 && !InCheck(board, 0)){
             MOVE null_mv = NULL_MOVE;
             MakeMove(board, &null_mv);
-            val = -AlphaBeta(board, depth-3, -beta, -beta+1, -1, control, killers);
+            val = -AlphaBeta(board, depth-3, -beta, -beta+1, root+1, control, 1, killers);
             Takeback(board, null_mv);
             if(val >= beta) return beta;
         }
         nposs_movs = MoveGen(board, poss_moves, 1);
-        SortMoves(board, poss_moves, nposs_movs, killers[depth]);
+        SortMoves(board, poss_moves, nposs_movs, killers[root]);
         for(int i = 0; i < nposs_movs; i++){
             MakeMove(board, &poss_moves[i]);
             control->node_count++;
             if(!LeftInCheck(board)){
-                if(root== 1 && depth > 6){
+                if(root == 0 && depth > 6){
                     MoveToAlgeb(poss_moves[i], str_mov);
                     printf("info depth %i hashfull %i currmove %s currmovenumber %i\n",
                         depth, hash_table.full/(hash_table.size/1000), str_mov, i+1);
@@ -146,11 +147,11 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, C
                 
                 if(val) {
                     if(best_move){
-                        val = -AlphaBeta(board, depth - 1, -alpha-1, -alpha, 0, control, killers);
+                        val = -AlphaBeta(board, depth-1, -alpha-1, -alpha, root+1, control, 0, killers);
                         if(val > alpha && val < beta){
-                            val = -AlphaBeta(board, depth - 1, -beta, -alpha, 0, control, killers);
+                            val = -AlphaBeta(board, depth-1, -beta, -alpha, root+1, control, 0, killers);
                         }
-                    }else val = -AlphaBeta(board, depth - 1, -beta, -alpha, 0, control, killers);
+                    }else val = -AlphaBeta(board, depth-1, -beta, -alpha, root+1, control, 0, killers);
                 }
                 Takeback(board, poss_moves[i]);
 
@@ -161,8 +162,11 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, C
                 if(val >= beta){
                     UpdateTable(board->zobrist_key, val, poss_moves[i], depth, HASH_BETA);
                     MOVE hash_move = GetHashMove(board->zobrist_key);
-                    if(CAPTMASK(poss_moves[i]) == 0){
-                        killers[depth] = poss_moves[i];
+                    if(killers[root][0] != poss_moves[i]
+                       && killers[root][1] != poss_moves[i]
+                       && CAPTMASK(poss_moves[i]) == 0){
+                        killers[root][1] = killers[root][0];
+                        killers[root][0] = poss_moves[i];
                     }
                     return beta;
                 }
@@ -170,9 +174,9 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, C
                     alpha = val;
                     hash_flag = HASH_EXACT;
                     best_move = poss_moves[i];
-                    if(root == 1) control->best_move = best_move;
+                    if(root == 0) control->best_move = best_move;
                 }
-                if(root == 1 && ((clock() - control->init_time) > control->wish_time*CPMS)){
+                if(root == 0 && ((clock() - control->init_time) > control->wish_time*CPMS)){
                 /*don't search anymore after current move; TODO: continue if fails low?*/
                     control->max_depth = depth;
                     return alpha;
@@ -190,7 +194,7 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, C
         }else UpdateTable(board->zobrist_key, alpha, best_move, depth, hash_flag);
         
     }else if(InCheck(board, 0)){
-        alpha = AlphaBeta(board, 1, alpha, beta, 0, control, killers);
+        alpha = AlphaBeta(board, 1, alpha, beta, root+1, control, 1, killers);
     }else{
         alpha = Quiescent(board, alpha, beta, control);
     }

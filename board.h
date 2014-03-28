@@ -97,7 +97,7 @@ int Perft(BOARD*, int);
 int SEE(BOARD*, MOVE*);
 int EvaluateMove(BOARD*, MOVE*, const MOVE);
 */
-void SortMoves(BOARD*, MOVE*, int, MOVE);
+void SortMoves(BOARD*, MOVE*, int, MOVE[]);
 int FilterWinning(BOARD*, MOVE*, int);
 
 int LazyEval(const BOARD*);
@@ -112,20 +112,20 @@ int KingStaticVal(const BOARD*, SQUARE, COLOR);
 */
 int Value(PIECE);
 
-static char WhiteInCheck(const BOARD* board){
+static char WhiteInCheck(const BOARD *board){
     return IsAttacked(board, board->wking_pos, BLACK);
 }
 
-static char BlackInCheck(const BOARD* board){
+static char BlackInCheck(const BOARD *board){
     return IsAttacked(board, board->bking_pos, WHITE);
 }
 
-static int InCheck(const BOARD* board, SQUARE *attacking_sqs){
+static int InCheck(const BOARD *board, SQUARE *attacking_sqs){
     if(board->white_to_move) return AttackingPieces(board, board->wking_pos, BLACK, attacking_sqs);
     else return AttackingPieces(board, board->bking_pos, WHITE, attacking_sqs);
 }
 
-static char LeftInCheck(const BOARD* board){
+static char LeftInCheck(const BOARD *board){
     if(board->white_to_move) return IsAttacked(board, board->bking_pos, WHITE);
     else return IsAttacked(board, board->wking_pos, BLACK);
 }
