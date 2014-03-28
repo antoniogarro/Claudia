@@ -40,7 +40,7 @@ inline void RememberCaptured(MOVE *move, PIECE captured)
 {
     *move |= (captured << 20);
 }
-inline void RememberEP(MOVE* move, SQUARE en_passant)
+inline void RememberEP(MOVE *move, SQUARE en_passant)
 {
     *move |= (en_passant << 24);
 }
@@ -50,7 +50,7 @@ inline void RememberCastleRight(MOVE *move, unsigned char rights)
 }
 
 
-void RemovePiece(BOARD* board, SQUARE sq)
+void RemovePiece(BOARD *board, SQUARE sq)
 {
     PIECE p = board->squares[sq];
     board->zobrist_key ^= zobkeys.zob_pieces[p][sq];
@@ -63,7 +63,7 @@ void RemovePiece(BOARD* board, SQUARE sq)
     board->squares[sq] = EMPTY;
 }
 
-void DropPiece(BOARD* board, SQUARE sq, PIECE piece)
+void DropPiece(BOARD *board, SQUARE sq, PIECE piece)
 {
     PIECE p = board->squares[sq];
     board->zobrist_key ^= zobkeys.zob_pieces[p][sq];
@@ -85,7 +85,7 @@ void DropPiece(BOARD* board, SQUARE sq, PIECE piece)
     board->squares[sq] = piece;
 }
 
-void MakeMove(BOARD* board, MOVE *curr_move)
+void MakeMove(BOARD *board, MOVE *curr_move)
 {
     board->ply++;
     SQUARE orig = ORIGMASK(*curr_move);
@@ -226,7 +226,7 @@ void MakeMove(BOARD* board, MOVE *curr_move)
 
 }
 
-void Takeback(BOARD* board, const MOVE prev_move)
+void Takeback(BOARD *board, const MOVE prev_move)
 {
     SQUARE orig = ORIGMASK(prev_move);
     SQUARE dest = DESTMASK(prev_move);

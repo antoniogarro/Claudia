@@ -108,7 +108,7 @@ int PawnStructureEval(const BOARD *board)
     }
     dp_bonus *= DOUBLED_PAWN_BONUS;
     
-    return (dp_bonus + isl_bonus)*GameStage();
+    return dp_bonus*GameStage(board);
 }
 
 int MaterialDraw(const BOARD *board)
