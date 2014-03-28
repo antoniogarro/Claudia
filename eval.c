@@ -31,15 +31,20 @@
 #include "board.h"
 #include "claudia.h"
 
+float GameStage(const BOARD *board)
+{
+    return (float)(STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
+}
+
 int PawnStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 {
-    float pawn_stage = (STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
+    float stage = GameStage(board);
     int val = PAWN_VALUE;
     if(color){
-        val += ROW(sq)*pawn_stage*PAWN_PUSH_BONUS;
+        val += ROW(sq)*stage*PAWN_PUSH_BONUS;
         val += WhitePawnMoves(board, sq, 0, 0, 1);
     }else{
-        val += (EIGHT_ROW - ROW(sq))*pawn_stage*PAWN_PUSH_BONUS;
+        val += (EIGHT_ROW - ROW(sq))*stage*PAWN_PUSH_BONUS;
         val += BlackPawnMoves(board, sq, 0, 0, 1);
     }
     return val;
@@ -88,34 +93,22 @@ int KingStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 
 int PawnStructureEval(const BOARD *board)
 {
-    int dp_bonus = 0, isl_bonus = 0, chain[2] = {0,0}, npawns[2] = {0,0};
+    int dp_bonus = 0,npawns[2] = {0,0};
     for (int c = 0; c < 8; c++){ 
         
         npawns[1] = board->pawn_column[1][c];
-        if(npawns[1] == 0) chain[1] = 0;
-        else if (npawns[1] == 1){
-            isl_bonus += chain[1];
-            chain[1]++;
-        }else{
-            chain[1]++;
+        if(npawns[1] > 1){
             dp_bonus -= npawns[1] * npawns[1];
         }
         
         npawns[0] = board->pawn_column[0][c];
-        if(npawns[0] == 0) chain[0] = 0;
-        else if (npawns[0] == 1){
-            isl_bonus -= chain[0];
-            chain[0]++;
-        }else{
-            chain[0]++;
+        if (npawns[0] > 1){
             dp_bonus += npawns[0] * npawns[0];
         }
     }
     dp_bonus *= DOUBLED_PAWN_BONUS;
-    isl_bonus *= ISOLATED_PAWN_BONUS;
     
-    float pawn_stage = (float)(STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
-    return (dp_bonus + isl_bonus)*pawn_stage;
+    return (dp_bonus + isl_bonus)*GameStage();
 }
 
 int MaterialDraw(const BOARD *board)
