@@ -161,8 +161,7 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, C
                 if(val >= beta){
                     UpdateTable(board->zobrist_key, val, poss_moves[i], depth, HASH_BETA);
                     MOVE hash_move = GetHashMove(board->zobrist_key);
-                    if(SQSMASK(poss_moves[i]) != SQSMASK(hash_move)
-                          && CAPTMASK(poss_moves[i]) == 0){
+                    if(CAPTMASK(poss_moves[i]) == 0){
                         killers[depth] = poss_moves[i];
                     }
                     return beta;
@@ -198,7 +197,7 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta, int root, C
     return alpha;
 }
 
-int Quiescent(BOARD* board, int alpha, int beta, CONTROL *control)
+int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
 {
     int nposs_movs, nlegal = 0;
     int val;
