@@ -32,36 +32,36 @@
 #include "hashtable.h"
 #include "board.h"
 
-int AllocTable(int table_size)
+int AllocTable(HASHTABLE *ht, int table_size)
 {
     unsigned int s = 1024*1024*table_size;
     do{
-        hash_table.entries = (HashData*) malloc(s);
-        hash_table.size = s/sizeof(HashData);
+        ht->entries = (HashData*) malloc(s);
+        ht->size = s/sizeof(HashData);
         s *= 0.8;
-    }while(hash_table.entries == 0);
+    }while(ht->entries == 0);
 
-    return hash_table.size;
+    return ht->size;
 }
 
-void DeleteTable()
+void DeleteTable(HASHTABLE *ht)
 {
-    free(hash_table.entries);
+    free(ht->entries);
 }
 
-void ClearHashTable()
+void ClearHashTable(HASHTABLE *ht)
 {
-    for(int i = 0;  i < hash_table.size; i++){
-        hash_table.entries[i].zobrist_key = 0;
-        hash_table.entries[i].data = 0;
+    for(int i = 0;  i < ht->size; i++){
+        ht->entries[i].zobrist_key = 0;
+        ht->entries[i].data = 0;
     }
-    hash_table.full = 0;
+    ht->full = 0;
 }
 
-void UpdateTable(KEY zob_key, int eval, MOVE best_move, int depth, int flag)
+void UpdateTable(HASHTABLE *ht, KEY zob_key, int eval, MOVE best_move, int depth, int flag)
 {
-    int key = zob_key%hash_table.size;
-    HashData *entry = &hash_table.entries[key];
+    int key = zob_key%ht->size;
+    HashData *entry = &ht->entries[key];
     
     if(MOVEMASK(entry->data)){
         if(!best_move) return;
@@ -69,7 +69,7 @@ void UpdateTable(KEY zob_key, int eval, MOVE best_move, int depth, int flag)
     }
     /*if(entry->depth >= depth && entry->best_move && !best_move) return;*/
     if(entry->zobrist_key != zob_key){
-        if(entry->zobrist_key == 0) hash_table.full++;
+        if(entry->zobrist_key == 0) ht->full++;
         entry->zobrist_key = zob_key;
     }
     /*if(flag == HASHEXACT || flag == HASHBETA);*/
@@ -79,18 +79,18 @@ void UpdateTable(KEY zob_key, int eval, MOVE best_move, int depth, int flag)
     entry->data |=  PUT_HASH_FLAG(flag);
 }
 
-MOVE GetHashMove(KEY zob_key)
+MOVE GetHashMove(HASHTABLE *ht, KEY zob_key)
 {
-    int key = zob_key%hash_table.size;
-    if(hash_table.entries[key].zobrist_key == zob_key){
-        return MOVEMASK(hash_table.entries[key].data);
+    int key = zob_key%ht->size;
+    if(ht->entries[key].zobrist_key == zob_key){
+        return MOVEMASK(ht->entries[key].data);
     }else return 0;
 }
 
-int GetHashEval(KEY zob_key, int depth, int alpha, int beta)
+int GetHashEval(HASHTABLE *ht, KEY zob_key, int depth, int alpha, int beta)
 {
-    int key = zob_key%hash_table.size;
-    const HashData *entry = &hash_table.entries[key];
+    int key = zob_key%ht->size;
+    const HashData *entry = &ht->entries[key];
     if(entry->zobrist_key == zob_key && DEPTHMASK(entry->data) >= depth){
         int eval = EVALMASK(entry->data);
         char flag = FLAGMASK(entry->data);

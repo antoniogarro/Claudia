@@ -113,8 +113,8 @@ int LazyEval(const BOARD *board)
     if(MaterialDraw(board)) return DRAW_VALUE;
     unsigned char side = board->white_to_move;
     int lazy = board->piece_material[1] - board->piece_material[0]
-                + board->pawn_material[1] - board->pawn_material[0]
-                + PawnStructureEval(board);
+             + board->pawn_material[1] - board->pawn_material[0]
+             + PawnStructureEval(board);
     if(side) return lazy;
     else return -lazy;
 }

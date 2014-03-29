@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
     
     ENGINE_STATE engine = {&main_board, &engine_control};
     
-    if(AllocTable(TABLESIZE) == 0){
+    if(AllocTable(&hash_table, TABLESIZE) == 0){
         printf("Not enough memory\n");
         return 1;
     }
-    ClearHashTable();
+    ClearHashTable(&hash_table);
 
     setvbuf(stdin, 0, _IONBF, 0);
     setvbuf(stdout, 0, _IONBF, 0);
@@ -68,6 +68,6 @@ int main(int argc, char *argv[])
         memset(input, 0, 2048);
     }
     
-    DeleteTable();
+    DeleteTable(&hash_table);
     return 0;
 }

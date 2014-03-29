@@ -61,11 +61,11 @@ typedef struct HASHTABLE{
 } HASHTABLE;
 extern struct HASHTABLE hash_table;
 
-int AllocTable(int);
-void DeleteTable();
-void ClearHashTable();
-void UpdateTable(KEY, int, MOVE, int, int);
-MOVE GetHashMove(KEY);
-int GetHashEval(KEY, int, int, int);
+int AllocTable(HASHTABLE*, int);
+void DeleteTable(HASHTABLE*);
+void ClearHashTable(HASHTABLE*);
+void UpdateTable(HASHTABLE*, KEY, int, MOVE, int, int);
+MOVE GetHashMove(HASHTABLE*, KEY);
+int GetHashEval(HASHTABLE*, KEY, int, int, int);
 
 #endif

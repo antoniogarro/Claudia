@@ -241,15 +241,15 @@ int setoption(char *input, ENGINE_STATE *stat)
 {
     int val = 0;
     sscanf(input, "setoption name Hash value %i", &val);
-    DeleteTable();
-    if(AllocTable(val) == 0) return 0;
-    ClearHashTable();
+    DeleteTable(&hash_table);
+    if(AllocTable(&hash_table, val) == 0) return 0;
+    ClearHashTable(&hash_table);
     return 1;
 }
 
 int ucinewgame(char *input, ENGINE_STATE *stat)
 {
-    ClearHashTable();
+    ClearHashTable(&hash_table);
     return 1;
 }
 

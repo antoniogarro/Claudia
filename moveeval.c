@@ -96,7 +96,7 @@ int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, const MOVE
 void SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killers[])
 {
     int eval[MAXMOVES];
-    MOVE hash_move = GetHashMove(board->zobrist_key);
+    MOVE hash_move = GetHashMove(&hash_table, board->zobrist_key);
     /*Evaluate every move, store evaluations:*/
     for(int i = 0; i < nmoves; i++){
         eval[i] = EvaluateMove(board, &moves[i], hash_move, killers);

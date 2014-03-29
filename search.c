@@ -118,7 +118,7 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     char hash_flag = HASH_ALPHA;
 
     if(depth){
-        val = GetHashEval(board->zobrist_key, depth, alpha, beta);
+        val = GetHashEval(&hash_table, board->zobrist_key, depth, alpha, beta);
         if(val != ERRORVALUE){
             return val;
         }
@@ -160,8 +160,7 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                 }
                 if(control->stop) return alpha;
                 if(val >= beta){
-                    UpdateTable(board->zobrist_key, val, poss_moves[i], depth, HASH_BETA);
-                    MOVE hash_move = GetHashMove(board->zobrist_key);
+                    UpdateTable(&hash_table, board->zobrist_key, val, poss_moves[i], depth, HASH_BETA);
                     if(killers[root][0] != poss_moves[i]
                        && killers[root][1] != poss_moves[i]
                        && CAPTMASK(poss_moves[i]) == 0){
@@ -185,13 +184,13 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
         }
         if(nlegal == 0){
             if(InCheck(board, 0)){
-/*UpdateTable(board->zobrist_key, MATE_VALUE+root, 0, depth, HASH_EXACT, hash_table.entries);*/
+/*UpdateTable(&hash_table, board->zobrist_key, MATE_VALUE+root, 0, depth, HASH_EXACT, hash_table.entries);*/
                 return MATE_VALUE;
             }else{
-/*UpdateTable(board->zobrist_key, DRAW_VALUE, 0, depth, HASH_EXACT, hash_table.entries);*/
+/*UpdateTable(&hash_table, board->zobrist_key, DRAW_VALUE, 0, depth, HASH_EXACT, hash_table.entries);*/
                 return DRAW_VALUE;    /*Stalemate*/
             }
-        }else UpdateTable(board->zobrist_key, alpha, best_move, depth, hash_flag);
+        }else UpdateTable(&hash_table, board->zobrist_key, alpha, best_move, depth, hash_flag);
         
     }else if(InCheck(board, 0)){
         alpha = AlphaBeta(board, 1, alpha, beta, root+1, control, 1, killers);
@@ -212,7 +211,7 @@ int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
     if(val+LAZYALPHA < alpha) return alpha;
 
     val = StaticEval(board);
-    UpdateTable(board->zobrist_key, val, 0, 0, HASH_EXACT);
+    UpdateTable(&hash_table, board->zobrist_key, val, 0, 0, HASH_EXACT);
 
     if (val >= beta) return beta;
     if (val > alpha) alpha = val;
@@ -243,12 +242,12 @@ and may fail if the hash table is full.*/
 int RetrievePV(BOARD *board, MOVE *PV, unsigned int depth)
 {
     unsigned int PVlen = 0;
-    MOVE mov = GetHashMove(board->zobrist_key);
+    MOVE mov = GetHashMove(&hash_table, board->zobrist_key);
     while(mov && PVlen <= depth && IsLegal(board, &mov)){
         PV[PVlen] = mov;
         PVlen++;
         MakeMove(board, &mov);
-        mov = GetHashMove(board->zobrist_key);
+        mov = GetHashMove(&hash_table, board->zobrist_key);
     }
     for(int i = PVlen; i > 0; i--){
         Takeback(board, PV[i-1]);
