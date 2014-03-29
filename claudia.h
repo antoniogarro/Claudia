@@ -34,31 +34,32 @@
 #define NAME  "Claudia"
 #define VERSION "0.2"
 
-/*white pieces have last bit = 1; black or empty, = 0.*/
-#define EMPTY 0x0            //0000            
-#define W_PAWN 0x9           //1001            
-#define B_PAWN 0x1           //0001            
-#define W_KNIGHT 0xA         //1010        
-#define B_KNIGHT 0x2         //0010    
-#define W_BISHOP 0xB         //1011    
-#define B_BISHOP 0x3         //0011    
-#define W_ROOK 0xC           //1100    
-#define B_ROOK 0x4           //0100
-#define W_QUEEN 0xE          //1110
-#define B_QUEEN 0x6          //0110
-#define W_KING 0xF           //1111
-#define B_KING 0x7           //0111
-#define K_CASTLE_RIGHT 0x5   //0101
-#define Q_CASTLE_RIGHT 0x8   //1000
-#define BOTH_CASTLES 0xD     //1101
+/* white pieces have least significant bit = 1; black = 0.*/
+/* K_CASTLE_RIGHT | Q_CASTLE_RIGHT = BOTH_CASTLES */
+enum PIECES { EMPTY,
+              K_CASTLE_RIGHT,
+              B_PAWN,
+              W_PAWN,
+              B_KNIGHT,
+              W_KNIGHT,
+              B_BISHOP,
+              W_BISHOP,
+              B_ROOK,
+              W_ROOK,
+              B_QUEEN,
+              W_QUEEN,
+              B_KING,
+              W_KING,
+              Q_CASTLE_RIGHT,
+              BOTH_CASTLES
+            };
 
-#define WHITE 0x8
-#define BLACK 0x0
-#define TURN_BLACK(piece) (piece & 0x7)
-#define TURN_WHITE(piece) (piece | 0x8)
-#define BLACK_TO_COLOR(blackpiece, piece) ((blackpiece)|(piece & 0x8))
-#define GET_COLOR(piece) (piece & 0x8)  // WHITE or BLACK
-#define GET_SIDE(piece) ((piece & 0x8) >> 3)    // 1 or 0
+#define WHITE 1
+#define BLACK 0
+#define TURN_BLACK(piece) (piece & 0xE)
+#define TURN_WHITE(piece) (piece | 0x1)
+#define BLACK_TO_COLOR(blackpiece, piece) ((blackpiece)|(piece & 0x1))
+#define GET_COLOR(piece) (piece & 0x1)
 
 #define FIRST_ROW 0x00
 #define SECOND_ROW 0x10
@@ -135,9 +136,10 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 #define HASHMOVE_VALUE 100000
 #define KILLER_VALUE 50
 
-#define DOUBLED_PAWN_BONUS 20
-#define ISOLATED_PAWN_BONUS 10
+#define DOUBLED_PAWN_BONUS 10
+#define ISOLATED_PAWN_BONUS 5
 #define PAWN_PUSH_BONUS 1
+#define PASSED_PAWN_BONUS 50
 
 #define ERRORVALUE -1000000001
 
