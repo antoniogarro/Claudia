@@ -77,17 +77,15 @@ void InitMaterial(BOARD *board)
 {
     board->pawn_material[0] = 0, board->pawn_material[1] = 0;
     board->piece_material[0] = 0, board->piece_material[1] = 0;
-    for(int c = 0; c < 8; c++){
-        board->pawn_column[0][c] = 0, board->pawn_column[1][c] = 0;
-    }
+    board->pawns[0] = 0, board->pawns[1] = 0;
     for (int sq = 0; sq < BOARDSIZE; sq++){
         PIECE p = board->squares[sq];
         if(IN_BOARD(sq) && p != EMPTY && p != W_KING && p != B_KING){
             if(p == W_PAWN || p == B_PAWN){
-                board->pawn_material[GET_SIDE(p)] += Value(p);
-                board->pawn_column[GET_SIDE(p)][COLUMN(sq)]++;
+                board->pawn_material[GET_COLOR(p)] += Value(p);
+                board->pawns[GET_COLOR(p)] = BitboardSet(sq, board->pawns[GET_COLOR(p)]);
             }else{
-                board->piece_material[GET_SIDE(p)] += Value(p);
+                board->piece_material[GET_COLOR(p)] += Value(p);
             }
         }
     }
@@ -96,20 +94,33 @@ void InitMaterial(BOARD *board)
 void PrintBoard(const BOARD *board)
 {
     printf("\n");
-    for(int c = 0; c < 8; c++) printf("% i ", board->pawn_column[0][c]);
-    printf("\n+--+--+--+--+--+--+--+--+     %c %i%i\n",
-            board->white_to_move+1, board->bq_castle, board->bk_castle);
+    printf("\n+--+--+--+--+--+--+--+--+ %c %c%c%c%c   +--+--+--+--+--+--+--+--+    +--+--+--+--+--+--+--+--+\n",
+            (board->white_to_move+1?'W':'B'),
+            (board->wq_castle?'Q':0), (board->wk_castle?'K':0),
+            (board->bq_castle?'q':0), (board->bk_castle?'k':0));
+    
     for(int i = 0x70; i >= 0; i++){
         if(!(i&0x88)){
             printf("| %c", PieceToChar(board->squares[i]));
         }else{
-            printf("|\n+--+--+--+--+--+--+--+--+\n");
+            printf("|           ");
+            for(int j = 0; j<8; j++) printf(" %c ", (board->pawns[0] & (1ull << (ROW(i-1) >> 1) << j)) ? 'p' : ' ');
+            printf("     ");
+            for(int j = 0; j<8; j++) printf(" %c ", (board->pawns[1] & (1ull << (ROW(i-1) >> 1) << j)) ? 'P' : ' ');
+            printf("\n+--+--+--+--+--+--+--+--+          +--+--+--+--+--+--+--+--+    +--+--+--+--+--+--+--+--+\n");
             i -= 0x19;
         }
     }
-    for(int c = 0; c < 8; c++) printf("% i ", board->pawn_column[1][c]);
-    printf("Material: W: %i %i; B: %i %i;  %i%i   Zobrist: %Lu\n",
+    printf("Material: W: %i %i; B: %i %i; Zobrist: %Lu BB: %llx , %llx \n",
             board->piece_material[1], board->pawn_material[1],
             board->piece_material[0], board->pawn_material[0],
-            board->wq_castle, board->wk_castle, board->zobrist_key);
+            board->zobrist_key, board->pawns[0], board->pawns[1]);
+    printf("Passers: %llx ranks %i; %llx ranks %i  ",
+            WPassedPawns(board->pawns[1], board->pawns[0]),
+            DotProduct(WPassedPawns(board->pawns[1], board->pawns[0]), WRANKS),
+            BPassedPawns(board->pawns[0], board->pawns[1]),
+            DotProduct(BPassedPawns(board->pawns[0], board->pawns[1]), BRANKS));
+    printf("Doubled: %i %i\n",
+            BitCount(DoubledPawns(board->pawns[1])),
+            BitCount(DoubledPawns(board->pawns[0])));
 }

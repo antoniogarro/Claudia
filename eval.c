@@ -31,20 +31,20 @@
 #include "board.h"
 #include "claudia.h"
 
-float GameStage(const BOARD *board)
+static float PawnStage(const BOARD *board)
 {
     return (float)(STARTPAWNS - board->pawn_material[0] - board->pawn_material[1])/STARTPAWNS;
 }
 
 int PawnStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 {
-    float stage = GameStage(board);
     int val = PAWN_VALUE;
     if(color){
-        val += ROW(sq)*stage*PAWN_PUSH_BONUS;
+        val += ROW(sq)*PawnStage(board)*PAWN_PUSH_BONUS;
         val += WhitePawnMoves(board, sq, 0, 0, 1);
     }else{
-        val += (EIGHT_ROW - ROW(sq))*stage*PAWN_PUSH_BONUS;
+         val += (EIGHT_ROW - ROW(sq))*PawnStage(board)*PAWN_PUSH_BONUS;
+
         val += BlackPawnMoves(board, sq, 0, 0, 1);
     }
     return val;
@@ -82,10 +82,10 @@ int KingStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 {
     int val = KING_VALUE;
     if(color){
-        val += CASTLE_BONUS*board->w_castled;
+        val += CASTLE_BONUS*board->w_castled*(1.0-PawnStage(board));
         val += CASTLE_RIGHT_BONUS*(board->wk_castle + board->wq_castle);
     }else{
-        val += CASTLE_BONUS*board->b_castled;
+        val += CASTLE_BONUS*board->b_castled*(1.0-PawnStage(board));
         val += CASTLE_RIGHT_BONUS*(board->bk_castle + board->bq_castle);
     }
     return val;
@@ -93,22 +93,11 @@ int KingStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 
 int PawnStructureEval(const BOARD *board)
 {
-    int dp_bonus = 0,npawns[2] = {0,0};
-    for (int c = 0; c < 8; c++){ 
-        
-        npawns[1] = board->pawn_column[1][c];
-        if(npawns[1] > 1){
-            dp_bonus -= npawns[1] * npawns[1];
-        }
-        
-        npawns[0] = board->pawn_column[0][c];
-        if (npawns[0] > 1){
-            dp_bonus += npawns[0] * npawns[0];
-        }
-    }
-    dp_bonus *= DOUBLED_PAWN_BONUS;
-    
-    return dp_bonus*GameStage(board);
+    BITBOARD bp = board->pawns[0], wp = board->pawns[1];
+    int val = (BitCount(DoubledPawns(wp)) - BitCount(DoubledPawns(bp))) * DOUBLED_PAWN_BONUS;
+    val += DotProduct(WPassedPawns(wp, bp), WRANKS) * PASSED_PAWN_BONUS;
+    val -= DotProduct(BPassedPawns(bp, wp), BRANKS) * PASSED_PAWN_BONUS;
+    return val*PawnStage(board);
 }
 
 int MaterialDraw(const BOARD *board)

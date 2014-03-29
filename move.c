@@ -55,10 +55,10 @@ void RemovePiece(BOARD *board, SQUARE sq)
     PIECE p = board->squares[sq];
     board->zobrist_key ^= zobkeys.zob_pieces[p][sq];
     if(p == W_PAWN || p == B_PAWN){
-        board->pawn_material[GET_SIDE(p)] -= Value(p);
-        board->pawn_column[GET_SIDE(p)][COLUMN(sq)]--;
+        board->pawn_material[GET_COLOR(p)] -= Value(p);
+        board->pawns[GET_COLOR(p)] = BitboardUnset(sq, board->pawns[GET_COLOR(p)]);
     }else if(p != EMPTY && p != W_KING && p != B_KING){
-        board->piece_material[GET_SIDE(p)] -= Value(p);
+        board->piece_material[GET_COLOR(p)] -= Value(p);
     }
     board->squares[sq] = EMPTY;
 }
@@ -70,17 +70,17 @@ void DropPiece(BOARD *board, SQUARE sq, PIECE piece)
     board->zobrist_key ^= zobkeys.zob_pieces[piece][sq];
     
     if(p == W_PAWN || p == B_PAWN){
-        board->pawn_material[GET_SIDE(p)] -= Value(p);
-        board->pawn_column[GET_SIDE(p)][COLUMN(sq)]--;
+        board->pawn_material[GET_COLOR(p)] -= Value(p);
+        board->pawns[GET_COLOR(p)] = BitboardUnset(sq, board->pawns[GET_COLOR(p)]);
     }else if(p != EMPTY && p != W_KING && p != B_KING){
-        board->piece_material[GET_SIDE(p)] -= Value(p);
+        board->piece_material[GET_COLOR(p)] -= Value(p);
     }
     
     if(piece == W_PAWN || piece == B_PAWN){
-        board->pawn_material[GET_SIDE(piece)] += Value(piece);
-        board->pawn_column[GET_SIDE(piece)][COLUMN(sq)]++;
+        board->pawn_material[GET_COLOR(piece)] += Value(piece);
+        board->pawns[GET_COLOR(piece)] = BitboardSet(sq, board->pawns[GET_COLOR(piece)]);
     }else if(piece != EMPTY && piece != W_KING && piece != B_KING){
-        board->piece_material[GET_SIDE(piece)] += Value(piece);
+        board->piece_material[GET_COLOR(piece)] += Value(piece);
     }
     board->squares[sq] = piece;
 }
@@ -158,7 +158,7 @@ void MakeMove(BOARD *board, MOVE *curr_move)
 
                 if(board->wq_castle) RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
                 if(board->wk_castle) RememberCastleRight(curr_move, K_CASTLE_RIGHT);
-                /*Stores lost castle rights: 'bits promoted' set to 8 if long castle is lost, 5 if short, 13 if both.*/
+                /*Stores lost castle rights: 'bits promoted' set to 14 if long castle is lost, 1 if short, 15 if both.*/
             }
             board->wk_castle = 0, board->wq_castle = 0;
             board->en_passant = INVALID_SQ;

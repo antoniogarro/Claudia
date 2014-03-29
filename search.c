@@ -71,7 +71,7 @@ void IterativeDeep(BOARD *board, CONTROL *control)
         if(control->stop){
             break;
         }
-        int PVlen = RetrievePV(board, iPV, 2*depth); /*Retrieve longer?*/
+        int PVlen = RetrievePV(board, iPV, depth+10);
         for(int i = 0; i < PVlen; i++){
             MoveToAlgeb(iPV[i], str_mov);
             strcat(sPV, str_mov);
@@ -185,7 +185,7 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
         }
         if(nlegal == 0){
             if(InCheck(board, 0)){
-/*UpdateTable(board->zobrist_key, MATE_VALUE+board->ply, 0, depth, HASH_EXACT, hash_table.entries);*/
+/*UpdateTable(board->zobrist_key, MATE_VALUE+root, 0, depth, HASH_EXACT, hash_table.entries);*/
                 return MATE_VALUE;
             }else{
 /*UpdateTable(board->zobrist_key, DRAW_VALUE, 0, depth, HASH_EXACT, hash_table.entries);*/

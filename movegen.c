@@ -221,7 +221,8 @@ int BlackPawnMoves(const BOARD *board, SQUARE orig, MOVE *poss_moves, int nmoves
     return nmoves;
 }
 
-int SlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
+int SlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece_color,
+                    MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
         for(SQUARE dest = orig + delta[i]; IN_BOARD(dest); dest += delta[i]){
@@ -230,7 +231,8 @@ int SlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece
                     if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                     nmoves++;
                 }
-            }else if(GET_COLOR(board->squares[dest]) != piece_color) {  /*Different color Piece, capture, stop sliding.*/
+            }else if(GET_COLOR(board->squares[dest]) != piece_color) { 
+                /*Different color Piece, capture, stop sliding.*/
                 if(poss_moves) poss_moves[nmoves] = Move(0, dest, orig);
                 nmoves++;
                 break;
@@ -240,7 +242,8 @@ int SlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece
     return nmoves;
 }
 
-int NonSlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece_color, MOVE *poss_moves, int nmoves, char noncaptures)
+int NonSlidingMoves(const BOARD *board, SQUARE orig, const char *delta, COLOR piece_color,
+                        MOVE *poss_moves, int nmoves, char noncaptures)
 {
     for(int i = 0; delta[i]; i++){
         SQUARE dest = orig + delta[i];

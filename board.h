@@ -33,25 +33,26 @@
 
 #include "claudia.h"
 #include "hashtable.h"
+#include "pawns.h"
 
 #define HISTLEN 500
 #define BOARDSIZE 0x80
 
 typedef struct BOARD {
     PIECE squares[BOARDSIZE];
+    BITBOARD pawns[2];
+    COLOR white_to_move;
     /*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
     SQUARE en_passant;
     unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
     unsigned char w_castled, b_castled;
     SQUARE wking_pos, bking_pos;
-    unsigned char white_to_move;
     int ply;
-    int rev_plies [HISTLEN];
+    int rev_plies[HISTLEN];
     KEY zobrist_key;
     KEY zobrist_history[HISTLEN];
     unsigned int piece_material[2];
     unsigned int pawn_material[2];
-    unsigned int pawn_column[2][8];
 } BOARD;
 
 typedef struct ZOBKEYS {
@@ -102,14 +103,6 @@ int FilterWinning(BOARD*, MOVE*, int);
 
 int LazyEval(const BOARD*);
 int StaticEval(const BOARD*);
-/*
-int PawnStaticVal(const BOARD*, SQUARE, COLOR);
-int KnightStaticVal(const BOARD*, SQUARE, COLOR);
-int BishopStaticVal(const BOARD*, SQUARE, COLOR);
-int RookStaticVal(const BOARD*, SQUARE, COLOR);
-int QueenStaticVal(const BOARD*, SQUARE, COLOR);
-int KingStaticVal(const BOARD*, SQUARE, COLOR);
-*/
 int Value(PIECE);
 
 static char WhiteInCheck(const BOARD *board){

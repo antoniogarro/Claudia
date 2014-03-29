@@ -58,8 +58,7 @@ void ClearHashTable()
     hash_table.full = 0;
 }
 
-void UpdateTable(KEY zob_key, int eval,
-                    MOVE best_move, int depth, int flag)
+void UpdateTable(KEY zob_key, int eval, MOVE best_move, int depth, int flag)
 {
     int key = zob_key%hash_table.size;
     HashData *entry = &hash_table.entries[key];
