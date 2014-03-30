@@ -31,6 +31,7 @@
 #ifndef HASHTABLEH
 #define HASHTABLEH
 #include "claudia.h"
+#include "pawns.h"
 
 #define HASH_EXACT 0
 #define HASH_BETA 1
@@ -68,4 +69,22 @@ void UpdateTable(HASHTABLE*, KEY, int, MOVE, int, int);
 MOVE GetHashMove(HASHTABLE*, KEY);
 int GetHashEval(HASHTABLE*, KEY, int, int, int);
 
+typedef struct{
+    KEY pawn_bitboard;
+    int eval;
+} PawnData;
+
+typedef struct PAWNTABLE{
+    PawnData *entries;
+    unsigned int size;
+    unsigned int full;
+} PAWNTABLE;
+
+extern struct PAWNTABLE pawn_table;
+
+int AllocPawnTable(PAWNTABLE*, int);
+void DeletePawnTable(PAWNTABLE*);
+void ClearPawnTable(PAWNTABLE*);
+void UpdatePawnTable(PAWNTABLE*, BITBOARD, int);
+int GetPawnEval(PAWNTABLE*, BITBOARD);
 #endif
