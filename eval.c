@@ -94,10 +94,16 @@ int KingStaticVal(const BOARD *board, SQUARE sq, COLOR color)
 int PawnStructureEval(const BOARD *board)
 {
     BITBOARD bp = board->pawns[0], wp = board->pawns[1];
-    int val = (BitCount(DoubledPawns(wp)) - BitCount(DoubledPawns(bp))) * DOUBLED_PAWN_BONUS;
+    BITBOARD b = bp | wp;
+    int val = GetPawnEval(&pawn_table, b);
+    if(val != ERRORVALUE) return val;
+    
+    val = (BitCount(DoubledPawns(bp)) - BitCount(DoubledPawns(wp))) * DOUBLED_PAWN_BONUS;
     val += DotProduct(WPassedPawns(wp, bp), WRANKS) * PASSED_PAWN_BONUS;
     val -= DotProduct(BPassedPawns(bp, wp), BRANKS) * PASSED_PAWN_BONUS;
-    return val*PawnStage(board);
+    val *= PawnStage(board);
+    UpdatePawnTable(&pawn_table, b, val);
+    return val;
 }
 
 int MaterialDraw(const BOARD *board)

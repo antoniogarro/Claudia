@@ -61,7 +61,7 @@ void ClearHashTable(HASHTABLE *ht)
 void UpdateTable(HASHTABLE *ht, KEY zob_key, int eval, MOVE best_move, int depth, int flag)
 {
     int key = zob_key%ht->size;
-    HashData *entry = &ht->entries[key];
+    HashData *entry = &(ht->entries[key]);
     
     if(MOVEMASK(entry->data)){
         if(!best_move) return;
@@ -90,7 +90,7 @@ MOVE GetHashMove(HASHTABLE *ht, KEY zob_key)
 int GetHashEval(HASHTABLE *ht, KEY zob_key, int depth, int alpha, int beta)
 {
     int key = zob_key%ht->size;
-    const HashData *entry = &ht->entries[key];
+    const HashData *entry = &(ht->entries[key]);
     if(entry->zobrist_key == zob_key && DEPTHMASK(entry->data) >= depth){
         int eval = EVALMASK(entry->data);
         char flag = FLAGMASK(entry->data);
@@ -103,6 +103,57 @@ int GetHashEval(HASHTABLE *ht, KEY zob_key, int depth, int alpha, int beta)
         if(flag == HASH_ALPHA && eval < alpha){
             return alpha;
         }
+    }
+    return ERRORVALUE;
+}
+
+
+/*Pawn HashTable routines*/
+
+int AllocPawnTable(PAWNTABLE *pt, int table_size)
+{
+    unsigned int s = 1024*1024*table_size;
+    do{
+        pt->entries = (PawnData*) malloc(s);
+        pt->size = s/sizeof(PawnData);
+        s *= 0.8;
+    }while(pt->entries == 0);
+
+    return pt->size;
+}
+
+void DeletePawnTable(PAWNTABLE *pt)
+{
+    free(pt->entries);
+}
+
+void ClearPawnTable(PAWNTABLE *pt)
+{
+    for(int i = 0;  i < pt->size; i++){
+        pt->entries[i].pawn_bitboard = 0;
+        pt->entries[i].eval = 0;
+    }
+    pt->full = 0;
+}
+
+void UpdatePawnTable(PAWNTABLE *pt, BITBOARD pawn_bitboard, int eval)
+{
+    int key = pawn_bitboard%pt->size;
+    PawnData *entry = &(pt->entries[key]);
+    
+    if(entry->pawn_bitboard != pawn_bitboard){
+        if(entry->pawn_bitboard == 0) pt->full++;
+        entry->pawn_bitboard = pawn_bitboard;
+    }
+    entry->eval = eval;
+}
+int GetPawnEval(PAWNTABLE *pt, BITBOARD pawn_bitboard)
+{
+    int key = pawn_bitboard%pt->size;
+    const PawnData *entry = &(pt->entries[key]);
+    
+    if(entry->pawn_bitboard == pawn_bitboard){
+        return entry->eval;
     }
     return ERRORVALUE;
 }

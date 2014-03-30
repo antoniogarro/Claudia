@@ -36,6 +36,7 @@
 
 /*Globals.*/
 HASHTABLE hash_table;
+PAWNTABLE pawn_table;
 ZOBKEYS zobkeys;
 
 int main(int argc, char *argv[])
@@ -55,7 +56,13 @@ int main(int argc, char *argv[])
         return 1;
     }
     ClearHashTable(&hash_table);
-
+    
+    if(AllocTable(&pawn_table, 100) == 0){
+        printf("Not enough memory\n");
+        return 1;
+    }
+    ClearPawnTable(&pawn_table);
+    
     setvbuf(stdin, 0, _IONBF, 0);
     setvbuf(stdout, 0, _IONBF, 0);
     fflush(NULL);
@@ -69,5 +76,6 @@ int main(int argc, char *argv[])
     }
     
     DeleteTable(&hash_table);
+    DeletePawnTable(&pawn_table);
     return 0;
 }
