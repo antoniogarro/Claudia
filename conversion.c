@@ -28,10 +28,9 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                    *
 ***************************************************************************************/
 
-#include "claudia.h"
 #include "board.h"
 
-char CharToPiece(const char fen)
+PIECE CharToPiece(const char fen)
 {
     char piece = 0;
     switch (fen) {
@@ -65,40 +64,10 @@ char CharToPiece(const char fen)
     return piece;
 }
 
-char PieceToChar(const char piece)
+char PieceToChar(PIECE piece)
 {
-    char char_piece = 0;
-    switch (piece){
-            case W_PAWN: char_piece = 'P';
-                break;
-            case B_PAWN: char_piece = 'p';
-                break;
-            case W_KNIGHT: char_piece = 'N';
-                break;
-            case B_KNIGHT: char_piece = 'n';
-                break;
-            case W_BISHOP: char_piece = 'B';
-                break;
-            case B_BISHOP: char_piece = 'b';
-                break;
-            case W_ROOK: char_piece = 'R';
-                break;
-            case B_ROOK: char_piece = 'r';
-                break;
-            case W_QUEEN: char_piece = 'Q';
-                break;
-            case B_QUEEN: char_piece = 'q';
-                break;
-            case W_KING: char_piece = 'K';
-                break;
-            case B_KING: char_piece = 'k';
-                break;
-            case EMPTY: char_piece = ' ';
-                break;
-            default: char_piece = 'C';
-                break;
-    }
-    return char_piece;
+    const char *pieces = "  pPnNbBrRqQkK";
+    return pieces[piece];
 }
 
 char CharToCoordinate(const char fen)

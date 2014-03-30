@@ -30,6 +30,8 @@
 #ifndef PAWNSH
 #define PAWNSH
 
+#include "board.h"
+
 typedef unsigned long long BITBOARD;
 
 #define NOT_A 0xfefefefefefefefe

@@ -28,8 +28,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                    *
 ***************************************************************************************/
 
-#include "claudia.h"
 #include "board.h"
+#include "engine.h"
 
 int SEE(BOARD *board, MOVE *main_capture)
 {
@@ -101,7 +101,6 @@ void SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killers[])
     for(int i = 0; i < nmoves; i++){
         eval[i] = EvaluateMove(board, &moves[i], hash_move, killers);
     }
-    
     /*Order according to that evaluation: insertion sort*/
     for(int i = 1; i < nmoves; i++){
         for(int j = i; j > 0 && (eval[j-1] < eval[j]); j--){            
@@ -136,7 +135,6 @@ int FilterWinning(BOARD *board, MOVE *captures, int ncapts)
             eval[j] = ev;
         }
     }
-
     /*Store the number of 'good' captures:*/
     for(int i = 0; i < ncapts && eval[i] > 0; i++){
         good_capts++;

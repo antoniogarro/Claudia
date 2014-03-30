@@ -28,7 +28,6 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                    *
 ***************************************************************************************/
 
-#include "claudia.h"
 #include "board.h"
 #include "engine.h"
 

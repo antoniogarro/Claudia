@@ -29,7 +29,6 @@
 ***************************************************************************************/
 
 #include "board.h"
-#include "claudia.h"
 
 int IsAttacked(const BOARD *board, SQUARE square, COLOR attacking_color)
 {

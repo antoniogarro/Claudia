@@ -29,6 +29,7 @@
 ***************************************************************************************/
 
 #include "board.h"
+#include "engine.h"
 
 char IsLegal(BOARD *board, MOVE *curr_move)
 {   /*TODO: rewrite!*/

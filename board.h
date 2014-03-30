@@ -31,12 +31,105 @@
 #ifndef BOARDH
 #define BOARDH
 
-#include "claudia.h"
-#include "hashtable.h"
-#include "pawns.h"
+/*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED:bits 16-19,
+CAPTURED:bits 20-23, CASTLE RIGHTS, PAWN_EP:bits 24-31*/
+typedef unsigned int MOVE;
+
+typedef unsigned char SQUARE;
+typedef unsigned char PIECE;
+typedef unsigned char COLOR;
+
+/*Zobrist keys*/
+typedef unsigned long long KEY;
+
+#define SQSMASK(move)  (move & 0xFFFF)
+#define ORIGMASK(move) (move & 0xFF)
+#define DESTMASK(move) ((move & 0xFFFF) >> 8)
+#define PROMMASK(move) ((move & 0xFFFFF) >> 16)
+#define CAPTMASK(move) ((move & 0xFFFFFF) >> 20)
+#define EPMASK(move)   (move >> 24)
+
+/* white pieces have least significant bit = 1; black = 0.*/
+/* K_CASTLE_RIGHT | Q_CASTLE_RIGHT = BOTH_CASTLES */
+enum PIECES { EMPTY,
+              K_CASTLE_RIGHT,
+              B_PAWN,
+              W_PAWN,
+              B_KNIGHT,
+              W_KNIGHT,
+              B_BISHOP,
+              W_BISHOP,
+              B_ROOK,
+              W_ROOK,
+              B_QUEEN,
+              W_QUEEN,
+              B_KING,
+              W_KING,
+              Q_CASTLE_RIGHT,
+              BOTH_CASTLES
+            };
+
+#define WHITE 1
+#define BLACK 0
+#define TURN_BLACK(piece) (piece & 0xE)
+#define TURN_WHITE(piece) (piece | 0x1)
+#define BLACK_TO_COLOR(blackpiece, piece) ((blackpiece)|(piece & 0x1))
+#define GET_COLOR(piece) (piece & 0x1)
+
+#define FIRST_ROW 0x00
+#define SECOND_ROW 0x10
+#define THIRD_ROW 0x20
+#define FOURTH_ROW 0x30
+#define FIFTH_ROW 0x40
+#define SIXTH_ROW 0x50
+#define SEVENTH_ROW 0x60
+#define EIGHT_ROW 0x70
+
+#define A_COLUMN 0x00
+#define B_COLUMN 0x01
+#define C_COLUMN 0x02
+#define D_COLUMN 0x03
+#define E_COLUMN 0x04
+#define F_COLUMN 0x05
+#define G_COLUMN 0x06
+#define H_COLUMN 0x07
+
+#define COLUMN(square) ((square) & 0x0F)
+#define ROW(square) ((square) & 0xF0)
+#define SQUARE(row, column) (row + column)
+#define IN_BOARD(square) !((square) & 0x88)
+#define INVALID_SQ 0xFF
+#define NULL_MOVE 0xFFFF
+
+#define ROW8(sq) ((sq) >> 4)
+
+#define a1 0x00
+#define b1 0x01
+#define c1 0x02
+#define d1 0x03
+#define e1 0x04
+#define f1 0x05
+#define g1 0x06
+#define h1 0x07
+#define a8 0x70
+#define b8 0x71
+#define c8 0x72
+#define d8 0x73
+#define e8 0x74
+#define f8 0x75
+#define g8 0x76
+#define h8 0x77
+
+#define STARTPOS "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n"
+
+#define ROW_UP 0x10
+#define ROW_DOWN -0x10
 
 #define HISTLEN 500
 #define BOARDSIZE 0x80
+
+#include "hashtable.h"
+#include "pawns.h"
 
 typedef struct BOARD {
     PIECE squares[BOARDSIZE];
@@ -74,30 +167,66 @@ int ReadFEN(const char*, BOARD*);
 
 int MoveGen(const BOARD*, MOVE*, char);
 int CaptureGen(const BOARD*, MOVE*);
-
-int WhitePawnMoves(const BOARD*, SQUARE, MOVE*, int, char);
-int BlackPawnMoves(const BOARD*, SQUARE, MOVE*, int, char);
-int SlidingMoves(const BOARD*, SQUARE, const char*, COLOR, MOVE*, int, char);
-int NonSlidingMoves(const BOARD*, SQUARE, const char*, COLOR, MOVE*, int, char);
 int GenerateWhiteCastle(const BOARD*, MOVE*, int);
 int GenerateBlackCastle(const BOARD*, MOVE*, int);
+
+typedef int (PIECEMOVES)(const BOARD*, SQUARE, MOVE*, int, char);
+
+PIECEMOVES WhitePawnMoves, BlackPawnMoves, NonSlidingMoves, SlidingMoves;
+
+static PIECEMOVES *const piece_moves[] = {
+    0,
+    0,
+    &BlackPawnMoves,
+    &WhitePawnMoves,
+    &NonSlidingMoves,
+    &NonSlidingMoves,
+    &SlidingMoves,
+    &SlidingMoves,
+    &SlidingMoves,
+    &SlidingMoves,
+    &SlidingMoves,
+    &SlidingMoves,
+    &NonSlidingMoves,
+    &NonSlidingMoves,
+};
+
+#ifndef DELTAS
+#define DELTAS
+static const SQUARE w_pawn_capture[] = {0x0F, 0x11, 0};
+static const SQUARE b_pawn_capture[] = {-0x0F, -0x11, 0};
+static const SQUARE knight_delta[] = {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0};
+static const SQUARE bishop_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0};
+static const SQUARE rook_delta[] = {0x01, 0x10, -0x01, -0x10, 0};
+static const SQUARE king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0};
+
+static const SQUARE *const deltas[] = {
+    0,
+    0,
+    b_pawn_capture,
+    w_pawn_capture,
+    knight_delta,
+    knight_delta,
+    bishop_delta,
+    bishop_delta,
+    rook_delta,
+    rook_delta,
+    king_delta,
+    king_delta,
+    king_delta,
+    king_delta,
+};
+#endif
 
 int IsAttacked(const BOARD*, SQUARE, COLOR);
 int AttackingPieces(const BOARD*, SQUARE, COLOR, SQUARE*);
 
 void MakeMove(BOARD*, MOVE*);
 void Takeback(BOARD*, const MOVE);
-/*
-void RemovePiece(BOARD*, SQUARE);
-void DropPiece(BOARD*, SQUARE, PIECE);
-*/
+
 char IsLegal(BOARD*, MOVE*);
 int Perft(BOARD*, int);
 
-/*
-int SEE(BOARD*, MOVE*);
-int EvaluateMove(BOARD*, MOVE*, const MOVE);
-*/
 void SortMoves(BOARD*, MOVE*, int, MOVE[]);
 int FilterWinning(BOARD*, MOVE*, int);
 
@@ -105,32 +234,32 @@ int LazyEval(const BOARD*);
 int StaticEval(const BOARD*);
 int Value(PIECE);
 
-static char WhiteInCheck(const BOARD *board){
+inline char WhiteInCheck(const BOARD *board){
     return IsAttacked(board, board->wking_pos, BLACK);
 }
 
-static char BlackInCheck(const BOARD *board){
+inline char BlackInCheck(const BOARD *board){
     return IsAttacked(board, board->bking_pos, WHITE);
 }
 
-static int InCheck(const BOARD *board, SQUARE *attacking_sqs){
+inline int InCheck(const BOARD *board, SQUARE *attacking_sqs){
     if(board->white_to_move) return AttackingPieces(board, board->wking_pos, BLACK, attacking_sqs);
     else return AttackingPieces(board, board->bking_pos, WHITE, attacking_sqs);
 }
 
-static char LeftInCheck(const BOARD *board){
+inline char LeftInCheck(const BOARD *board){
     if(board->white_to_move) return IsAttacked(board, board->bking_pos, WHITE);
     else return IsAttacked(board, board->wking_pos, BLACK);
 }
 
-static inline MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
+inline MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
 {
     return (piece << 16) | (dest << 8) | orig;
 }
 
 /* Some methods to convert coordinates to algebraic notation, and the other way round.*/
-char CharToPiece(const char);
-char PieceToChar(const char);
+PIECE CharToPiece(const char);
+char PieceToChar(PIECE);
 char CharToCoordinate(const char);
 char RowCoordinateToChar(const char);
 char ColumnCoordinateToChar(const char);

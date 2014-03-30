@@ -30,7 +30,7 @@
 
 #include <stdlib.h>
 #include "hashtable.h"
-#include "board.h"
+#include "engine.h"
 
 int AllocTable(HASHTABLE *ht, int table_size)
 {

@@ -33,6 +33,23 @@
 
 #define NAME  "Claudia"
 #define VERSION "0.2"
+/*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED:bits 16-19,
+CAPTURED:bits 20-23, CASTLE RIGHTS, PAWN_EP:bits 24-31*/
+typedef unsigned int MOVE;
+
+/*Zobrist keys*/
+typedef unsigned long long KEY;
+
+typedef unsigned char SQUARE;
+typedef unsigned char PIECE;
+typedef unsigned char COLOR;
+
+#define SQSMASK(move)  (move & 0xFFFF)
+#define ORIGMASK(move) (move & 0xFF)
+#define DESTMASK(move) ((move & 0xFFFF) >> 8)
+#define PROMMASK(move) ((move & 0xFFFFF) >> 16)
+#define CAPTMASK(move) ((move & 0xFFFFFF) >> 20)
+#define EPMASK(move)   (move >> 24)
 
 /* white pieces have least significant bit = 1; black = 0.*/
 /* K_CASTLE_RIGHT | Q_CASTLE_RIGHT = BOTH_CASTLES */
@@ -107,29 +124,16 @@ enum PIECES { EMPTY,
 
 #define STARTPOS "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n"
 
-#define STARTPAWNS 1600
-
 #define ROW_UP 0x10
 #define ROW_DOWN -0x10
 
-#ifndef DELTAS
-#define DELTAS
-static char w_pawn_capture[] = {0x0F, 0x11, 0};
-static char b_pawn_capture[] = {-0x0F, -0x11, 0};
-static char knight_delta[] = {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0};
-static char bishop_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0};
-static char rook_delta[] = {0x01, 0x10, -0x01, -0x10, 0};
-static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0};
-#endif
+#ifndef VALUES
+#define VALUES
+#define STARTPAWNS 1600
+#define STARTMATERIAL 6280
+static const int piece_values[] = { 0, 0, 100, 100, 300, 300, 320, 320, 500, 500, 900, 900, 5000, 5000 };
+static const int mobility_bonus[] = { 0, 0, -1, 1, -5, 5, -4, 4, -1, 1, -1, 1, -1, 1 };
 
-#ifndef PIECE_VALUE
-#define PIECE_VALUE
-#define PAWN_VALUE 100
-#define KNIGHT_VALUE 300
-#define BISHOP_VALUE 320
-#define ROOK_VALUE 500
-#define QUEEN_VALUE 900
-#define KING_VALUE 5000
 #define INFINITE 10000000
 #define DRAW_VALUE 0
 #define MATE_VALUE -100000
@@ -138,8 +142,8 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 
 #define DOUBLED_PAWN_BONUS 10
 #define ISOLATED_PAWN_BONUS 5
-#define PAWN_PUSH_BONUS 1
-#define PASSED_PAWN_BONUS 50
+#define PAWN_PUSH_BONUS 0.1
+#define PASSED_PAWN_BONUS 20
 
 #define ERRORVALUE -1000000001
 
@@ -159,23 +163,5 @@ static char king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 
 #define MAXMOVES 250
 #define MAXDEPTH 70
 #endif
-
-/*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED:bits 16-19,
-CAPTURED:bits 20-23, CASTLE RIGHTS, PAWN_EP:bits 24-31*/
-typedef unsigned int MOVE;
-
-/*Zobrist keys*/
-typedef unsigned long long KEY;
-
-typedef unsigned char SQUARE;
-typedef unsigned char PIECE;
-typedef unsigned char COLOR;
-
-#define SQSMASK(move)  (move & 0xFFFF)
-#define ORIGMASK(move) (move & 0xFF)
-#define DESTMASK(move) ((move & 0xFFFF) >> 8)
-#define PROMMASK(move) ((move & 0xFFFFF) >> 16)
-#define CAPTMASK(move) ((move & 0xFFFFFF) >> 20)
-#define EPMASK(move)   (move >> 24)
 
 #endif

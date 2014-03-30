@@ -28,9 +28,9 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                    *
 ***************************************************************************************/
 
-#include "claudia.h"
 #include <stdio.h>
 #include "board.h"
+
 /*
 'MakeMove()' modifies curr_move to update information depending on the position (captured, catle, EP...).
 'MakeMove()' does NOT verify legality!

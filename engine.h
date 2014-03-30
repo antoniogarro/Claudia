@@ -34,6 +34,47 @@
 #include <time.h>
 #include "board.h"
 
+#define NAME  "Claudia"
+#define VERSION "0.2"
+
+
+#ifndef VALUES
+#define VALUES
+#define STARTPAWNS 1600
+#define STARTMATERIAL 6280
+static const int piece_values[] = { 0, 0, 100, 100, 300, 300, 320, 320, 500, 500, 900, 900, 5000, 5000 };
+static const int mobility_bonus[] = { 0, 0, -1, 1, -5, 5, -4, 4, -1, 1, -1, 1, -1, 1 };
+
+#define INFINITE 10000000
+#define DRAW_VALUE 0
+#define MATE_VALUE -100000
+#define HASHMOVE_VALUE 100000
+#define KILLER_VALUE 50
+
+#define DOUBLED_PAWN_BONUS 10
+#define ISOLATED_PAWN_BONUS 5
+#define PAWN_PUSH_BONUS 0.1
+#define PASSED_PAWN_BONUS 20
+
+#define ERRORVALUE -1000000001
+
+#define N_MOBILITY_BONUS 5
+#define B_MOBILITY_BONUS 4
+#define R_MOBILITY_BONUS 1
+#define Q_MOBILITY_BONUS 1
+#define CASTLE_BONUS 60
+#define CASTLE_RIGHT_BONUS 20
+#endif
+
+#ifndef SEARCH
+#define SEARCH
+#define ASP_WINDOW 50
+#define LAZYBETA 400
+#define LAZYALPHA 1000
+#define MAXMOVES 250
+#define MAXDEPTH 70
+#endif
+
 static const clock_t CPMS = CLOCKS_PER_SEC/1000;
 
 typedef struct CONTROL {

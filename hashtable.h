@@ -30,7 +30,8 @@
 
 #ifndef HASHTABLEH
 #define HASHTABLEH
-#include "claudia.h"
+
+#include "board.h"
 #include "pawns.h"
 
 #define HASH_EXACT 0

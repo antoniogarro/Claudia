@@ -35,7 +35,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "engine.h"
-#include "claudia.h"
 #include "board.h"
 
 typedef unsigned char uint8;
@@ -257,48 +256,8 @@ KEY PolyglotKey(const BOARD *board)
 {
     KEY key = 0;
     for (int i = 0; i<128; i++){
-        int p = 0;
-        switch(board->squares[i]){
-            case B_PAWN:
-                p = 0;
-                break;
-            case W_PAWN:
-                p = 1;
-                break;
-            case B_KNIGHT:
-                p = 2;
-                break;
-            case W_KNIGHT:
-                p = 3;
-                break;
-            case B_BISHOP:
-                p = 4;
-                break;
-            case W_BISHOP:
-                p = 5;
-                break;
-            case B_ROOK:
-                p = 6;
-                break;
-            case W_ROOK:
-                p = 7;
-                break;
-            case B_QUEEN:
-                p = 8;
-                break;
-            case W_QUEEN:
-                p = 9;
-                break;
-            case B_KING:
-                p = 10;
-                break;
-            case W_KING:
-                p = 11;
-                break;
-            default:
-                p = 12;
-        }
-        if(IN_BOARD(i) && p < 12) key ^= RandomPiece[64*p+8*(ROW(i)/0x10)+COLUMN(i)];
+        int p = board->squares[i] - 2;
+        if(IN_BOARD(i) && p >= 0) key ^= RandomPiece[64*p+8*(ROW8(i))+COLUMN(i)];
     }
 
     if(board->wk_castle) key ^= RandomCastle[0];

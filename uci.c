@@ -37,7 +37,6 @@
 #include <process.h>
 #endif
 #include "engine.h"
-#include "claudia.h"
 #include "hashtable.h"
 
 

@@ -30,7 +30,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "claudia.h"
 #include "engine.h"
 #include "board.h"
 
@@ -57,7 +56,7 @@ int main(int argc, char *argv[])
     }
     ClearHashTable(&hash_table);
     
-    if(AllocTable(&pawn_table, 100) == 0){
+    if(AllocPawnTable(&pawn_table, 100) == 0){
         printf("Not enough memory\n");
         return 1;
     }

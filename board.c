@@ -29,7 +29,6 @@
 ***************************************************************************************/
 
 #include <stdio.h>
-#include "claudia.h"
 #include "board.h"
 #include "random.h"
 
