@@ -31,7 +31,7 @@
 #include "board.h"
 #include "engine.h"
 
-int SEE(BOARD *board, MOVE *main_capture)
+static int SEE(BOARD *board, MOVE *main_capture)
 {
     SQUARE dest = DESTMASK(*main_capture);
     SQUARE captured, sq;
@@ -77,7 +77,7 @@ int SEE(BOARD *board, MOVE *main_capture)
     return val;
 }
 
-int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, const MOVE killers[])
+static int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, const MOVE killers[])
 {
     /*Compare with hash_move, using only orig, des; curr_move may not have captured or ep info.*/
     if(SQSMASK(*curr_move) == SQSMASK(hash_move)){

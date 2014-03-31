@@ -218,7 +218,8 @@ int CaptureGen(const BOARD *board, MOVE *poss_moves)
 {
     return MoveGen(board, poss_moves, 0);
 }
-
+#define JUMP
+#ifdef JUMP
 int MoveGen(const BOARD *board, MOVE *poss_moves, char noncaptures)
 {
     int nmoves = 0;
@@ -235,3 +236,61 @@ int MoveGen(const BOARD *board, MOVE *poss_moves, char noncaptures)
     }
     return nmoves;
 }
+#else
+int MoveGen(const BOARD *board, MOVE *poss_moves, char noncaptures)
+{
+    int nmoves = 0;
+    for(SQUARE orig = a1; orig <= h8; orig++){
+        PIECE p = board->squares[orig];
+        if(board->white_to_move){
+            switch(p){
+                case W_PAWN:
+                    nmoves = WhitePawnMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case W_KNIGHT:
+                    nmoves = NonSlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case W_BISHOP:
+                    nmoves = SlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case W_ROOK:
+                    nmoves = SlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case W_QUEEN:
+                    nmoves = SlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case W_KING:
+                    nmoves = NonSlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                default: break;
+            }
+            if(noncaptures) nmoves = GenerateWhiteCastle(board, poss_moves, nmoves);
+        }else{
+            switch(p){
+                case B_PAWN:
+                    nmoves = BlackPawnMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case B_KNIGHT:
+                    nmoves = NonSlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case B_BISHOP:
+                    nmoves = SlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case B_ROOK:
+                    nmoves = SlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case B_QUEEN:
+                    nmoves = SlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                case B_KING:
+                    nmoves = NonSlidingMoves(board, orig, poss_moves, nmoves, noncaptures);
+                    break;
+                default: break;
+            }
+            if(noncaptures) nmoves = GenerateBlackCastle(board, poss_moves, nmoves);
+        }
+        if(COLUMN(orig) == H_COLUMN) orig += 8;
+    }
+    return nmoves;
+}
+#endif

@@ -30,7 +30,7 @@
 
 #include "board.h"
 
-int IsAttacked(const BOARD *board, SQUARE square, COLOR attacking_color)
+inline int IsAttacked(const BOARD *board, SQUARE square, COLOR attacking_color)
 {
     return AttackingPieces(board, square, attacking_color, 0);
 }

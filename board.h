@@ -31,8 +31,8 @@
 #ifndef BOARDH
 #define BOARDH
 
-/*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED:bits 16-19,
-CAPTURED:bits 20-23, CASTLE RIGHTS, PAWN_EP:bits 24-31*/
+/*Type to store moves: ORIG:bits 0-7, DEST:bits 8-15, PROMOTED and CASTLE RIGHTS:bits 16-19,
+CAPTURED:bits 20-23, PAWN_EP:bits 24-31 -> 0xEECPDDOO*/
 typedef unsigned int MOVE;
 
 typedef unsigned char SQUARE;
@@ -199,7 +199,7 @@ static const SQUARE knight_delta[] = {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x2
 static const SQUARE bishop_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0};
 static const SQUARE rook_delta[] = {0x01, 0x10, -0x01, -0x10, 0};
 static const SQUARE king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0};
-
+#ifdef POINTDELTAS
 static const SQUARE *const deltas[] = {
     0,
     0,
@@ -216,10 +216,25 @@ static const SQUARE *const deltas[] = {
     king_delta,
     king_delta,
 };
+#else
+static const SQUARE deltas[][9] = {
+    {0,0,0,0,0,0,0,0,0,},
+    {0,0,0,0,0,0,0,0,0,},
+    {-0x0F, -0x11,0,0,0,0,0,0,0},
+    {0x0F, 0x11,0,0,0,0,0,0,0},
+    {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0},
+    {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0},
+    {0x11, 0x0F, -0x11, -0x0F,0,0,0,0,0},
+    {0x11, 0x0F, -0x11, -0x0F,0,0,0,0,0},
+    {0x01, 0x10, -0x01, -0x10,0,0,0,0,0},
+    {0x01, 0x10, -0x01, -0x10,0,0,0,0,0},
+    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
+    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
+    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
+    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0}
+};
 #endif
-
-int IsAttacked(const BOARD*, SQUARE, COLOR);
-int AttackingPieces(const BOARD*, SQUARE, COLOR, SQUARE*);
+#endif
 
 void MakeMove(BOARD*, MOVE*);
 void Takeback(BOARD*, const MOVE);
@@ -234,11 +249,14 @@ int LazyEval(const BOARD*);
 int StaticEval(const BOARD*);
 int Value(PIECE);
 
-inline char WhiteInCheck(const BOARD *board){
+int IsAttacked(const BOARD*, SQUARE, COLOR);
+int AttackingPieces(const BOARD*, SQUARE, COLOR, SQUARE*);
+
+inline int WhiteInCheck(const BOARD *board){
     return IsAttacked(board, board->wking_pos, BLACK);
 }
 
-inline char BlackInCheck(const BOARD *board){
+inline int BlackInCheck(const BOARD *board){
     return IsAttacked(board, board->bking_pos, WHITE);
 }
 

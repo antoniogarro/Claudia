@@ -37,6 +37,24 @@
 #define SPVLEN 600
 #define MVLEN 7
 
+/*This works because the replacement scheme ensures shallow PV is not overwritten,
+and may fail if the hash table is full.*/
+static int RetrievePV(BOARD *board, MOVE *PV, unsigned int depth)
+{
+    unsigned int PVlen = 0;
+    MOVE mov = GetHashMove(&hash_table, board->zobrist_key);
+    while(mov && PVlen <= depth && IsLegal(board, &mov)){
+        PV[PVlen] = mov;
+        PVlen++;
+        MakeMove(board, &mov);
+        mov = GetHashMove(&hash_table, board->zobrist_key);
+    }
+    for(int i = PVlen; i > 0; i--){
+        Takeback(board, PV[i-1]);
+    }
+    return PVlen;
+}
+
 static int AssesDraw(const BOARD *board)
 {
     if(board->rev_plies[board->ply] >= 50) {
@@ -51,62 +69,44 @@ static int AssesDraw(const BOARD *board)
     return ERRORVALUE;
 }
 
-void IterativeDeep(BOARD *board, CONTROL *control)
+static int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
 {
-    MOVE iPV[PVLEN];
-    char sPV[SPVLEN];
-    char str_mov[MVLEN];
-    int eval = 0;
-    int alpha = -INFINITE;
-    int beta = INFINITE;
-    unsigned long long nps = 0;
-    MOVE killers[MAXDEPTH][2];
-    
-    for(unsigned int depth = 1; depth <= control->max_depth;){
-        unsigned long long curr_time = clock();
-        memset(sPV, 0, SPVLEN);
-        control->node_count = 0;
-        
-        eval = AlphaBeta(board, depth, alpha, beta, 0, control, 1, killers);
-        if(control->stop){
-            break;
-        }
-        int PVlen = RetrievePV(board, iPV, depth+10);
-        for(int i = 0; i < PVlen; i++){
-            MoveToAlgeb(iPV[i], str_mov);
-            strcat(sPV, str_mov);
-        }
-        MoveToAlgeb(control->best_move, str_mov);
+    int nposs_movs, nlegal = 0;
+    int val;
+    MOVE poss_moves[MAXMOVES];
 
-        curr_time = (unsigned long long)((clock() - curr_time)/CPMS);
-        if(curr_time){
-            nps = 1000*(control->node_count/curr_time);
-        }
-        if(eval > MATE_VALUE/2 && -eval > MATE_VALUE/2){
-            printf("info depth %u time %llu nodes %llu nps %llu score cp %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, eval, sPV);
-        }else if(-eval < MATE_VALUE/2){
-            printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, (PVlen+1)/2, sPV);
-        }else if(eval < MATE_VALUE/2){
-            printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, -(PVlen+1)/2, sPV);
-        }
-        if(eval <= alpha || eval >= beta){
-            alpha = -INFINITE;
-            beta = INFINITE;
-        }else{
-            if(3*curr_time > control->wish_time-(clock()-control->init_time)) break;
-            alpha = eval - ASP_WINDOW;
-            beta = eval + ASP_WINDOW;
-            depth++;
-        }
+    val = LazyEval(board);
+    if(val-LAZYBETA >= beta) return beta;
+    if(val+LAZYALPHA < alpha) return alpha;
+
+    val = StaticEval(board);
+    UpdateTable(&hash_table, board->zobrist_key, val, 0, 0, HASH_EXACT);
+
+    if (val >= beta) return beta;
+    if (val > alpha) alpha = val;
+    
+    nposs_movs = CaptureGen(board, poss_moves);
+    nposs_movs = FilterWinning(board, poss_moves, nposs_movs);
+
+    for(int i = 0; i < nposs_movs; i++){
+        control->node_count++;
+        MakeMove(board, &poss_moves[i]);
+        if(!LeftInCheck(board)){
+            nlegal++;
+            val = -Quiescent(board, -beta, -alpha, control);
+            Takeback(board, poss_moves[i]);
+            if(val >= beta){
+                return beta;
+            }
+            if(val > alpha){
+                alpha = val;
+            }
+        }else Takeback(board, poss_moves[i]);
     }
-    control->stop = 1;
-    printf("bestmove %s\n", str_mov);
+    return alpha;
 }
 
-int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
+static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                int root, CONTROL *control, char skip_null, MOVE killers[][2])
 {
     int nposs_movs, nlegal = 0;
@@ -200,57 +200,57 @@ int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     return alpha;
 }
 
-int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
+void IterativeDeep(BOARD *board, CONTROL *control)
 {
-    int nposs_movs, nlegal = 0;
-    int val;
-    MOVE poss_moves[MAXMOVES];
-
-    val = LazyEval(board);
-    if(val-LAZYBETA >= beta) return beta;
-    if(val+LAZYALPHA < alpha) return alpha;
-
-    val = StaticEval(board);
-    UpdateTable(&hash_table, board->zobrist_key, val, 0, 0, HASH_EXACT);
-
-    if (val >= beta) return beta;
-    if (val > alpha) alpha = val;
+    MOVE iPV[PVLEN];
+    char sPV[SPVLEN];
+    char str_mov[MVLEN];
+    int eval = 0;
+    int alpha = -INFINITE;
+    int beta = INFINITE;
+    unsigned long long nps = 0;
+    MOVE killers[MAXDEPTH][2];
     
-    nposs_movs = CaptureGen(board, poss_moves);
-    nposs_movs = FilterWinning(board, poss_moves, nposs_movs);
+    for(unsigned int depth = 1; depth <= control->max_depth;){
+        unsigned long long curr_time = clock();
+        memset(sPV, 0, SPVLEN);
+        control->node_count = 0;
+        
+        eval = AlphaBeta(board, depth, alpha, beta, 0, control, 1, killers);
+        if(control->stop){
+            break;
+        }
+        int PVlen = RetrievePV(board, iPV, depth+10);
+        for(int i = 0; i < PVlen; i++){
+            MoveToAlgeb(iPV[i], str_mov);
+            strcat(sPV, str_mov);
+        }
+        MoveToAlgeb(control->best_move, str_mov);
 
-    for(int i = 0; i < nposs_movs; i++){
-        control->node_count++;
-        MakeMove(board, &poss_moves[i]);
-        if(!LeftInCheck(board)){
-            nlegal++;
-            val = -Quiescent(board, -beta, -alpha, control);
-            Takeback(board, poss_moves[i]);
-            if(val >= beta){
-                return beta;
-            }
-            if(val > alpha){
-                alpha = val;
-            }
-        }else Takeback(board, poss_moves[i]);
+        curr_time = (unsigned long long)((clock() - curr_time)/CPMS);
+        if(curr_time){
+            nps = 1000*(control->node_count/curr_time);
+        }
+        if(eval > MATE_VALUE/2 && -eval > MATE_VALUE/2){
+            printf("info depth %u time %llu nodes %llu nps %llu score cp %i pv %s\n",
+                    depth, curr_time, control->node_count, nps, eval, sPV);
+        }else if(-eval < MATE_VALUE/2){
+            printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
+                    depth, curr_time, control->node_count, nps, (PVlen+1)/2, sPV);
+        }else if(eval < MATE_VALUE/2){
+            printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
+                    depth, curr_time, control->node_count, nps, -(PVlen+1)/2, sPV);
+        }
+        if(eval <= alpha || eval >= beta){
+            alpha = -INFINITE;
+            beta = INFINITE;
+        }else{
+            if(3*curr_time > control->wish_time-(clock()-control->init_time)) break;
+            alpha = eval - ASP_WINDOW;
+            beta = eval + ASP_WINDOW;
+            depth++;
+        }
     }
-    return alpha;
-}
-
-/*This only works because the replacement scheme ensures shallow PV is not overwritten,
-and may fail if the hash table is full.*/
-int RetrievePV(BOARD *board, MOVE *PV, unsigned int depth)
-{
-    unsigned int PVlen = 0;
-    MOVE mov = GetHashMove(&hash_table, board->zobrist_key);
-    while(mov && PVlen <= depth && IsLegal(board, &mov)){
-        PV[PVlen] = mov;
-        PVlen++;
-        MakeMove(board, &mov);
-        mov = GetHashMove(&hash_table, board->zobrist_key);
-    }
-    for(int i = PVlen; i > 0; i--){
-        Takeback(board, PV[i-1]);
-    }
-    return PVlen;
+    control->stop = 1;
+    printf("bestmove %s\n", str_mov);
 }

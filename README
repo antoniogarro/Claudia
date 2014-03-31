@@ -9,7 +9,24 @@ Claudia runs as a console application and can be used with any chess GUI that su
 
 ALGORITHM
 
-The engine uses a 0x88 internal board representation and a single threaded negamax algorithm with alpha-beta pruning, iterative deepening, aspiration windows, principal variation search, null move pruning, lazy evaluation, quiescent search, check extensions, static exchange evaluation and transposition tables. Its leaf evaluation function is still very rudimentary, currently only taking into account material advantage and piece mobility, and lacking specific ending knowledge.
+The engine uses:
+
+	* 0x88 internal board representation,
+	* bitboards for pawn structure evaluation;
+	* a single threaded negamax algorithm
+	* alpha-beta pruning,
+	* iterative deepening,
+	* aspiration windows,
+	* principal variation search,
+	* null move pruning,
+	* lazy evaluation,
+	* quiescent search,
+	* check extensions,
+	* static exchange evaluation,
+	* killer moves heuristic
+	* transposition tables.
+
+Its leaf evaluation function is still very rudimentary; currently it takes into account material advantage, piece mobility and pawn structure, and lacks most specific ending knowledge.
 
 Claudia supports opening books in Polyglot (.bin) format, and will attempt to use an opening book named "book.bin" and placed in its same directory. The default book has been built from over forty thousand high-quality tournament games played by Grand Masters and International Masters over the last five years.
 

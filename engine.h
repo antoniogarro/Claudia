@@ -40,30 +40,56 @@
 
 #ifndef VALUES
 #define VALUES
-#define STARTPAWNS 1600
-#define STARTMATERIAL 6280
-static const int piece_values[] = { 0, 0, 100, 100, 300, 300, 320, 320, 500, 500, 900, 900, 5000, 5000 };
-static const int mobility_bonus[] = { 0, 0, -1, 1, -5, 5, -4, 4, -1, 1, -1, 1, -1, 1 };
 
+#define ERRORVALUE -1000000001
 #define INFINITE 10000000
 #define DRAW_VALUE 0
 #define MATE_VALUE -100000
 #define HASHMOVE_VALUE 100000
 #define KILLER_VALUE 50
 
+#define PAWN_VALUE 100
+#define KNIGHT_VALUE 300
+#define BISHOP_VALUE 320
+#define ROOK_VALUE 500
+#define QUEEN_VALUE 900
+
+#define STARTPAWNS 1600
+#define STARTMATERIAL 6280
+
+static const int piece_values[] = {
+    0, 0,
+    PAWN_VALUE, PAWN_VALUE,
+    KNIGHT_VALUE, KNIGHT_VALUE,
+    BISHOP_VALUE, BISHOP_VALUE,
+    ROOK_VALUE, ROOK_VALUE,
+    QUEEN_VALUE, QUEEN_VALUE,
+    -MATE_VALUE, -MATE_VALUE
+};
+
+#define N_MOBILITY 5
+#define B_MOBILITY 4
+#define R_MOBILITY 1
+#define Q_MOBILITY 1
+#define K_MOBILITY 0
+static const int mobility_bonus[] = {
+     0, 0,
+    -1, 1,
+    -N_MOBILITY, N_MOBILITY,
+    -B_MOBILITY, B_MOBILITY,
+    -R_MOBILITY, R_MOBILITY,
+    -Q_MOBILITY, Q_MOBILITY,
+    -K_MOBILITY, K_MOBILITY
+};
+
+#define CASTLE_BONUS 60
+#define CASTLE_RIGHT_BONUS 20
+
 #define DOUBLED_PAWN_BONUS 10
 #define ISOLATED_PAWN_BONUS 5
 #define PAWN_PUSH_BONUS 0.1
 #define PASSED_PAWN_BONUS 20
 
-#define ERRORVALUE -1000000001
-
-#define N_MOBILITY_BONUS 5
-#define B_MOBILITY_BONUS 4
-#define R_MOBILITY_BONUS 1
-#define Q_MOBILITY_BONUS 1
-#define CASTLE_BONUS 60
-#define CASTLE_RIGHT_BONUS 20
 #endif
 
 #ifndef SEARCH
@@ -100,9 +126,6 @@ struct UCI_COMMAND{
 };
 
 void IterativeDeep(BOARD*, CONTROL*);
-int AlphaBeta(BOARD*, unsigned int, int, int, int, CONTROL*, char, MOVE[][2]);
-int Quiescent(BOARD*, int, int, CONTROL*);
-int RetrievePV(BOARD*, MOVE*, unsigned int);
 
 int ParseCommand(const char*);
 int Command(const char*, ENGINE_STATE*);

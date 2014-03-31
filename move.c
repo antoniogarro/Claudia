@@ -49,8 +49,7 @@ inline void RememberCastleRight(MOVE *move, unsigned char rights)
     *move |= (rights << 16);
 }
 
-
-void RemovePiece(BOARD *board, SQUARE sq)
+static void RemovePiece(BOARD *board, SQUARE sq)
 {
     PIECE p = board->squares[sq];
     board->zobrist_key ^= zobkeys.zob_pieces[p][sq];
@@ -63,7 +62,7 @@ void RemovePiece(BOARD *board, SQUARE sq)
     board->squares[sq] = EMPTY;
 }
 
-void DropPiece(BOARD *board, SQUARE sq, PIECE piece)
+static void DropPiece(BOARD *board, SQUARE sq, PIECE piece)
 {
     PIECE p = board->squares[sq];
     board->zobrist_key ^= zobkeys.zob_pieces[p][sq];
@@ -83,6 +82,115 @@ void DropPiece(BOARD *board, SQUARE sq, PIECE piece)
         board->piece_material[GET_COLOR(piece)] += Value(piece);
     }
     board->squares[sq] = piece;
+}
+
+static inline void MoveWhitePawn(BOARD *board, SQUARE orig, SQUARE dest, PIECE promoted)
+{
+    if(ROW(dest) == EIGHT_ROW){            /*Promotion*/
+        DropPiece(board, dest, TURN_WHITE(promoted));
+        board->en_passant = INVALID_SQ;        /*Invalid square: no pawn en passant.*/
+    }else{
+        DropPiece(board, dest, W_PAWN);
+        if(ROW(dest) == FOURTH_ROW && ROW(orig) == SECOND_ROW){
+            board->en_passant = dest + ROW_DOWN;
+        }else{
+            /*Remove en passant captured pawn (we won't later).*/
+            if(dest == board->en_passant) RemovePiece(board, dest + ROW_DOWN);
+            board->en_passant = INVALID_SQ;
+        }
+    }
+    board->rev_plies[board->ply] = 0;
+}
+
+static inline void MoveBlackPawn(BOARD *board, SQUARE orig, SQUARE dest, PIECE promoted)
+{
+    if(ROW(dest) == FIRST_ROW){
+        DropPiece(board, dest, TURN_BLACK(promoted));
+        board->en_passant = INVALID_SQ;
+    }else{
+        DropPiece(board, dest, B_PAWN);
+        if(ROW(dest) == FIFTH_ROW && ROW(orig) == SEVENTH_ROW){
+            board->en_passant = dest + ROW_UP;
+        }else{
+            if(dest == board->en_passant) RemovePiece(board, dest + ROW_UP);
+            board->en_passant = INVALID_SQ;
+        }
+    }
+    board->rev_plies[board->ply] = 0;
+}
+
+static inline void MoveWhiteKing(BOARD *board, SQUARE orig, SQUARE dest, MOVE *curr_move)
+{
+    DropPiece(board, dest, W_KING);
+    board->wking_pos = dest;
+    if(orig == e1){
+        if(dest == g1){        /*Short castle*/
+            RemovePiece(board, h1);
+            DropPiece(board, f1, W_ROOK);
+            board->w_castled = 1;
+        }
+        if(dest == c1){        /*Long castle*/
+            RemovePiece(board, a1);
+            DropPiece(board, d1, W_ROOK);
+            board->w_castled = 1;
+        }
+
+        if(board->wq_castle) RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
+        if(board->wk_castle) RememberCastleRight(curr_move, K_CASTLE_RIGHT);
+        /*Stores lost castle rights: 'bits promoted' set to 14 if long castle is lost, 1 if short, 15 if both.*/
+    }
+    board->wk_castle = 0, board->wq_castle = 0;
+    board->en_passant = INVALID_SQ;
+}
+
+static inline void MoveBlackKing(BOARD *board, SQUARE orig, SQUARE dest, MOVE *curr_move)
+{
+    DropPiece(board, dest, B_KING);
+    board->bking_pos = dest;
+    if(orig == e8){
+        if(dest == g8){
+            RemovePiece(board, h8);
+            DropPiece(board, f8, B_ROOK);
+            board->b_castled = 1;
+        }
+        if(dest == c8){
+            RemovePiece(board, a8);
+            DropPiece(board, d8, B_ROOK);
+            board->b_castled = 1;
+        }
+
+        if(board->bq_castle) RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
+        if(board->bk_castle) RememberCastleRight(curr_move, K_CASTLE_RIGHT);
+    }
+    board->bk_castle = 0, board->bq_castle = 0;
+    board->en_passant = INVALID_SQ;
+}
+
+static inline void MoveWhiteRook(BOARD *board, SQUARE orig, SQUARE dest, MOVE *curr_move)
+{
+    if(board->wq_castle && orig == a1) {
+        RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
+        board->wq_castle = 0;
+    }
+    if(board->wk_castle && orig == h1) {
+        RememberCastleRight(curr_move, K_CASTLE_RIGHT);
+        board->wk_castle = 0;
+    }
+    DropPiece(board, dest, W_ROOK);
+    board->en_passant = INVALID_SQ;
+}
+static inline void MoveBlackRook(BOARD *board, SQUARE orig, SQUARE dest, MOVE *curr_move)
+{    
+    if(board->bq_castle && orig == a8) {
+        RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
+        board->bq_castle = 0;
+    }
+    if(board->bk_castle && orig == h8) {
+        RememberCastleRight(curr_move, K_CASTLE_RIGHT);
+        board->bk_castle = 0;
+    }
+    DropPiece(board, dest, B_ROOK);
+    board->en_passant = INVALID_SQ;
 }
 
 void MakeMove(BOARD *board, MOVE *curr_move)
@@ -109,109 +217,23 @@ void MakeMove(BOARD *board, MOVE *curr_move)
     
     switch (board->squares[orig]){
         case W_PAWN:
-            if(ROW(dest) == EIGHT_ROW){            /*Promotion*/
-                DropPiece(board, dest, TURN_WHITE(promoted));
-                board->en_passant = INVALID_SQ;        /*Invalid square: no pawn en passant.*/
-            }else{
-                DropPiece(board, dest, W_PAWN);
-                if(ROW(dest) == FOURTH_ROW && ROW(orig) == SECOND_ROW){
-                    board->en_passant = dest + ROW_DOWN;
-                }else{
-                    /*Remove en passant captured pawn (we won't later).*/
-                    if(dest == board->en_passant) RemovePiece(board, dest + ROW_DOWN);
-                    board->en_passant = INVALID_SQ;
-                }
-            }
-            board->rev_plies[board->ply] = 0;
+            MoveWhitePawn(board, orig, dest, promoted);
             break;
-
         case B_PAWN:
-            if(ROW(dest) == FIRST_ROW){
-                DropPiece(board, dest, TURN_BLACK(promoted));
-                board->en_passant = INVALID_SQ;
-            }else{
-                DropPiece(board, dest, B_PAWN);
-                if(ROW(dest) == FIFTH_ROW && ROW(orig) == SEVENTH_ROW){
-                    board->en_passant = dest + ROW_UP;
-                }else{
-                    if(dest == board->en_passant) RemovePiece(board, dest + ROW_UP);
-                    board->en_passant = INVALID_SQ;
-                }
-            }
-            board->rev_plies[board->ply] = 0;
+            MoveBlackPawn(board, orig, dest, promoted);
             break;
-
         case W_KING:
-            DropPiece(board, dest, W_KING);
-            board->wking_pos = dest;
-            if(orig == e1){
-                if(dest == g1){        /*Short castle*/
-                    RemovePiece(board, h1);
-                    DropPiece(board, f1, W_ROOK);
-                    board->w_castled = 1;
-                }
-                if(dest == c1){        /*Long castle*/
-                    RemovePiece(board, a1);
-                    DropPiece(board, d1, W_ROOK);
-                    board->w_castled = 1;
-                }
-
-                if(board->wq_castle) RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
-                if(board->wk_castle) RememberCastleRight(curr_move, K_CASTLE_RIGHT);
-                /*Stores lost castle rights: 'bits promoted' set to 14 if long castle is lost, 1 if short, 15 if both.*/
-            }
-            board->wk_castle = 0, board->wq_castle = 0;
-            board->en_passant = INVALID_SQ;
+            MoveWhiteKing(board, orig, dest, curr_move);
             break;
-
         case B_KING:
-            DropPiece(board, dest, B_KING);
-            board->bking_pos = dest;
-            if(orig == e8){
-                if(dest == g8){
-                    RemovePiece(board, h8);
-                    DropPiece(board, f8, B_ROOK);
-                    board->b_castled = 1;
-                }
-                if(dest == c8){
-                    RemovePiece(board, a8);
-                    DropPiece(board, d8, B_ROOK);
-                    board->b_castled = 1;
-                }
-
-                if(board->bq_castle) RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
-                if(board->bk_castle) RememberCastleRight(curr_move, K_CASTLE_RIGHT);
-            }
-            board->bk_castle = 0, board->bq_castle = 0;
-            board->en_passant = INVALID_SQ;
+            MoveBlackKing(board, orig, dest, curr_move);
             break;
-
         case W_ROOK:
-            if(board->wq_castle && orig == a1) {
-                RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
-                board->wq_castle = 0;
-            }
-            if(board->wk_castle && orig == h1) {
-                RememberCastleRight(curr_move, K_CASTLE_RIGHT);
-                board->wk_castle = 0;
-            }
-            DropPiece(board, dest, W_ROOK);
-            board->en_passant = INVALID_SQ;
+            MoveWhiteRook(board, orig, dest, curr_move);
             break;
-
         case B_ROOK:
-            if(board->bq_castle && orig == a8) {
-                RememberCastleRight(curr_move, Q_CASTLE_RIGHT);
-                board->bq_castle = 0;
-            }
-            if(board->bk_castle && orig == h8) {
-                RememberCastleRight(curr_move, K_CASTLE_RIGHT);
-                board->bk_castle = 0;
-            }
-            DropPiece(board, dest, B_ROOK);
-            board->en_passant = INVALID_SQ;
+            MoveBlackRook(board, orig, dest, curr_move);
             break;
-
         default:
             DropPiece(board, dest, board->squares[orig]);
             board->en_passant = INVALID_SQ;
@@ -327,17 +349,19 @@ void Takeback(BOARD *board, const MOVE prev_move)
                     DropPiece(board, orig, B_ROOK);
                 }
                 break;
-            /*case EMPTY:
-                break; */
+            /*
+            case EMPTY:
+                break;
+            */
             default:
                 if(promoted){
                     /*drop a PAWN, same color as the piece's on dest.*/
-                    DropPiece(board, orig, BLACK_TO_COLOR(B_PAWN, board->squares[dest]));
+                    DropPiece(board, orig, (GET_COLOR(board->squares[dest]) ? W_PAWN : B_PAWN));
                 }else{
                     DropPiece(board, orig, board->squares[dest]);
                 }
                 break;
     }
-    DropPiece(board, dest,captured);
+    DropPiece(board, dest, captured);
     board->ply--;
 }

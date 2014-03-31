@@ -19,7 +19,7 @@
 
 * Checks in quiescent search		low			pending
 
-* King safety evaluation		medium			pending
+* King safety evaluation		low			pending
 
 * Pawn structure evaluation		medium			ongoing
 
@@ -41,4 +41,4 @@
 
 * Lazy evaluation			-			done
 
-* Killer moves				medium			ongoing
+* Killer moves				-			done

@@ -71,7 +71,7 @@ int Command(const char *input, ENGINE_STATE *stat)
     return uci_commands[cmd].cmd(input_copy, stat);
 }
 
-void ManageTimes(int nmoves, ENGINE_STATE *stat)
+inline void ManageTimes(int nmoves, ENGINE_STATE *stat)
 {
     if(stat->board->white_to_move){
         stat->control->wish_time = stat->control->wtime/nmoves + stat->control->wtime_inc;
@@ -82,7 +82,7 @@ void ManageTimes(int nmoves, ENGINE_STATE *stat)
     }
 }
 
-void ResetTimes(ENGINE_STATE *stat)
+inline void ResetTimes(ENGINE_STATE *stat)
 {
     stat->control->wtime = 0; stat->control->btime = 0;
     stat->control->wtime_inc = 0; stat->control->btime_inc = 0;

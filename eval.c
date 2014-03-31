@@ -57,7 +57,7 @@ static inline int MobilityEval(const BOARD *board)
     int val = 0;
     for(SQUARE sq = a1; sq <= h8; sq++){
         PIECE p = board->squares[sq];
-        if(p && p != W_KING && p != B_KING){
+        if(p && p < B_KING){
             val += piece_moves[p](board, sq, 0, 0, 1) * mobility_bonus[p];
         }
         if(COLUMN(sq) == H_COLUMN) sq += 8;
@@ -67,13 +67,15 @@ static inline int MobilityEval(const BOARD *board)
 
 static inline int PawnStructureEval(const BOARD *board)
 {
+    return 0;
     BITBOARD bp = board->pawns[0], wp = board->pawns[1];
     BITBOARD b = bp | wp;
     int val = GetPawnEval(&pawn_table, b);
     if(val != ERRORVALUE) return val;
-    
+
+    val = 0;    
     val += DotProduct(wp, WRANKS) * PAWN_PUSH_BONUS;
-    val -= DotProduct(bp, WRANKS) * PAWN_PUSH_BONUS;
+    val -= DotProduct(bp, BRANKS) * PAWN_PUSH_BONUS;
     
     val = (BitCount(DoubledPawns(bp)) - BitCount(DoubledPawns(wp))) * DOUBLED_PAWN_BONUS;
     val += DotProduct(WPassedPawns(wp, bp), WRANKS) * PASSED_PAWN_BONUS;

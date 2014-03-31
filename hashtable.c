@@ -76,7 +76,7 @@ void UpdateTable(HASHTABLE *ht, KEY zob_key, int eval, MOVE best_move, int depth
     entry->data = PUT_HASH_MOVE(best_move);
     entry->data |= PUT_HASH_EVAL(eval);
     entry->data |= PUT_HASH_DEPTH(depth);
-    entry->data |=  PUT_HASH_FLAG(flag);
+    entry->data |= PUT_HASH_FLAG(flag);
 }
 
 MOVE GetHashMove(HASHTABLE *ht, KEY zob_key)
