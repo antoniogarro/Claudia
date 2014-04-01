@@ -95,8 +95,8 @@ void PrintBoard(const BOARD *board)
     printf("\n");
     printf("\n+--+--+--+--+--+--+--+--+ %c %c%c%c%c   +--+--+--+--+--+--+--+--+    +--+--+--+--+--+--+--+--+\n",
             (board->white_to_move+1?'W':'B'),
-            (board->wq_castle?'Q':0), (board->wk_castle?'K':0),
-            (board->bq_castle?'q':0), (board->bk_castle?'k':0));
+            (board->wq_castle?'Q':' '), (board->wk_castle?'K':' '),
+            (board->bq_castle?'q':' '), (board->bk_castle?'k':' '));
     
     for(int i = 0x70; i >= 0; i++){
         if(!(i&0x88)){

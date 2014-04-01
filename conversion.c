@@ -67,7 +67,7 @@ PIECE CharToPiece(const char fen)
 char PieceToChar(PIECE piece)
 {
   //const char *pieces = " PpNnBbRrQqKkCCC";
-    const char *pieces = " CppnNbBrRqQkKCC";
+    const char *pieces = " CpPnNbBrRqQkKCC";
     return pieces[piece];
 }
 
