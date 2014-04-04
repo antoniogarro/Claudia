@@ -31,11 +31,6 @@
 #include <stdio.h>
 #include "board.h"
 
-/*
-'MakeMove()' modifies curr_move to update information depending on the position (captured, catle, EP...).
-'MakeMove()' does NOT verify legality!
-*/
-
 inline void RememberCaptured(MOVE *move, PIECE captured)
 {
     /*captured piece: bits 20-23; 0 if EMPTY, o en passant capture:*/
@@ -190,6 +185,10 @@ static inline void MoveBlackRook(BOARD *board, SQUARE orig, SQUARE dest, MOVE *c
     board->en_passant = INVALID_SQ;
 }
 
+/*
+'MakeMove()' modifies curr_move to update information depending on the position (captured, castle, EP...).
+'MakeMove()' does NOT verify legality!
+*/
 void MakeMove(BOARD *board, MOVE *curr_move)
 {
     board->ply++;
@@ -359,11 +358,9 @@ void Takeback(BOARD *board, const MOVE prev_move)
             case B_KING:
                 TakebackBlackKing(board, orig, dest, promoted);
                 break;
-
             case W_ROOK:
                 TakebackWhiteRook(board, orig, dest, promoted);
                 break;
-
             case B_ROOK:
                 TakebackBlackRook(board, orig,  dest, promoted);
                 break;

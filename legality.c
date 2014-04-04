@@ -32,7 +32,7 @@
 #include "engine.h"
 
 char IsLegal(BOARD *board, MOVE *curr_move)
-{   /*TODO: rewrite!*/
+{
     MOVE poss_moves[MAXMOVES];
     int nposs_movs = MoveGen(board, poss_moves, 1);
     /*We only compare info about squares to decide legality, not captured piece or previous EP:*/

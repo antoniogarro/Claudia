@@ -33,6 +33,8 @@
 #include "engine.h"
 #include "board.h"
 
+#define BUFFER 2048
+
 /*Globals.*/
 HASHTABLE hash_table;
 PAWNTABLE pawn_table;
@@ -43,7 +45,6 @@ int main(int argc, char *argv[])
     BOARD main_board;
     InitBoard(&main_board);
     ReadFEN(STARTPOS, &main_board);
-    /*ReadFEN("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");*/
     
     CONTROL engine_control;
     engine_control.stop = 1;
@@ -65,13 +66,13 @@ int main(int argc, char *argv[])
     setvbuf(stdin, 0, _IONBF, 0);
     setvbuf(stdout, 0, _IONBF, 0);
     fflush(NULL);
-    char input[2048];
+    char input[BUFFER];
 
-    while(fgets(input, sizeof(input), stdin)){
+    while(fgets(input, BUFFER, stdin)){
         if(!Command(input, &engine)){
             break;
         }    
-        memset(input, 0, 2048);
+        memset(input, 0, BUFFER);
     }
     
     DeleteTable(&hash_table);

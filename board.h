@@ -234,6 +234,17 @@ static const SQUARE deltas[][9] = {
     {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0}
 };
 #endif
+
+static const SQUARE distance_to_center[] = {
+    6, 5, 4, 3, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0,
+    5, 4, 3, 2, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0,
+    4, 3, 2, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0,
+    3, 2, 1, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+    3, 2, 1, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+    4, 3, 2, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0,
+    5, 4, 3, 2, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0,
+    6, 5, 4, 3, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0
+};
 #endif
 
 void MakeMove(BOARD*, MOVE*);
@@ -284,3 +295,4 @@ char ColumnCoordinateToChar(const char);
 MOVE AlgebToMove(const char*);
 void MoveToAlgeb(const MOVE, char*);
 #endif
+

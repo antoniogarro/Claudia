@@ -30,7 +30,6 @@
 
 #include "board.h"
 
-/*TODO: merge White and Black pawns generators?*/
 inline int WhitePawnMoves(const BOARD *board, SQUARE orig, MOVE *poss_moves, int nmoves, char noncaptures)
 {
     SQUARE dest = orig + ROW_UP;
