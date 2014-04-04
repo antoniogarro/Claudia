@@ -118,9 +118,9 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     char hash_flag = HASH_ALPHA;
 
     if(depth){
-        val = GetHashEval(&hash_table, board->zobrist_key, depth, alpha, beta);
-        if(val != ERRORVALUE){
-            return val;
+	if(root > 0){
+            val = GetHashEval(&hash_table, board->zobrist_key, depth, alpha, beta);
+            if(val != ERRORVALUE) return val; 
         }
         if(!skip_null && depth > 2 
                 && board->piece_material[board->white_to_move] != 0
