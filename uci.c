@@ -40,12 +40,13 @@
 #include "hashtable.h"
 
 
-CMDFN make_move, quit, go, stop, perft, position, uci, isready, setoption, ucinewgame, showboard;
+CMDFN make_move, quit, go, stop, ponderhit, perft, position, uci, isready, setoption, ucinewgame, showboard;
 
 const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
                                            {"quit", &quit},
                                            {"go", &go},
                                            {"stop", &stop},
+                                           {"ponderhit", &ponderhit},
                                            {"perft", &perft},
                                            {"position", &position},
                                            {"uci", &uci},
@@ -110,6 +111,7 @@ int go(char *input, ENGINE_STATE *stat)
     stat->control->max_time = INFINITE;
     stat->control->wish_time = INFINITE;
     stat->control->stop = 1;
+    stat->control->ponder = 0;
     ResetTimes(stat);
     int movestogo = 30;
     char manage_times = 1;
@@ -129,10 +131,11 @@ int go(char *input, ENGINE_STATE *stat)
                 stat->control->max_time = atol(str_param);
                 manage_times = 0;
             }
-            break;
         }else if(!strcmp("infinite",  str_param)){
             manage_times = 0;
             break;
+        }else if(!strcmp("ponder", str_param)){
+            stat->control->ponder = 1;
         }else if(!strcmp("btime",  str_param)){
             str_param = strtok(NULL, " \n\t");
             if(str_param){
@@ -184,6 +187,12 @@ int go(char *input, ENGINE_STATE *stat)
 int stop(char *input, ENGINE_STATE *stat)
 {
     stat->control->stop = 1;
+    return 1;
+}
+
+int ponderhit(char *input, ENGINE_STATE *stat)
+{
+    stat->control->ponder=0;
     return 1;
 }
 

@@ -84,6 +84,8 @@ static const int mobility_bonus[] = {
 
 #define CASTLE_BONUS 60
 #define CASTLE_RIGHT_BONUS 20
+#define KING_CENTER_BONUS 10
+#define SIMPLIFY_BONUS 1
 
 #define DOUBLED_PAWN_BONUS 10
 #define ISOLATED_PAWN_BONUS 5
@@ -108,7 +110,7 @@ typedef struct CONTROL {
     clock_t init_time, wish_time, max_time;
     unsigned int max_depth;
     unsigned long long node_count;
-    char uci, stop;
+    char uci, stop, ponder;
     MOVE best_move;
 } CONTROL;
 

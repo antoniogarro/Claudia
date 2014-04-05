@@ -93,7 +93,7 @@ void InitMaterial(BOARD *board)
 void PrintBoard(const BOARD *board)
 {
     printf("\n");
-    printf("\n+--+--+--+--+--+--+--+--+ %c %c%c%c%c   +--+--+--+--+--+--+--+--+    +--+--+--+--+--+--+--+--+\n",
+    printf("\n+--+--+--+--+--+--+--+--+ %c %c%c%c%c +--+--+--+--+--+--+--+--+   +--+--+--+--+--+--+--+--+\n",
             (board->white_to_move+1?'W':'B'),
             (board->wq_castle?'Q':' '), (board->wk_castle?'K':' '),
             (board->bq_castle?'q':' '), (board->bk_castle?'k':' '));
@@ -102,11 +102,11 @@ void PrintBoard(const BOARD *board)
         if(!(i&0x88)){
             printf("| %c", PieceToChar(board->squares[i]));
         }else{
-            printf("|           ");
+            printf("|         ");
             for(int j = 0; j<8; j++) printf(" %c ", (board->pawns[0] & (1ull << (ROW(i-1) >> 1) << j)) ? 'p' : ' ');
-            printf("     ");
+            printf("    ");
             for(int j = 0; j<8; j++) printf(" %c ", (board->pawns[1] & (1ull << (ROW(i-1) >> 1) << j)) ? 'P' : ' ');
-            printf("\n+--+--+--+--+--+--+--+--+          +--+--+--+--+--+--+--+--+    +--+--+--+--+--+--+--+--+\n");
+            printf("\n+--+--+--+--+--+--+--+--+        +--+--+--+--+--+--+--+--+   +--+--+--+--+--+--+--+--+\n");
             i -= 0x19;
         }
     }

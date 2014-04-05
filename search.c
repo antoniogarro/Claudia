@@ -118,7 +118,7 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     char hash_flag = HASH_ALPHA;
 
     if(depth){
-	if(root > 0){
+        if(root > 0){
             val = GetHashEval(&hash_table, board->zobrist_key, depth, alpha, beta);
             if(val != ERRORVALUE) return val; 
         }
@@ -144,7 +144,6 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                 }
                 nlegal++;
                 val = AssesDraw(board);
-                
                 if(val) {
                     if(best_move){
                         val = -AlphaBeta(board, depth-1, -alpha-1, -alpha, root+1, control, 0, killers);
@@ -155,15 +154,15 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                 }
                 Takeback(board, poss_moves[i]);
 
-                if(clock() - control->init_time > control->max_time*CPMS*0.95){
+                if(!control->ponder && clock() - control->init_time > control->max_time*CPMS*0.95){
                     control->stop = 1;
                 }
                 if(control->stop) return alpha;
                 if(val >= beta){
                     UpdateTable(&hash_table, board->zobrist_key, val, poss_moves[i], depth, HASH_BETA);
-                    if(killers[root][0] != poss_moves[i]
-                       && killers[root][1] != poss_moves[i]
-                       && CAPTMASK(poss_moves[i]) == 0){
+                    if(CAPTMASK(poss_moves[i]) == 0
+                            && killers[root][0] != poss_moves[i]
+                            && killers[root][1] != poss_moves[i]){
                         killers[root][1] = killers[root][0];
                         killers[root][0] = poss_moves[i];
                     }
@@ -175,10 +174,10 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                     best_move = poss_moves[i];
                     if(root == 0) control->best_move = best_move;
                 }
-                if(root == 0 && ((clock() - control->init_time) > control->wish_time*CPMS)){
-                /*don't search anymore after current move; TODO: continue if fails low?*/
+                if(root == 0 && !control->ponder && ((clock() - control->init_time) > control->wish_time*CPMS)){
+                /* if short of time, don't search anymore after current move */
                     control->max_depth = depth;
-                    return alpha;
+                    return alpha; // val???
                 }
             }else Takeback(board, poss_moves[i]);
         }
@@ -205,7 +204,7 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     MOVE iPV[PVLEN];
     char sPV[SPVLEN];
     char str_mov[MVLEN];
-    int eval = 0;
+    int eval = 0, pvlen = 0;
     int alpha = -INFINITE;
     int beta = INFINITE;
     unsigned long long nps = 0;
@@ -220,12 +219,11 @@ void IterativeDeep(BOARD *board, CONTROL *control)
         if(control->stop){
             break;
         }
-        int PVlen = RetrievePV(board, iPV, depth+10);
-        for(int i = 0; i < PVlen; i++){
+        pvlen = RetrievePV(board, iPV, depth+10);
+        for(int i = 0; i < pvlen; i++){
             MoveToAlgeb(iPV[i], str_mov);
             strcat(sPV, str_mov);
         }
-        MoveToAlgeb(control->best_move, str_mov);
 
         curr_time = (unsigned long long)((clock() - curr_time)/CPMS);
         if(curr_time){
@@ -236,21 +234,28 @@ void IterativeDeep(BOARD *board, CONTROL *control)
                     depth, curr_time, control->node_count, nps, eval, sPV);
         }else if(-eval < MATE_VALUE/2){
             printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, (PVlen+1)/2, sPV);
+                    depth, curr_time, control->node_count, nps, (pvlen+1)/2, sPV);
         }else if(eval < MATE_VALUE/2){
             printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, -(PVlen+1)/2, sPV);
+                    depth, curr_time, control->node_count, nps, -(pvlen+1)/2, sPV);
         }
         if(eval <= alpha || eval >= beta){
             alpha = -INFINITE;
             beta = INFINITE;
         }else{
-            if(3*curr_time > control->wish_time-(clock()-control->init_time)) break;
+            if(3*curr_time > control->wish_time-(clock()-control->init_time)
+                    && !control->ponder) break;
             alpha = eval - ASP_WINDOW;
             beta = eval + ASP_WINDOW;
             depth++;
         }
     }
     control->stop = 1;
-    printf("bestmove %s\n", str_mov);
+    MoveToAlgeb(control->best_move, str_mov);
+    printf("bestmove %s", str_mov);
+    if(pvlen > 1){
+        MoveToAlgeb(iPV[1], str_mov);
+        printf("ponder %s", str_mov);
+    }
+    printf("\n");
 }

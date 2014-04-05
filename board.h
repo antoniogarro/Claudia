@@ -140,8 +140,8 @@ typedef struct BOARD {
     unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
     unsigned char w_castled, b_castled;
     SQUARE wking_pos, bking_pos;
-    int ply;
-    int rev_plies[HISTLEN];
+    unsigned int ply;
+    unsigned int rev_plies[HISTLEN];
     KEY zobrist_key;
     KEY zobrist_history[HISTLEN];
     unsigned int piece_material[2];
@@ -276,7 +276,7 @@ inline int InCheck(const BOARD *board, SQUARE *attacking_sqs){
     else return AttackingPieces(board, board->bking_pos, WHITE, attacking_sqs);
 }
 
-inline char LeftInCheck(const BOARD *board){
+inline int LeftInCheck(const BOARD *board){
     if(board->white_to_move) return IsAttacked(board, board->bking_pos, WHITE);
     else return IsAttacked(board, board->wking_pos, BLACK);
 }

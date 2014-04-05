@@ -191,7 +191,7 @@ void MoveToAlgeb(const MOVE curr_move, char *str_mov)
 {
     MOVE aux_move = (curr_move & 0xFFFFF) >> 16;
     str_mov [4] = PieceToChar(aux_move);
-    if(str_mov[4] == 'C'){
+    if(str_mov[4] == 'C' || str_mov[4] == ' '){
         str_mov[4] = ' ';
         str_mov[5] = 0;
     }else{

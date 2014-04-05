@@ -42,14 +42,16 @@ static inline float GameStage(const BOARD *board)
     return 1.0 - (float)(board->piece_material[0] + board->piece_material[1])/STARTMATERIAL;
 }
 
-static inline int CastleVal(const BOARD *board)
+static inline int KingEval(const BOARD *board)
 {
-    int val = 0;
-    val += board->w_castled * (1.0-PawnStage(board)) * CASTLE_BONUS;
-    val -= board->b_castled * (1.0-PawnStage(board)) * CASTLE_BONUS;
-    val += (board->wk_castle + board->wq_castle) * CASTLE_RIGHT_BONUS;
-    val -= (board->bk_castle + board->bq_castle) * CASTLE_RIGHT_BONUS;
-    return val;
+    return (board->w_castled * (1.0-PawnStage(board)) -
+            board->b_castled * (1.0-PawnStage(board))) * CASTLE_BONUS
+         +
+           ((board->wk_castle + board->wq_castle) -
+            (board->bk_castle + board->bq_castle)) * CASTLE_RIGHT_BONUS
+         +
+           (distance_to_center[board->bking_pos] -
+            distance_to_center[board->wking_pos]) * KING_CENTER_BONUS * PawnStage(board);
 }
 
 static inline int MobilityEval(const BOARD *board)
@@ -67,16 +69,11 @@ static inline int MobilityEval(const BOARD *board)
 
 static inline int PawnStructureEval(const BOARD *board)
 {
-    return 0;
     BITBOARD bp = board->pawns[0], wp = board->pawns[1];
     BITBOARD b = bp | wp;
     int val = GetPawnEval(&pawn_table, b);
     if(val != ERRORVALUE) return val;
 
-    val = 0;    
-    val += DotProduct(wp, WRANKS) * PAWN_PUSH_BONUS;
-    val -= DotProduct(bp, BRANKS) * PAWN_PUSH_BONUS;
-    
     val = (BitCount(DoubledPawns(bp)) - BitCount(DoubledPawns(wp))) * DOUBLED_PAWN_BONUS;
     val += DotProduct(WPassedPawns(wp, bp), WRANKS) * PASSED_PAWN_BONUS;
     val -= DotProduct(BPassedPawns(bp, wp), BRANKS) * PASSED_PAWN_BONUS;
@@ -96,8 +93,8 @@ static inline int MaterialDraw(const BOARD *board)
 
 static inline int MaterialEval(const BOARD *board)
 {
-    return board->piece_material[1] + board->pawn_material[1]
-         - board->piece_material[0] - board->pawn_material[0];
+    return (board->piece_material[1] + board->pawn_material[1]
+          - board->piece_material[0] - board->pawn_material[0]);
 }
 
 int LazyEval(const BOARD *board)
@@ -113,7 +110,8 @@ int StaticEval(const BOARD *board)
     int val = MaterialEval(board);
     val += MobilityEval(board);
     val += PawnStructureEval(board);
-    val += CastleVal(board);
+    val += KingEval(board);
+    val *= (1.0 + SIMPLIFY_BONUS * GameStage(board));
     return board->white_to_move ? val : -val;
 }
 
