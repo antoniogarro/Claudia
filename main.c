@@ -51,13 +51,13 @@ int main(int argc, char *argv[])
     
     ENGINE_STATE engine = {&main_board, &engine_control};
     
-    if(AllocTable(&hash_table, TABLESIZE) == 0){
+    if(AllocTable(&hash_table, 0.8*TABLESIZE) == 0){
         printf("Not enough memory\n");
         return 1;
     }
     ClearHashTable(&hash_table);
     
-    if(AllocPawnTable(&pawn_table, 100) == 0){
+    if(AllocPawnTable(&pawn_table, 0.2*TABLESIZE) == 0){
         printf("Not enough memory\n");
         return 1;
     }

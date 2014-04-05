@@ -248,9 +248,10 @@ int isready(char *input, ENGINE_STATE *stat)
 int setoption(char *input, ENGINE_STATE *stat)
 {
     int val = 0;
-    sscanf(input, "setoption name Hash value %i", &val);
+    if(!sscanf(input, "setoption name Hash value %i", &val)) return 1;
     DeleteTable(&hash_table);
-    if(AllocTable(&hash_table, val) == 0) return 0;
+    if(AllocPawnTable(&pawn_table, 0.2*val) == 0) return 0;
+    if(AllocTable(&hash_table, 0.8*val) == 0) return 0;
     ClearHashTable(&hash_table);
     return 1;
 }
