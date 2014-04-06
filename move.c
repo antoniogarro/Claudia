@@ -57,21 +57,23 @@ static void RemovePiece(BOARD *board, SQUARE sq)
         board->pawn_material[GET_COLOR(p)] -= Value(p);
         board->pawns[GET_COLOR(p)] = BitboardUnset(sq, board->pawns[GET_COLOR(p)]);
     }else if(p != EMPTY && p != W_KING && p != B_KING){
+        if(p == W_BISHOP || p == B_BISHOP) board->bishops[GET_COLOR(p)]--;
         board->piece_material[GET_COLOR(p)] -= Value(p);
     }
     board->squares[sq] = EMPTY;
 }
 
-static void DropPiece(BOARD *board, SQUARE sq, PIECE piece)
+static void DropPiece(BOARD *board, SQUARE sq, PIECE p)
 {
-    board->zobrist_key ^= zobkeys.zob_pieces[piece][sq];
-    if(piece == W_PAWN || piece == B_PAWN){
-        board->pawn_material[GET_COLOR(piece)] += Value(piece);
-        board->pawns[GET_COLOR(piece)] = BitboardSet(sq, board->pawns[GET_COLOR(piece)]);
-    }else if(piece != EMPTY && piece != W_KING && piece != B_KING){
-        board->piece_material[GET_COLOR(piece)] += Value(piece);
+    board->zobrist_key ^= zobkeys.zob_pieces[p][sq];
+    if(p == W_PAWN || p == B_PAWN){
+        board->pawn_material[GET_COLOR(p)] += Value(p);
+        board->pawns[GET_COLOR(p)] = BitboardSet(sq, board->pawns[GET_COLOR(p)]);
+    }else if(p != EMPTY && p != W_KING && p != B_KING){
+        if(p == W_BISHOP || p == B_BISHOP) board->bishops[GET_COLOR(p)]++;
+        board->piece_material[GET_COLOR(p)] += Value(p);
     }
-    board->squares[sq] = piece;
+    board->squares[sq] = p;
 }
 
 static inline void MoveWhitePawn(BOARD *board, SQUARE orig, SQUARE dest, const MOVE *curr_move)

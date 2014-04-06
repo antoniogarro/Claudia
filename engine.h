@@ -48,15 +48,6 @@
 #define HASHMOVE_VALUE 100000
 #define KILLER_VALUE 50
 
-#define PAWN_VALUE 100
-#define KNIGHT_VALUE 300
-#define BISHOP_VALUE 320
-#define ROOK_VALUE 500
-#define QUEEN_VALUE 900
-
-#define STARTPAWNS 1600
-#define STARTMATERIAL 6280
-
 static const int piece_values[] = {
     0, 0,
     PAWN_VALUE, PAWN_VALUE,
@@ -85,7 +76,7 @@ static const int mobility_bonus[] = {
 #define CASTLE_BONUS 60
 #define CASTLE_RIGHT_BONUS 20
 #define KING_CENTER_BONUS 10
-#define SIMPLIFY_BONUS 1
+#define SIMPLIFY_BONUS 0.1
 
 #define DOUBLED_PAWN_BONUS 10
 #define ISOLATED_PAWN_BONUS 5

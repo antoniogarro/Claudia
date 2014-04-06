@@ -128,6 +128,14 @@ enum PIECES { EMPTY,
 #define HISTLEN 500
 #define BOARDSIZE 0x80
 
+#define PAWN_VALUE 100
+#define KNIGHT_VALUE 300
+#define BISHOP_VALUE 320
+#define ROOK_VALUE 500
+#define QUEEN_VALUE 900
+
+#define STARTPAWNS 1600
+#define STARTMATERIAL 6280
 #include "hashtable.h"
 #include "pawns.h"
 
@@ -140,12 +148,13 @@ typedef struct BOARD {
     unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
     unsigned char w_castled, b_castled;
     SQUARE wking_pos, bking_pos;
-    unsigned int ply;
-    unsigned int rev_plies[HISTLEN];
+    int ply;
+    int rev_plies[HISTLEN];
     KEY zobrist_key;
     KEY zobrist_history[HISTLEN];
-    unsigned int piece_material[2];
-    unsigned int pawn_material[2];
+    int piece_material[2];
+    int pawn_material[2];
+    int bishops[2];
 } BOARD;
 
 typedef struct ZOBKEYS {
@@ -284,6 +293,17 @@ inline int LeftInCheck(const BOARD *board){
 inline MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
 {
     return (piece << 16) | (dest << 8) | orig;
+}
+
+/*Game stage according to material present; 0 -> 1 as game progresses.*/
+inline float PawnStage(const BOARD *board)
+{
+    return 1.0 - (float)(board->pawn_material[0] + board->pawn_material[1])/STARTPAWNS;
+}
+
+inline float GameStage(const BOARD *board)
+{
+    return 1.0 - (float)(board->piece_material[0] + board->piece_material[1])/STARTMATERIAL;
 }
 
 /* Some methods to convert coordinates to algebraic notation, and the other way round.*/

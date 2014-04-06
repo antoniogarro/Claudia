@@ -55,6 +55,7 @@ void InitBoard(BOARD *board)
     board->en_passant = INVALID_SQ;    /*there's no en passant pawn initialy.*/
     board->pawn_material[0] = 0, board->pawn_material[1] = 0;
     board->piece_material[0] = 0, board->piece_material[1] = 0;
+    board->bishops[0] = 0, board->bishops[1] = 0;
 }
 
 void InitZobrist(BOARD *board)
@@ -77,6 +78,7 @@ void InitMaterial(BOARD *board)
     board->pawn_material[0] = 0, board->pawn_material[1] = 0;
     board->piece_material[0] = 0, board->piece_material[1] = 0;
     board->pawns[0] = 0, board->pawns[1] = 0;
+    board->bishops[0] = 0, board->bishops[1] = 0;
     for (int sq = 0; sq < BOARDSIZE; sq++){
         PIECE p = board->squares[sq];
         if(IN_BOARD(sq) && p != EMPTY && p != W_KING && p != B_KING){
@@ -84,6 +86,7 @@ void InitMaterial(BOARD *board)
                 board->pawn_material[GET_COLOR(p)] += Value(p);
                 board->pawns[GET_COLOR(p)] = BitboardSet(sq, board->pawns[GET_COLOR(p)]);
             }else{
+                if(p == W_BISHOP || p == B_BISHOP) board->bishops[GET_COLOR(p)]++;
                 board->piece_material[GET_COLOR(p)] += Value(p);
             }
         }
@@ -110,16 +113,18 @@ void PrintBoard(const BOARD *board)
             i -= 0x19;
         }
     }
-    printf("Material: W: %i %i; B: %i %i; Zobrist: %Lu BB: %llx , %llx \n",
+    printf("Material: W: %i %i; B: %i %i; Zobrist: %Lu; Stage: %f PawnStage: %f\n",
             board->piece_material[1], board->pawn_material[1],
             board->piece_material[0], board->pawn_material[0],
-            board->zobrist_key, board->pawns[0], board->pawns[1]);
-    printf("Passers: %llx ranks %i; %llx ranks %i  ",
+            board->zobrist_key, GameStage(board), PawnStage(board));
+    printf("BB: %llx , %llx; Passers: %llx ranks %i; %llx ranks %i  ",
+            board->pawns[0], board->pawns[1],
             WPassedPawns(board->pawns[1], board->pawns[0]),
             DotProduct(WPassedPawns(board->pawns[1], board->pawns[0]), WRANKS),
             BPassedPawns(board->pawns[0], board->pawns[1]),
             DotProduct(BPassedPawns(board->pawns[0], board->pawns[1]), BRANKS));
-    printf("Doubled: %i %i\n",
+    printf("Doubled: %i %i; Eval: %i\n",
             BitCount(DoubledPawns(board->pawns[1])),
-            BitCount(DoubledPawns(board->pawns[0])));
+            BitCount(DoubledPawns(board->pawns[0])),
+            StaticEval(board));
 }

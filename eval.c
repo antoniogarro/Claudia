@@ -30,18 +30,7 @@
 
 #include "board.h"
 #include "engine.h"
-
-/*Game stage according to material present; 0 -> 1 as game progresses.*/
-static inline float PawnStage(const BOARD *board)
-{
-    return 1.0 - (float)(board->pawn_material[0] + board->pawn_material[1])/STARTPAWNS;
-}
-
-static inline float GameStage(const BOARD *board)
-{
-    return 1.0 - (float)(board->piece_material[0] + board->piece_material[1])/STARTMATERIAL;
-}
-
+#include <stdio.h>
 static inline int KingEval(const BOARD *board)
 {
     return (board->w_castled * (1.0-PawnStage(board)) -

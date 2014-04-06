@@ -58,8 +58,8 @@ typedef struct{
 
 typedef struct HASHTABLE{
     HashData *entries;
-    unsigned int size;
-    unsigned int full;
+    int size;
+    int full;
 } HASHTABLE;
 extern struct HASHTABLE hash_table;
 
@@ -77,8 +77,8 @@ typedef struct{
 
 typedef struct PAWNTABLE{
     PawnData *entries;
-    unsigned int size;
-    unsigned int full;
+    int size;
+    int full;
 } PAWNTABLE;
 
 extern struct PAWNTABLE pawn_table;
