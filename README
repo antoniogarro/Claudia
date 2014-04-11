@@ -24,9 +24,10 @@ The engine uses:
 	* check extensions,
 	* static exchange evaluation,
 	* killer moves heuristic
-	* transposition tables.
+	* transposition tables,
+	* pondering.
 
-Its leaf evaluation function is still very rudimentary; currently it takes into account material advantage, piece mobility and pawn structure, and lacks most specific ending knowledge.
+Its leaf evaluation function is still very rudimentary; currently it takes into account material advantage, piece mobility and pawn structure, and uses a tapered evaluation with limited ending knowledge.
 
 Claudia supports opening books in Polyglot (.bin) format, and will attempt to use an opening book named "book.bin" and placed in its same directory. The default book has been built from over forty thousand high-quality tournament games played by Grand Masters and International Masters over the last five years.
 
@@ -38,7 +39,7 @@ Claudia is obviously named after Claude E. Shannon (1916 - 2001).
 
 COPYRIGHT
 
-This program has been written from scratch by Antonio Garro, and is released under a permissive BSD license: the code can be used and modified, as long as proper attribution is maintained. Please refer to license in the source code for further details.
+This program has been written from scratch by Antonio Garro, and is released under a permissive BSD license: the code can be used and modified, as long as proper attribution is maintained. Please refer to the license in the source code for further details.
 
 The Polyglot opening book support uses code written by Michel Van den Bergh and released by such author into the public domain.
 

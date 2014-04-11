@@ -23,7 +23,7 @@
 
 * Pawn structure evaluation		medium			ongoing
 
-* Ponder				low			pending
+* Ponder				-			done
 
 * Get rid of global board		-			done
 
@@ -42,3 +42,5 @@
 * Lazy evaluation			-			done
 
 * Killer moves				-			done
+
+* Bishop pair				-			done
