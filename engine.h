@@ -77,6 +77,7 @@ static const int mobility_bonus[] = {
 #define CASTLE_RIGHT_BONUS 20
 #define KING_CENTER_BONUS 10
 #define SIMPLIFY_BONUS 0.1
+#define BISHOP_PAIR_BONUS 20
 
 #define DOUBLED_PAWN_BONUS 10
 #define ISOLATED_PAWN_BONUS 5

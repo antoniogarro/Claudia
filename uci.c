@@ -76,10 +76,10 @@ inline void ManageTimes(int nmoves, ENGINE_STATE *stat)
 {
     if(stat->board->white_to_move){
         stat->control->wish_time = stat->control->wtime/nmoves + stat->control->wtime_inc;
-        stat->control->max_time = stat->control->wtime;
+        stat->control->max_time = stat->control->wtime *0.2;
     }else{
         stat->control->wish_time = stat->control->btime/nmoves + stat->control->btime_inc;
-        stat->control->max_time = stat->control->btime;
+        stat->control->max_time = stat->control->btime *0.2;
     }
 }
 
@@ -250,15 +250,18 @@ int setoption(char *input, ENGINE_STATE *stat)
     int val = 0;
     if(!sscanf(input, "setoption name Hash value %i", &val)) return 1;
     DeleteTable(&hash_table);
+    DeletePawnTable(&pawn_table);
     if(AllocPawnTable(&pawn_table, 0.2*val) == 0) return 0;
     if(AllocTable(&hash_table, 0.8*val) == 0) return 0;
     ClearHashTable(&hash_table);
+    ClearPawnTable(&pawn_table);
     return 1;
 }
 
 int ucinewgame(char *input, ENGINE_STATE *stat)
 {
     ClearHashTable(&hash_table);
+    ClearPawnTable(&pawn_table);
     return 1;
 }
 

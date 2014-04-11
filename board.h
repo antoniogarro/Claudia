@@ -73,7 +73,7 @@ enum PIECES { EMPTY,
 #define BLACK 0
 #define TURN_BLACK(piece) (piece & 0xE)
 #define TURN_WHITE(piece) (piece | 0x1)
-#define BLACK_TO_COLOR(blackpiece, piece) ((blackpiece)|(piece & 0x1))
+/* #define BLACK_TO_COLOR(blackpiece, piece) ((blackpiece)|(piece & 0x1)) */
 #define GET_COLOR(piece) (piece & 0x1)
 
 #define FIRST_ROW 0x00
@@ -269,8 +269,12 @@ int LazyEval(const BOARD*);
 int StaticEval(const BOARD*);
 int Value(PIECE);
 
-int IsAttacked(const BOARD*, SQUARE, COLOR);
 int AttackingPieces(const BOARD*, SQUARE, COLOR, SQUARE*);
+
+inline int IsAttacked(const BOARD *board, SQUARE square, COLOR attacking_color)
+{
+    return AttackingPieces(board, square, attacking_color, 0);
+}
 
 inline int WhiteInCheck(const BOARD *board){
     return IsAttacked(board, board->wking_pos, BLACK);

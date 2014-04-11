@@ -58,7 +58,7 @@ static inline int MobilityEval(const BOARD *board)
 
 static inline int PawnStructureEval(const BOARD *board)
 {
-    BITBOARD bp = board->pawns[0], wp = board->pawns[1];
+    BITBOARD bp = board->pawns[BLACK], wp = board->pawns[WHITE];
     BITBOARD b = bp | wp;
     int val = GetPawnEval(&pawn_table, b);
     if(val != ERRORVALUE) return val;
@@ -82,8 +82,10 @@ static inline int MaterialDraw(const BOARD *board)
 
 static inline int MaterialEval(const BOARD *board)
 {
-    return (board->piece_material[1] + board->pawn_material[1]
-          - board->piece_material[0] - board->pawn_material[0]);
+    return (board->piece_material[WHITE] + board->pawn_material[WHITE]
+          - board->piece_material[BLACK] - board->pawn_material[BLACK])
+          + ((board->bishops[WHITE] == 2) - (board->bishops[BLACK] == 2))
+             * BISHOP_PAIR_BONUS * PawnStage(board);
 }
 
 int LazyEval(const BOARD *board)

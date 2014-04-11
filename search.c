@@ -44,8 +44,7 @@ static int RetrievePV(BOARD *board, MOVE *PV, unsigned int depth)
     unsigned int PVlen = 0;
     MOVE mov = GetHashMove(&hash_table, board->zobrist_key);
     while(mov && PVlen <= depth && IsLegal(board, &mov)){
-        PV[PVlen] = mov;
-        PVlen++;
+        PV[PVlen++] = mov;
         MakeMove(board, &mov);
         mov = GetHashMove(&hash_table, board->zobrist_key);
     }
@@ -74,7 +73,11 @@ static int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
     int nposs_movs, nlegal = 0;
     int val;
     MOVE poss_moves[MAXMOVES];
-
+    
+    if(!control->ponder && clock() - control->init_time >= control->max_time*CPMS){
+        control->stop = 1;
+    }
+    
     val = LazyEval(board);
     if(val-LAZYBETA >= beta) return beta;
     if(val+LAZYALPHA < alpha) return alpha;
@@ -109,7 +112,7 @@ static int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
 static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                int root, CONTROL *control, char skip_null, MOVE killers[][2])
 {
-    int nposs_movs, nlegal = 0;
+    int nmoves, nlegal = 0;
     MOVE poss_moves[MAXMOVES];
     MOVE best_move = 0;
     char str_mov[MVLEN];
@@ -131,16 +134,19 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
             Takeback(board, null_mv);
             if(val >= beta) return beta;
         }
-        nposs_movs = MoveGen(board, poss_moves, 1);
-        SortMoves(board, poss_moves, nposs_movs, killers[root]);
-        for(int i = 0; i < nposs_movs; i++){
+        nmoves = MoveGen(board, poss_moves, 1);
+        SortMoves(board, poss_moves, nmoves, killers[root]);
+        for(int i = 0; i < nmoves; i++){
             MakeMove(board, &poss_moves[i]);
             control->node_count++;
             if(!LeftInCheck(board)){
-                if(root == 0 && depth > 6){
-                    MoveToAlgeb(poss_moves[i], str_mov);
-                    printf("info depth %i hashfull %i currmove %s currmovenumber %i\n",
-                        depth, hash_table.full/(hash_table.size/1000), str_mov, i+1);
+                if(root == 0){
+                    if(!control->best_move) control->best_move = poss_moves[0];    /* Better than nothing. */
+                    if(depth > 6 && !control->ponder){
+                        MoveToAlgeb(poss_moves[i], str_mov);
+                        printf("info depth %i hashfull %i currmove %s currmovenumber %i\n",
+                            depth, hash_table.full/(hash_table.size/1000), str_mov, i+1);
+                    }
                 }
                 nlegal++;
                 val = AssesDraw(board);
@@ -153,10 +159,6 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                     }else val = -AlphaBeta(board, depth-1, -beta, -alpha, root+1, control, 0, killers);
                 }
                 Takeback(board, poss_moves[i]);
-
-                if(!control->ponder && clock() - control->init_time > control->max_time*CPMS*0.95){
-                    control->stop = 1;
-                }
                 if(control->stop) return alpha;
                 if(val >= beta){
                     UpdateTable(&hash_table, board->zobrist_key, val, poss_moves[i], depth, HASH_BETA);
@@ -177,7 +179,7 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                 if(root == 0 && !control->ponder && ((clock() - control->init_time) > control->wish_time*CPMS)){
                 /* if short of time, don't search anymore after current move */
                     control->max_depth = depth;
-                    return alpha; // val???
+                    return alpha;
                 }
             }else Takeback(board, poss_moves[i]);
         }
@@ -209,9 +211,10 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     int beta = INFINITE;
     unsigned long long nps = 0;
     MOVE killers[MAXDEPTH][2];
+    control->best_move = 0;
     
     for(unsigned int depth = 1; depth <= control->max_depth;){
-        unsigned long long curr_time = clock();
+        clock_t curr_time = clock();
         memset(sPV, 0, SPVLEN);
         control->node_count = 0;
         
@@ -225,19 +228,19 @@ void IterativeDeep(BOARD *board, CONTROL *control)
             strcat(sPV, str_mov);
         }
 
-        curr_time = (unsigned long long)((clock() - curr_time)/CPMS);
+        curr_time = (clock() - curr_time)/CPMS;
         if(curr_time){
             nps = 1000*(control->node_count/curr_time);
         }
         if(eval > MATE_VALUE/2 && -eval > MATE_VALUE/2){
             printf("info depth %u time %llu nodes %llu nps %llu score cp %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, eval, sPV);
+                    depth, (unsigned long long)curr_time, control->node_count, nps, eval, sPV);
         }else if(-eval < MATE_VALUE/2){
             printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, (pvlen+1)/2, sPV);
+                    depth, (unsigned long long)curr_time, control->node_count, nps, (pvlen+1)/2, sPV);
         }else if(eval < MATE_VALUE/2){
             printf("info depth %u time %llu nodes %llu nps %llu score mate %i pv %s\n",
-                    depth, curr_time, control->node_count, nps, -(pvlen+1)/2, sPV);
+                    depth, (unsigned long long)curr_time, control->node_count, nps, -(pvlen+1)/2, sPV);
         }
         if(eval <= alpha || eval >= beta){
             alpha = -INFINITE;

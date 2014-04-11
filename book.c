@@ -400,7 +400,6 @@ int PolyglotChooseMove(KEY key)
     }
     int offset = PolyglotFindKey(f,key,&entry);
     if(entry.key!=key){
-        printf("info string Out of book.\n");
         fclose(f);
         return 0;
     }

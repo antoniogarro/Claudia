@@ -30,11 +30,6 @@
 
 #include "board.h"
 
-inline int IsAttacked(const BOARD *board, SQUARE square, COLOR attacking_color)
-{
-    return AttackingPieces(board, square, attacking_color, 0);
-}
-
 int AttackingPieces(const BOARD *board, SQUARE square, COLOR attacking_color, SQUARE *attacking_sqs)
 {
     int attackers = 0;
