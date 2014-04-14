@@ -130,12 +130,12 @@ enum PIECES { EMPTY,
 
 #define PAWN_VALUE 100
 #define KNIGHT_VALUE 300
-#define BISHOP_VALUE 320
+#define BISHOP_VALUE 300
 #define ROOK_VALUE 500
 #define QUEEN_VALUE 900
 
 #define STARTPAWNS 1600
-#define STARTMATERIAL 6280
+#define STARTMATERIAL 6200
 #include "hashtable.h"
 #include "pawns.h"
 
