@@ -119,23 +119,26 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     SQUARE checking_sqs[5];
     int val = ERRORVALUE;
     char hash_flag = HASH_ALPHA;
+    int reduce = 0, LMR = 0;
 
     if(depth){
         if(root > 0){
             val = GetHashEval(&hash_table, board->zobrist_key, depth, alpha, beta);
             if(val != ERRORVALUE) return val; 
         }
-        if(!skip_null && depth > 2 
-                && board->piece_material[board->white_to_move] != 0
-                && !InCheck(board, 0)){
-            MOVE null_mv = NULL_MOVE;
-            MakeMove(board, &null_mv);
-            val = -AlphaBeta(board, depth-3, -beta, -beta+1, root+1, control, 1, killers);
-            Takeback(board, null_mv);
-            if(val >= beta) return beta;
+        if(depth > 2 && !InCheck(board, 0)){
+
+            if(!skip_null && board->piece_material[board->white_to_move] != 0){
+                MOVE null_mv = NULL_MOVE;
+                MakeMove(board, &null_mv);
+                val = -AlphaBeta(board, depth-3, -beta, -beta+1, root+1, control, 1, killers);
+                Takeback(board, null_mv);
+                if(val >= beta) return beta;
+            }
+            reduce = 1;	/*Try Late Move reductions.*/
         }
         nmoves = MoveGen(board, moves, 1);
-        SortMoves(board, moves, nmoves, killers[root]);
+        int good = SortMoves(board, moves, nmoves, killers[root]);
         for(int i = 0; i < nmoves; i++){
             MakeMove(board, &moves[i]);
             control->node_count++;
@@ -152,9 +155,13 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                 val = AssesDraw(board);
                 if(val) {
                     if(best_move){
-                        val = -AlphaBeta(board, depth-1, -alpha-1, -alpha, root+1, control, 0, killers);
-                        if(val > alpha && val < beta){
-                            val = -AlphaBeta(board, depth-1, -beta, -alpha, root+1, control, 0, killers);
+                        LMR = (reduce && i > good) ? 1 : 0;
+                        val = -AlphaBeta(board, depth-LMR-1, -alpha-1, -alpha, root+1, control, 0, killers);
+                        if(val > alpha){
+                            val = -AlphaBeta(board, depth-1, -alpha-1, -alpha, root+1, control, 0, killers);
+                            if(val > alpha && val < beta){
+                                val = -AlphaBeta(board, depth-1, -beta, -alpha, root+1, control, 0, killers);
+                            }
                         }
                     }else val = -AlphaBeta(board, depth-1, -beta, -alpha, root+1, control, 0, killers);
                 }

@@ -93,13 +93,14 @@ static int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, con
     else return 0;
 }
 
-void SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killers[])
+int SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killers[])
 {
-    int eval[MAXMOVES];
+    int eval[MAXMOVES], good = 0;
     MOVE hash_move = GetHashMove(&hash_table, board->zobrist_key);
     /*Evaluate every move, store evaluations:*/
     for(int i = 0; i < nmoves; i++){
         eval[i] = EvaluateMove(board, &moves[i], hash_move, killers);
+	if(eval[i] > 0) good++;
     }
     /*Order according to that evaluation: insertion sort*/
     for(int i = 1; i < nmoves; i++){
@@ -113,6 +114,7 @@ void SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killers[])
             eval[j] = ev;
         }
     }
+    return good;
 }
 
 int FilterWinning(BOARD *board, MOVE *captures, int ncapts)
@@ -123,6 +125,7 @@ int FilterWinning(BOARD *board, MOVE *captures, int ncapts)
     /*evaluate every move, store evaluations:*/
     for(int i = 0; i < ncapts; i++){
         eval[i] = SEE(board, &captures[i]);
+	if(eval[i] > 0) good_capts++;
     }
     for(int i = 1; i < ncapts; i++){
         for(int j = i; j > 0 && (eval[j-1] < eval[j]); j--){
@@ -134,10 +137,6 @@ int FilterWinning(BOARD *board, MOVE *captures, int ncapts)
             eval[j-1] = eval[j];
             eval[j] = ev;
         }
-    }
-    /*Store the number of 'good' captures:*/
-    for(int i = 0; i < ncapts && eval[i] > 0; i++){
-        good_capts++;
     }
     return good_capts;
 }

@@ -262,7 +262,7 @@ void Takeback(BOARD*, const MOVE);
 char IsLegal(BOARD*, MOVE*);
 int Perft(BOARD*, int);
 
-void SortMoves(BOARD*, MOVE*, int, MOVE[]);
+int SortMoves(BOARD*, MOVE*, int, MOVE[]);
 int FilterWinning(BOARD*, MOVE*, int);
 
 int LazyEval(const BOARD*);
