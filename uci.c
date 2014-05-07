@@ -76,10 +76,10 @@ inline void ManageTimes(int nmoves, ENGINE_STATE *stat)
 {
     if(stat->board->white_to_move){
         stat->control->wish_time = stat->control->wtime/nmoves + stat->control->wtime_inc;
-        stat->control->max_time = stat->control->wtime *0.2;
+        stat->control->max_time = stat->control->wtime;
     }else{
         stat->control->wish_time = stat->control->btime/nmoves + stat->control->btime_inc;
-        stat->control->max_time = stat->control->btime *0.2;
+        stat->control->max_time = stat->control->btime;
     }
 }
 
@@ -113,7 +113,7 @@ int go(char *input, ENGINE_STATE *stat)
     stat->control->stop = 1;
     stat->control->ponder = 0;
     ResetTimes(stat);
-    int movestogo = 30;
+    int movestogo = 20;
     char manage_times = 1;
     char *str_param = strtok(input, " \n\t");
     for(str_param = strtok(NULL, " \n\t"); str_param; str_param = strtok(NULL, " \n\t")){
@@ -127,7 +127,7 @@ int go(char *input, ENGINE_STATE *stat)
         }else if(!strcmp("time",  str_param)){
             str_param = strtok(NULL, " \n\t");
             if(str_param){
-                stat->control->wish_time = atol(str_param);
+                stat->control->wish_time = INFINITE;
                 stat->control->max_time = atol(str_param);
                 manage_times = 0;
             }
@@ -186,6 +186,7 @@ int go(char *input, ENGINE_STATE *stat)
 
 int stop(char *input, ENGINE_STATE *stat)
 {
+    stat->control->ponder = 0;
     stat->control->stop = 1;
     return 1;
 }

@@ -130,12 +130,12 @@ enum PIECES { EMPTY,
 
 #define PAWN_VALUE 100
 #define KNIGHT_VALUE 300
-#define BISHOP_VALUE 300
+#define BISHOP_VALUE 310
 #define ROOK_VALUE 500
 #define QUEEN_VALUE 900
 
 #define STARTPAWNS 1600
-#define STARTMATERIAL 6200
+#define STARTMATERIAL 6240
 #include "hashtable.h"
 #include "pawns.h"
 
@@ -302,12 +302,12 @@ inline MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
 /*Game stage according to material present; 0 -> 1 as game progresses.*/
 inline float PawnStage(const BOARD *board)
 {
-    return 1.0 - (float)(board->pawn_material[0] + board->pawn_material[1])/STARTPAWNS;
+    return 1.0f - (float)(board->pawn_material[0] + board->pawn_material[1])/STARTPAWNS;
 }
 
 inline float GameStage(const BOARD *board)
 {
-    return 1.0 - (float)(board->piece_material[0] + board->piece_material[1])/STARTMATERIAL;
+    return 1.0f - (float)(board->piece_material[0] + board->piece_material[1])/STARTMATERIAL;
 }
 
 /* Some methods to convert coordinates to algebraic notation, and the other way round.*/

@@ -78,10 +78,12 @@ static const int mobility_bonus[] = {
 #define KING_CENTER_BONUS 10
 #define SIMPLIFY_BONUS 0.1
 #define BISHOP_PAIR_BONUS 20
+#define PROMOTION_VALUE	10
+#define CHECK_VALUE	10	/*unused*/
 
 #define DOUBLED_PAWN_BONUS 10
-#define ISOLATED_PAWN_BONUS 5
-#define PAWN_PUSH_BONUS 0.1
+#define ISOLATED_PAWN_BONUS 5 /*unused*/
+#define PAWN_PUSH_BONUS 0.1 /*unused*/
 #define PASSED_PAWN_BONUS 20
 
 #endif
@@ -98,7 +100,7 @@ static const int mobility_bonus[] = {
 static const clock_t CPMS = CLOCKS_PER_SEC/1000;
 
 typedef struct CONTROL {
-    int wtime, btime, wtime_inc, btime_inc;
+    clock_t wtime, btime, wtime_inc, btime_inc;
     clock_t init_time, wish_time, max_time;
     unsigned int max_depth;
     unsigned long long node_count;

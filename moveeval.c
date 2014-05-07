@@ -59,8 +59,7 @@ static int SEE(BOARD *board, MOVE *main_capture)
         }
         else move_hist[depth] = Move(0, dest, less_attack_sq);
         
-        MakeMove(board, &move_hist[depth]);
-        depth++;
+        MakeMove(board, &move_hist[depth++]);
         attackers = AttackingPieces(board, dest, board->white_to_move, attacking_sqs);
     }
 
@@ -77,20 +76,30 @@ static int SEE(BOARD *board, MOVE *main_capture)
     return val;
 }
 
+static int QuietMoveEval(BOARD *board, MOVE *move, const MOVE killers[])
+{
+    if(SQSMASK(*move) == SQSMASK(killers[0]) || SQSMASK(*move) == SQSMASK(killers[1])){
+        return KILLER_VALUE;
+    }else if(PROMMASK(*move)){
+        return PROMOTION_VALUE;
+    }else{
+        return 0;
+    }
+}
+
 static int EvaluateMove(BOARD *board, MOVE *curr_move, const MOVE hash_move, const MOVE killers[])
 {
     /*Compare with hash_move, using only orig, des; curr_move may not have captured or ep info.*/
     if(SQSMASK(*curr_move) == SQSMASK(hash_move)){
         return HASHMOVE_VALUE;        /*search HashMove first.*/
     }
-    if(SQSMASK(*curr_move) == SQSMASK(killers[0]) 
-          || SQSMASK(*curr_move) == SQSMASK(killers[1])){
-        return KILLER_VALUE;
-    }
     /*Evaluate captures with SEE:*/
     SQUARE dest = DESTMASK(*curr_move);
-    if(board->squares[dest] != EMPTY) return SEE(board, curr_move);
-    else return 0;
+    if(board->squares[dest] != EMPTY){
+        return SEE(board, curr_move);
+    }else{
+        return QuietMoveEval(board, curr_move, killers);
+    }
 }
 
 int SortMoves(BOARD *board, MOVE *moves, int nmoves, MOVE killers[])

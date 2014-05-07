@@ -116,7 +116,6 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     MOVE moves[MAXMOVES];
     MOVE best_move = 0;
     char str_mov[MVLEN];
-    SQUARE checking_sqs[5];
     int val = ERRORVALUE;
     char hash_flag = HASH_ALPHA;
     int reduce = 0, LMR = 0;
@@ -155,7 +154,7 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                 val = AssesDraw(board);
                 if(val) {
                     if(best_move){
-                        LMR = (reduce && i > good) ? 1 : 0;
+                        LMR = (reduce && i > good && !CAPTMASK(moves[i]) && !InCheck(board, 0)) ? 1 : 0;
                         val = -AlphaBeta(board, depth-LMR-1, -alpha-1, -alpha, root+1, control, 0, killers);
                         if(val > alpha){
                             val = -AlphaBeta(board, depth-1, -alpha-1, -alpha, root+1, control, 0, killers);
@@ -166,7 +165,7 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                     }else val = -AlphaBeta(board, depth-1, -beta, -alpha, root+1, control, 0, killers);
                 }
                 Takeback(board, moves[i]);
-                if(control->stop) return alpha;
+                if(!control->ponder && control->stop) return alpha;
                 if(val >= beta){
                     UpdateTable(&hash_table, board->zobrist_key, val, moves[i], depth, HASH_BETA);
                     if(CAPTMASK(moves[i]) == 0
@@ -183,9 +182,9 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                     best_move = moves[i];
                     if(root == 0) control->best_move = best_move;
                 }
-                if(root == 0 && !control->ponder && ((clock() - control->init_time) > control->wish_time*CPMS)){
+                if(root == 0 && ((clock() - control->init_time) > control->wish_time*CPMS)){
                 /* if short of time, don't search anymore after current move */
-                    control->max_depth = depth;
+                    control->stop = 1;
                     return alpha;
                 }
             }else Takeback(board, moves[i]);
@@ -216,9 +215,12 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     int eval = 0, pvlen = 0;
     int alpha = -INFINITE;
     int beta = INFINITE;
+    int widening = ASP_WINDOW;
     unsigned long long nps = 0;
     MOVE killers[MAXDEPTH][2];
     control->best_move = 0;
+
+/*printf("time %llu %llu\n", control->max_time, control->wish_time);*/
     
     for(unsigned int depth = 1; depth <= control->max_depth;){
         clock_t curr_time = clock();
@@ -226,7 +228,7 @@ void IterativeDeep(BOARD *board, CONTROL *control)
         control->node_count = 0;
         
         eval = AlphaBeta(board, depth, alpha, beta, 0, control, 1, killers);
-        if(control->stop){
+        if(control->stop && !control->ponder){
             break;
         }
         pvlen = RetrievePV(board, iPV, depth+10);
@@ -253,8 +255,9 @@ void IterativeDeep(BOARD *board, CONTROL *control)
             alpha = -INFINITE;
             beta = INFINITE;
         }else{
-            if(3*curr_time > control->wish_time-(clock()-control->init_time)
-                    && !control->ponder) break;
+            if(3*curr_time > control->wish_time*CPMS - (clock()-control->init_time)){
+                control->stop = 1;
+            }
             alpha = eval - ASP_WINDOW;
             beta = eval + ASP_WINDOW;
             depth++;
