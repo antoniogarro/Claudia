@@ -113,6 +113,7 @@ void PrintBoard(const BOARD *board)
             i -= 0x19;
         }
     }
+    printf("Ply: %i  (%i)  EnPassant: %x\n", board->ply, board->rev_plies[board->ply], board->en_passant);
     printf("Material: W: %i %i; B: %i %i; Zobrist: %Lu; Stage: %f PawnStage: %f\n",
             board->piece_material[1], board->pawn_material[1],
             board->piece_material[0], board->pawn_material[0],

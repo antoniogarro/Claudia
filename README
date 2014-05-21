@@ -1,6 +1,7 @@
 
 Claudia is an UCI chess engine written in C, with the purpose of serving as an exercise in chess programming techniques.
 
+It now plays on the Free Internet Chess Server (FICS) under the handle Claudiae.
 
 USAGE
 

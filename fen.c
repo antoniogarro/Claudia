@@ -30,10 +30,11 @@
 
 #include "board.h"
 #include "engine.h"
+#include <stdlib.h>
 
 int ReadFEN(const char *sFEN, BOARD *board)
-{    /*TODO: check FEN validity.*/
-    unsigned char fen_pos = 0;
+{   /*TODO: check FEN validity.*/
+    int fen_pos = 0;
     SQUARE square = 0x70;
     board->wk_castle = 0;
     board->bk_castle = 0;
@@ -89,6 +90,8 @@ int ReadFEN(const char *sFEN, BOARD *board)
                 break;
             case 'q':  board->bq_castle = 1;
                 break;
+            case '-':
+                break;
             default: on_board = 0;
                 break;
         }
@@ -104,10 +107,12 @@ int ReadFEN(const char *sFEN, BOARD *board)
                 break;
         }
     }
-    /*only 3rd y 6th row:*/
-    /*if((cEnPassant >> 4) == 0x2 || (cEnPassant >> 4) == 0x5) board->squares[cEnPassant] = PAWN_EP;*/
-    /*TODO: halfmoves and moves.*/
-    board->ply = 0;
+    
+    /*halfmoves and moves.*/
+    int rev = atoi(&sFEN[fen_pos]);
+    while(sFEN[++fen_pos] != ' '); 
+    board->ply = atoi(&sFEN[fen_pos]);
+    board->rev_plies[board->ply] = rev;
     InitZobrist(board);
     InitMaterial(board);
     return fen_pos;

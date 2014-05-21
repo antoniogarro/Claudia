@@ -68,7 +68,7 @@ static int AssesDraw(const BOARD *board)
     return ERRORVALUE;
 }
 
-static int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
+static int Quiescent(BOARD *board, int alpha, int beta, int root, CONTROL *control, MOVE killers[][2])
 {
     int nmoves, nlegal = 0;
     int val;
@@ -89,14 +89,15 @@ static int Quiescent(BOARD *board, int alpha, int beta, CONTROL *control)
     if (val > alpha) alpha = val;
     
     nmoves = CaptureGen(board, moves);
-    nmoves = FilterWinning(board, moves, nmoves);
+    nmoves = FilterWinning(board, moves, nmoves); 
+//   nmoves = SortMoves(board, moves, nmoves, killers[root]);
 
     for(int i = 0; i < nmoves; i++){
         control->node_count++;
         MakeMove(board, &moves[i]);
         if(!LeftInCheck(board)){
             nlegal++;
-            val = -Quiescent(board, -beta, -alpha, control);
+            val = -Quiescent(board, -beta, -alpha, root+1, control, killers);
             Takeback(board, moves[i]);
             if(val >= beta){
                 return beta;
@@ -202,7 +203,7 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     }else if(InCheck(board, 0)){
         alpha = AlphaBeta(board, 1, alpha, beta, root+1, control, 1, killers);
     }else{
-        alpha = Quiescent(board, alpha, beta, control);
+        alpha = Quiescent(board, alpha, beta, root, control, killers);
     }
     return alpha;
 }
