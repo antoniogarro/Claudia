@@ -54,7 +54,7 @@ static int RetrievePV(BOARD *board, MOVE *PV, unsigned int depth)
     return PVlen;
 }
 
-static int AssesDraw(const BOARD *board)
+static int AssessDraw(const BOARD *board)
 {
     if(board->rev_plies[board->ply] >= 50) {
         return DRAW_VALUE;
@@ -78,6 +78,7 @@ static int Quiescent(BOARD *board, int alpha, int beta, int root, CONTROL *contr
         control->stop = 1;
     }
     
+    if(root > control->seldepth) control->seldepth = root;
     val = LazyEval(board);
     if(val-LAZYBETA >= beta) return beta;
     if(val+LAZYALPHA < alpha) return alpha;
@@ -122,6 +123,7 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
     int reduce = 0, LMR = 0;
 
     if(depth){
+        if(root > control->seldepth) control->seldepth = root;
         if(root > 0){
             val = GetHashEval(&hash_table, board->zobrist_key, depth, alpha, beta);
             if(val != ERRORVALUE) return val; 
@@ -147,12 +149,12 @@ static int AlphaBeta(BOARD *board, unsigned int depth, int alpha, int beta,
                     if(!control->best_move) control->best_move = moves[i];    /* Better than nothing. */
                     if(depth > 6 && !control->ponder){
                         MoveToAlgeb(moves[i], str_mov);
-                        printf("info depth %i hashfull %i currmove %s currmovenumber %i\n",
-                            depth, hash_table.full/(hash_table.size/1000), str_mov, i+1);
+                        printf("info depth %i seldepth %i hashfull %i currmove %s currmovenumber %i\n",
+                            depth, control->seldepth, hash_table.full/(hash_table.size/1000), str_mov, i+1);
                     }
                 }
                 nlegal++;
-                val = AssesDraw(board);
+                val = AssessDraw(board);
                 if(val) {
                     if(best_move){
                         LMR = (reduce && i > good && !CAPTMASK(moves[i]) && !InCheck(board, 0)) ? 1 : 0;
@@ -227,6 +229,7 @@ void IterativeDeep(BOARD *board, CONTROL *control)
         clock_t curr_time = clock();
         memset(sPV, 0, SPVLEN);
         control->node_count = 0;
+        control->seldepth = 0;
         
         eval = AlphaBeta(board, depth, alpha, beta, 0, control, 1, killers);
         if(control->stop && !control->ponder){

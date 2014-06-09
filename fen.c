@@ -111,9 +111,10 @@ int ReadFEN(const char *sFEN, BOARD *board)
     /*halfmoves and moves.*/
     int rev = atoi(&sFEN[fen_pos]);
     while(sFEN[++fen_pos] != ' '); 
-    board->ply = atoi(&sFEN[fen_pos]);
+    board->ply = 2*atoi(&sFEN[fen_pos]) - board->white_to_move - 1;
     board->rev_plies[board->ply] = rev;
     InitZobrist(board);
+    board->zobrist_history[board->ply] = board->zobrist_key;
     InitMaterial(board);
     return fen_pos;
 }
