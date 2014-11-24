@@ -88,14 +88,15 @@ static inline int MaterialEval(const BOARD *board)
              * BISHOP_PAIR_BONUS * PawnStage(board);
 }
 
-int LazyEval(const BOARD *board)
+int LazyEval(const BOARD *board, int w_contempt)
 {
     if(MaterialDraw(board)) return DRAW_VALUE;
     int lazy = MaterialEval(board) + PawnStructureEval(board);
+    lazy += w_contempt * (1.0 - GameStage(board));
     return board->white_to_move ? lazy : -lazy;
 }
 
-int StaticEval(const BOARD *board)
+int StaticEval(const BOARD *board, int w_contempt)
 {
     if(MaterialDraw(board)) return DRAW_VALUE;
     int val = MaterialEval(board);
@@ -103,6 +104,7 @@ int StaticEval(const BOARD *board)
     val += PawnStructureEval(board);
     val += KingEval(board);
     val *= (1.0 + SIMPLIFY_BONUS * GameStage(board));
+    val += w_contempt * (1.0 - GameStage(board));
     return board->white_to_move ? val : -val;
 }
 

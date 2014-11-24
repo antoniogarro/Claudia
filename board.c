@@ -127,5 +127,5 @@ void PrintBoard(const BOARD *board)
     printf("Doubled: %i %i; Eval: %i\n",
             BitCount(DoubledPawns(board->pawns[1])),
             BitCount(DoubledPawns(board->pawns[0])),
-            StaticEval(board));
+            StaticEval(board, 0));
 }

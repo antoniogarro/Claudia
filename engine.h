@@ -106,6 +106,7 @@ typedef struct CONTROL {
     unsigned long long node_count;
     char uci, stop, ponder;
     MOVE best_move;
+    int contempt;
 } CONTROL;
 
 typedef struct ENGINE_STATE{

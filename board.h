@@ -265,8 +265,8 @@ int Perft(BOARD*, int);
 int SortMoves(BOARD*, MOVE*, int, MOVE[]);
 int FilterWinning(BOARD*, MOVE*, int);
 
-int LazyEval(const BOARD*);
-int StaticEval(const BOARD*);
+int LazyEval(const BOARD*, int w_contempt);
+int StaticEval(const BOARD*, int w_contempt);
 int Value(PIECE);
 
 int AttackingPieces(const BOARD*, SQUARE, COLOR, SQUARE*);

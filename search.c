@@ -79,11 +79,11 @@ static int Quiescent(BOARD *board, int alpha, int beta, int root, CONTROL *contr
     }
     
     if(root > control->seldepth) control->seldepth = root;
-    val = LazyEval(board);
+    val = LazyEval(board, control->contempt);
     if(val-LAZYBETA >= beta) return beta;
     if(val+LAZYALPHA < alpha) return alpha;
 
-    val = StaticEval(board);
+    val = StaticEval(board, control->contempt);
     UpdateTable(&hash_table, board->zobrist_key, val, 0, 0, HASH_EXACT);
 
     if (val >= beta) return beta;
@@ -91,7 +91,7 @@ static int Quiescent(BOARD *board, int alpha, int beta, int root, CONTROL *contr
     
     nmoves = CaptureGen(board, moves);
     nmoves = FilterWinning(board, moves, nmoves); 
-//   nmoves = SortMoves(board, moves, nmoves, killers[root]);
+//  nmoves = SortMoves(board, moves, nmoves, killers[root]);
 
     for(int i = 0; i < nmoves; i++){
         control->node_count++;

@@ -249,13 +249,17 @@ int isready(char *input, ENGINE_STATE *stat)
 int setoption(char *input, ENGINE_STATE *stat)
 {
     int val = 0;
-    if(!sscanf(input, "setoption name Hash value %i", &val)) return 1;
-    DeleteTable(&hash_table);
-    DeletePawnTable(&pawn_table);
-    if(AllocPawnTable(&pawn_table, 0.2*val) == 0) return 0;
-    if(AllocTable(&hash_table, 0.8*val) == 0) return 0;
-    ClearHashTable(&hash_table);
-    ClearPawnTable(&pawn_table);
+    if(sscanf(input, "setoption name Hash value %i", &val)) {
+        DeleteTable(&hash_table);
+        DeletePawnTable(&pawn_table);
+        if(AllocPawnTable(&pawn_table, 0.2*val) == 0) return 0;
+        if(AllocTable(&hash_table, 0.8*val) == 0) return 0;
+        ClearHashTable(&hash_table);
+        ClearPawnTable(&pawn_table);
+    } else if(sscanf(input, "setoption name Contempt value %i", &val)) {
+        stat->control->contempt = val;
+        printf("contempt: %u\n", stat->control->contempt);
+    }
     return 1;
 }
 
