@@ -39,9 +39,9 @@
 
 /*This works because the replacement scheme ensures shallow PV is not overwritten,
 and may fail if the hash table is full.*/
-static int RetrievePV(BOARD *board, MOVE *PV, unsigned int depth)
+static int RetrievePV(BOARD *board, MOVE *PV, int depth)
 {
-    unsigned int PVlen = 0;
+    int PVlen = 0;
     MOVE mov = GetHashMove(&hash_table, board->zobrist_key);
     while(mov && PVlen <= depth && IsLegal(board, &mov)){
         PV[PVlen++] = mov;
@@ -225,7 +225,7 @@ void IterativeDeep(BOARD *board, CONTROL *control)
 
 /*printf("time %llu %llu\n", control->max_time, control->wish_time);*/
     
-    for(unsigned int depth = 1; depth <= control->max_depth;){
+    for(int depth = 1; depth <= control->max_depth;){
         clock_t curr_time = clock();
         memset(sPV, 0, SPVLEN);
         control->node_count = 0;
@@ -270,7 +270,7 @@ void IterativeDeep(BOARD *board, CONTROL *control)
     control->stop = 1;
     MoveToAlgeb(control->best_move, str_mov);
     printf("bestmove %s", str_mov);
-    if(pvlen > 1){
+    if(pvlen > 1 && iPV[0] == control->best_move){
         MoveToAlgeb(iPV[1], str_mov);
         printf("ponder %s", str_mov);
     }

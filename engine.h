@@ -102,7 +102,7 @@ static const clock_t CPMS = CLOCKS_PER_SEC/1000;
 typedef struct CONTROL {
     clock_t wtime, btime, wtime_inc, btime_inc;
     clock_t init_time, wish_time, max_time;
-    unsigned int max_depth, seldepth;
+    int max_depth, seldepth;
     unsigned long long node_count;
     char uci, stop, ponder;
     MOVE best_move;
