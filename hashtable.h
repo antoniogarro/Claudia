@@ -51,15 +51,15 @@
 #define TABLESIZE 32
 
 typedef struct{
-    KEY zobrist_key;
-    /*bits 0-19: hash_move; bits 20-51: eval; bits 52-61: depth; 62-63: flags.*/
-    KEY data;
+  KEY zobrist_key;
+  /*bits 0-19: hash_move; bits 20-51: eval; bits 52-61: depth; 62-63: flags.*/
+  KEY data;
 } HashData;
 
 typedef struct HASHTABLE{
-    HashData *entries;
-    int size;
-    int full;
+  HashData *entries;
+  int size;
+  int full;
 } HASHTABLE;
 extern struct HASHTABLE hash_table;
 
@@ -71,14 +71,14 @@ MOVE GetHashMove(HASHTABLE*, KEY);
 int GetHashEval(HASHTABLE*, KEY, int, int, int);
 
 typedef struct{
-    KEY pawn_bitboard;
-    int eval;
+  KEY pawn_bitboard;
+  int eval;
 } PawnData;
 
 typedef struct PAWNTABLE{
-    PawnData *entries;
-    int size;
-    int full;
+  PawnData *entries;
+  int size;
+  int full;
 } PAWNTABLE;
 
 extern struct PAWNTABLE pawn_table;

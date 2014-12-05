@@ -42,40 +42,40 @@ ZOBKEYS zobkeys;
 
 int main(int argc, char *argv[])
 {
-    BOARD main_board;
-    InitBoard(&main_board);
-    ReadFEN(STARTPOS, &main_board);
-    
-    CONTROL engine_control;
-    engine_control.stop = 1;
-    
-    ENGINE_STATE engine = {&main_board, &engine_control};
-    
-    if(AllocTable(&hash_table, 0.8*TABLESIZE) == 0){
-        printf("Not enough memory\n");
-        return 1;
-    }
-    ClearHashTable(&hash_table);
-    
-    if(AllocPawnTable(&pawn_table, 0.2*TABLESIZE) == 0){
-        printf("Not enough memory\n");
-        return 1;
-    }
-    ClearPawnTable(&pawn_table);
-    
-    setvbuf(stdin, 0, _IONBF, 0);
-    setvbuf(stdout, 0, _IONBF, 0);
-    fflush(NULL);
-    char input[BUFFER];
+  BOARD main_board;
+  InitBoard(&main_board);
+  ReadFEN(STARTPOS, &main_board);
+  
+  CONTROL engine_control;
+  engine_control.stop = 1;
+  
+  ENGINE_STATE engine = {&main_board, &engine_control};
+  
+  if (AllocTable(&hash_table, 0.8*TABLESIZE) == 0) {
+    printf("Not enough memory\n");
+    return 1;
+  }
+  ClearHashTable(&hash_table);
+  
+  if (AllocPawnTable(&pawn_table, 0.2*TABLESIZE) == 0) {
+    printf("Not enough memory\n");
+    return 1;
+  }
+  ClearPawnTable(&pawn_table);
+  
+  setvbuf(stdin, 0, _IONBF, 0);
+  setvbuf(stdout, 0, _IONBF, 0);
+  fflush(NULL);
+  char input[BUFFER];
 
-    while(fgets(input, BUFFER, stdin)){
-        if(!Command(input, &engine)){
-            break;
-        }    
-        memset(input, 0, BUFFER);
-    }
-    
-    DeleteTable(&hash_table);
-    DeletePawnTable(&pawn_table);
-    return 0;
+  while (fgets(input, BUFFER, stdin)) {
+    if (!Command(input, &engine)) {
+      break;
+    }  
+    memset(input, 0, BUFFER);
+  }
+  
+  DeleteTable(&hash_table);
+  DeletePawnTable(&pawn_table);
+  return 0;
 }

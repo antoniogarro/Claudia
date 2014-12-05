@@ -240,204 +240,204 @@ KEY Random64[781] = {
    0xF8D626AAAF278509ULL
 };
 
-KEY *RandomPiece     = Random64;
-KEY *RandomCastle    = Random64+768;
+KEY *RandomPiece   = Random64;
+KEY *RandomCastle  = Random64+768;
 KEY *RandomEnPassant = Random64+772;
-KEY *RandomTurn      = Random64+780;
+KEY *RandomTurn    = Random64+780;
 
 typedef struct {
-    KEY key;    
-    uint16 move;
-    uint16 weight;
-    uint32 learn;
+  KEY key;  
+  uint16 move;
+  uint16 weight;
+  uint32 learn;
 } entry_t;
 
 KEY PolyglotKey(const BOARD *board)
 {
-    KEY key = 0;
-    for (int i = 0; i<128; i++){
-        int p = board->squares[i] - 2;
-        if(IN_BOARD(i) && p >= 0) key ^= RandomPiece[64*p+8*(ROW8(i))+COLUMN(i)];
-    }
+  KEY key = 0;
+  for (int i = 0; i<128; i++) {
+    int p = board->squares[i] - 2;
+    if (IN_BOARD(i) && p >= 0) key ^= RandomPiece[64*p+8*(ROW8(i))+COLUMN(i)];
+  }
 
-    if(board->wk_castle) key ^= RandomCastle[0];
-    if(board->wq_castle) key ^= RandomCastle[1];
-    if(board->bk_castle) key ^= RandomCastle[2];
-    if(board->bq_castle) key ^= RandomCastle[3];
+  if (board->wk_castle) key ^= RandomCastle[0];
+  if (board->wq_castle) key ^= RandomCastle[1];
+  if (board->bk_castle) key ^= RandomCastle[2];
+  if (board->bq_castle) key ^= RandomCastle[3];
 
-    if(IN_BOARD(board->en_passant)){
-        int r = ROW(board->en_passant);
-        int c = COLUMN(board->en_passant);
-        if(r == THIRD_ROW){
-            if((IN_BOARD(r + ROW_UP + c + 1) && board->squares[r + ROW_UP + c + 1] == B_PAWN)||
-               (IN_BOARD(r + ROW_UP + c + 1) && board->squares[r + ROW_UP + c - 1] == B_PAWN)){
-                key ^= RandomEnPassant[c];
-            }
-        }else{
-            if((IN_BOARD(r + ROW_DOWN + c + 1) && board->squares[r + ROW_DOWN + c + 1] == W_PAWN)||
-               (IN_BOARD(r + ROW_DOWN + c + 1) && board->squares[r + ROW_DOWN + c - 1] == W_PAWN)){
-                key ^= RandomEnPassant[c];
-            }
-        }
+  if (IN_BOARD(board->en_passant)) {
+    int r = ROW(board->en_passant);
+    int c = COLUMN(board->en_passant);
+    if (r == THIRD_ROW) {
+      if ((IN_BOARD(r + ROW_UP + c + 1) && board->squares[r + ROW_UP + c + 1] == B_PAWN)||
+         (IN_BOARD(r + ROW_UP + c + 1) && board->squares[r + ROW_UP + c - 1] == B_PAWN)) {
+        key ^= RandomEnPassant[c];
+      }
+    } else {
+      if ((IN_BOARD(r + ROW_DOWN + c + 1) && board->squares[r + ROW_DOWN + c + 1] == W_PAWN)||
+         (IN_BOARD(r + ROW_DOWN + c + 1) && board->squares[r + ROW_DOWN + c - 1] == W_PAWN)) {
+        key ^= RandomEnPassant[c];
+      }
     }
-    if(board->white_to_move) key ^= RandomTurn[0];
-    return key;
+  }
+  if (board->white_to_move) key ^= RandomTurn[0];
+  return key;
 }
 
 #define MAX_MOVES 100
 
 entry_t entry_none = {
-    0, 0, 0, 0
+  0, 0, 0, 0
 };
 
 int PolyglotIntFromFile(FILE *f, int l, KEY *r)
 {
-    for(int i = 0; i < l; i++){
-        int c = fgetc(f);
-        if(c == EOF){
-            return 1;
-        }
-        (*r) = ((*r) << 8) + c;
+  for (int i = 0; i < l; i++) {
+    int c = fgetc(f);
+    if (c == EOF) {
+      return 1;
     }
-    return 0;
+    (*r) = ((*r) << 8) + c;
+  }
+  return 0;
 }
 
 int PolyglotEntry(FILE *f, entry_t *entry)
 {
-    KEY r = 0;
-    if(PolyglotIntFromFile(f, 8, &r)){
-        return 1;
-    }
-    entry->key = r;
-    if(PolyglotIntFromFile(f, 2, &r)){
-        return 1;
-    }
-    entry->move = r;
-    if(PolyglotIntFromFile(f, 2, &r)){
-        return 1;
-    }
-    entry->weight = r;
-    if(PolyglotIntFromFile(f, 4, &r)){
-        return 1;
-    }
-    entry->learn = r;
-    return 0;
+  KEY r = 0;
+  if (PolyglotIntFromFile(f, 8, &r)) {
+    return 1;
+  }
+  entry->key = r;
+  if (PolyglotIntFromFile(f, 2, &r)) {
+    return 1;
+  }
+  entry->move = r;
+  if (PolyglotIntFromFile(f, 2, &r)) {
+    return 1;
+  }
+  entry->weight = r;
+  if (PolyglotIntFromFile(f, 4, &r)) {
+    return 1;
+  }
+  entry->learn = r;
+  return 0;
 }
 
 int PolyglotFindKey(FILE *f, KEY key, entry_t *entry)
 {
-    entry_t first_entry = entry_none, last_entry, middle_entry;
-    int first = -1;
-    
-    if(fseek(f, -16, SEEK_END)){
-        *entry = entry_none;
-        entry->key = key + 1; //hack
-        return -1;
+  entry_t first_entry = entry_none, last_entry, middle_entry;
+  int first = -1;
+  
+  if (fseek(f, -16, SEEK_END)) {
+    *entry = entry_none;
+    entry->key = key + 1; //hack
+    return -1;
+  }
+  int last = ftell(f)/16;
+  PolyglotEntry(f, &last_entry);
+  for (;;) {
+    if (last-first == 1) {
+      *entry = last_entry;
+      return last;
     }
-    int last = ftell(f)/16;
-    PolyglotEntry(f, &last_entry);
-    for(;;){
-        if(last-first == 1){
-            *entry = last_entry;
-            return last;
-        }
-        int middle = (first+last)/2;
-        fseek(f, 16*middle, SEEK_SET);
-        PolyglotEntry(f, &middle_entry);
-        if(key <= middle_entry.key){
-            last = middle;
-            last_entry = middle_entry;
-        }else{
-            first = middle;
-            first_entry = middle_entry;
-        }
+    int middle = (first+last)/2;
+    fseek(f, 16*middle, SEEK_SET);
+    PolyglotEntry(f, &middle_entry);
+    if (key <= middle_entry.key) {
+      last = middle;
+      last_entry = middle_entry;
+    } else {
+      first = middle;
+      first_entry = middle_entry;
     }
+  }
 }
 
 void PolyglotMoveToString(char move_s[6], uint16 move)
 {
-    char *promote_pieces = " nbrq";
-    int f = (move>>6)&077;
-    int fr = (f>>3)&0x7;
-    int ff = f&0x7;
-    int t = move&077;
-    int tr = (t>>3)&0x7;
-    int tf = t&0x7;
-    int p = (move>>12)&0x7;
-    
-    move_s[0] = ff+'a';
-    move_s[1] = fr+'1';
-    move_s[2] = tf+'a';
-    move_s[3] = tr+'1';
-    
-    if(p){
-        move_s[4] = promote_pieces[p];
-        move_s[5] = '\0';
-    }else{
-        move_s[4] = '\0';
-    }
-    
-    if(!strcmp(move_s, "e1h1")){
-        strcpy(move_s, "e1g1");
-    }else if(!strcmp(move_s, "e1a1")){
-        strcpy(move_s, "e1c1");
-    }else if(!strcmp(move_s, "e8h8")){
-        strcpy(move_s, "e8g8");
-    }else if(!strcmp(move_s, "e8a8")){
-        strcpy(move_s, "e8c8");
-    }
+  char *promote_pieces = " nbrq";
+  int f = (move>>6)&077;
+  int fr = (f>>3)&0x7;
+  int ff = f&0x7;
+  int t = move&077;
+  int tr = (t>>3)&0x7;
+  int tf = t&0x7;
+  int p = (move>>12)&0x7;
+  
+  move_s[0] = ff+'a';
+  move_s[1] = fr+'1';
+  move_s[2] = tf+'a';
+  move_s[3] = tr+'1';
+  
+  if (p) {
+    move_s[4] = promote_pieces[p];
+    move_s[5] = '\0';
+  } else {
+    move_s[4] = '\0';
+  }
+  
+  if (!strcmp(move_s, "e1h1")) {
+    strcpy(move_s, "e1g1");
+  } else if (!strcmp(move_s, "e1a1")) {
+    strcpy(move_s, "e1c1");
+  } else if (!strcmp(move_s, "e8h8")) {
+    strcpy(move_s, "e8g8");
+  } else if (!strcmp(move_s, "e8a8")) {
+    strcpy(move_s, "e8c8");
+  }
 }
 
 int PolyglotChooseMove(KEY key)
 {
-    entry_t entry;
-    entry_t entries[MAX_MOVES];
+  entry_t entry;
+  entry_t entries[MAX_MOVES];
 
-    FILE *f = fopen("book.bin", "rb");
-    if(!f){
-        perror("book.bin");
-        return 0;
-    }
-    int offset = PolyglotFindKey(f,key,&entry);
-    if(entry.key!=key){
-        fclose(f);
-        return 0;
-    }
-    entries[0] = entry;
-    int count = 1;
-    
-    fseek(f, 16*(offset+1), SEEK_SET);
-    
-    int total_weight = entry.weight;
-    
-    for(;;){
-        if(PolyglotEntry(f, &entry)) break;
-        if(entry.key != key) break;
-        
-        if(count == MAX_MOVES){
-            fclose(f);
-            return 0;
-        }
-        entries[count++] = entry;
-        total_weight += entry.weight;
-    }
+  FILE *f = fopen("book.bin", "rb");
+  if (!f) {
+    perror("book.bin");
+    return 0;
+  }
+  int offset = PolyglotFindKey(f,key,&entry);
+  if (entry.key!=key) {
     fclose(f);
+    return 0;
+  }
+  entries[0] = entry;
+  int count = 1;
+  
+  fseek(f, 16*(offset+1), SEEK_SET);
+  
+  int total_weight = entry.weight;
+  
+  for (;;) {
+    if (PolyglotEntry(f, &entry)) break;
+    if (entry.key != key) break;
     
-    char move_s[6];
-    printf("info string book");
-    for(int i = 0; i < count; i++){
-        PolyglotMoveToString(move_s, entries[i].move);
-        printf(" %s", move_s);
+    if (count == MAX_MOVES) {
+      fclose(f);
+      return 0;
     }
-    printf("\n");
-    srand(clock());
-    int r = rand()%total_weight;
-    int i = 0;
-    for(int w = entries[0].weight; w < r; i++){
-        w += entries[i+1].weight;
-    }
-    
+    entries[count++] = entry;
+    total_weight += entry.weight;
+  }
+  fclose(f);
+  
+  char move_s[6];
+  printf("info string book");
+  for (int i = 0; i < count; i++) {
     PolyglotMoveToString(move_s, entries[i].move);
-    printf("bestmove %s\n", move_s);
-    return 1;
+    printf(" %s", move_s);
+  }
+  printf("\n");
+  srand(clock());
+  int r = rand()%total_weight;
+  int i = 0;
+  for (int w = entries[0].weight; w < r; i++) {
+    w += entries[i+1].weight;
+  }
+  
+  PolyglotMoveToString(move_s, entries[i].move);
+  printf("bestmove %s\n", move_s);
+  return 1;
 }

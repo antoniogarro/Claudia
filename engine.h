@@ -49,13 +49,13 @@
 #define KILLER_VALUE 50
 
 static const int piece_values[] = {
-    0, 0,
-    PAWN_VALUE, PAWN_VALUE,
-    KNIGHT_VALUE, KNIGHT_VALUE,
-    BISHOP_VALUE, BISHOP_VALUE,
-    ROOK_VALUE, ROOK_VALUE,
-    QUEEN_VALUE, QUEEN_VALUE,
-    -MATE_VALUE, -MATE_VALUE
+  0, 0,
+  PAWN_VALUE, PAWN_VALUE,
+  KNIGHT_VALUE, KNIGHT_VALUE,
+  BISHOP_VALUE, BISHOP_VALUE,
+  ROOK_VALUE, ROOK_VALUE,
+  QUEEN_VALUE, QUEEN_VALUE,
+  -MATE_VALUE, -MATE_VALUE
 };
 
 #define N_MOBILITY 5
@@ -64,13 +64,13 @@ static const int piece_values[] = {
 #define Q_MOBILITY 1
 #define K_MOBILITY 0
 static const int mobility_bonus[] = {
-     0, 0,
-    -1, 1,
-    -N_MOBILITY, N_MOBILITY,
-    -B_MOBILITY, B_MOBILITY,
-    -R_MOBILITY, R_MOBILITY,
-    -Q_MOBILITY, Q_MOBILITY,
-    -K_MOBILITY, K_MOBILITY
+   0, 0,
+  -1, 1,
+  -N_MOBILITY, N_MOBILITY,
+  -B_MOBILITY, B_MOBILITY,
+  -R_MOBILITY, R_MOBILITY,
+  -Q_MOBILITY, Q_MOBILITY,
+  -K_MOBILITY, K_MOBILITY
 };
 
 #define CASTLE_BONUS 60
@@ -100,26 +100,26 @@ static const int mobility_bonus[] = {
 static const clock_t CPMS = CLOCKS_PER_SEC/1000;
 
 typedef struct CONTROL {
-    clock_t wtime, btime, wtime_inc, btime_inc;
-    clock_t init_time, wish_time, max_time;
-    int max_depth, seldepth;
-    unsigned long long node_count;
-    char uci, stop, ponder;
-    MOVE best_move;
-    int contempt;
+  clock_t wtime, btime, wtime_inc, btime_inc;
+  clock_t init_time, wish_time, max_time;
+  int max_depth, seldepth;
+  unsigned long long node_count;
+  char uci, stop, ponder;
+  MOVE best_move;
+  int contempt;
 } CONTROL;
 
 typedef struct ENGINE_STATE{
-    BOARD *board;
-    CONTROL *control;
+  BOARD *board;
+  CONTROL *control;
 } ENGINE_STATE;
 
 /*UCI commands*/
 typedef int CMDFN(char*, ENGINE_STATE*);
 
 struct UCI_COMMAND{
-    char *name;
-    CMDFN *cmd;
+  char *name;
+  CMDFN *cmd;
 };
 
 void IterativeDeep(BOARD*, CONTROL*);
@@ -131,16 +131,18 @@ int PolyglotChooseMove(KEY key);
 
 static void think(void *pparams)
 {   
-    BOARD *board = ((ENGINE_STATE*)pparams)->board;
-    CONTROL *control = ((ENGINE_STATE*)pparams)->control;
-    
-    if(PolyglotChooseMove(PolyglotKey(board))){
-        control->stop = 1;
-        return;
-    }
-    IterativeDeep(board, control);
+  BOARD *board = ((ENGINE_STATE*)pparams)->board;
+  CONTROL *control = ((ENGINE_STATE*)pparams)->control;
+  
+  if (PolyglotChooseMove(PolyglotKey(board))) {
     control->stop = 1;
     return;
+  } else {
+    control->stop = 0;
+  }
+  IterativeDeep(board, control);
+  control->stop = 1;
+  return;
 }
 
 #endif

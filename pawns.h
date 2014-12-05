@@ -38,49 +38,49 @@ typedef unsigned long long BITBOARD;
 #define NOT_H 0x7f7f7f7f7f7f7f7f
 
 static char BRANKS[] = {
-    7,7,7,7,7,7,7,7,
-    6,6,6,6,6,6,6,6,
-    5,5,5,5,5,5,5,5,
-    4,4,4,4,4,4,4,4,
-    3,3,3,3,3,3,3,3,
-    2,2,2,2,2,2,2,2,
-    1,1,1,1,1,1,1,1,
-    0,0,0,0,0,0,0,0
+  7,7,7,7,7,7,7,7,
+  6,6,6,6,6,6,6,6,
+  5,5,5,5,5,5,5,5,
+  4,4,4,4,4,4,4,4,
+  3,3,3,3,3,3,3,3,
+  2,2,2,2,2,2,2,2,
+  1,1,1,1,1,1,1,1,
+  0,0,0,0,0,0,0,0
   };
   
 static char WRANKS[] = {
-    0,0,0,0,0,0,0,0,
-    1,1,1,1,1,1,1,1,                       
-    2,2,2,2,2,2,2,2,
-    3,3,3,3,3,3,3,3,
-    4,4,4,4,4,4,4,4,
-    5,5,5,5,5,5,5,5,
-    6,6,6,6,6,6,6,6,
-    7,7,7,7,7,7,7,7
+  0,0,0,0,0,0,0,0,
+  1,1,1,1,1,1,1,1,             
+  2,2,2,2,2,2,2,2,
+  3,3,3,3,3,3,3,3,
+  4,4,4,4,4,4,4,4,
+  5,5,5,5,5,5,5,5,
+  6,6,6,6,6,6,6,6,
+  7,7,7,7,7,7,7,7
   };
 
 static inline BITBOARD BitboardSet(SQUARE sq, BITBOARD b)
 {
-    return b | (1ull << (ROW(sq)>>1) << COLUMN(sq));
+  return b | (1ull << (ROW(sq)>>1) << COLUMN(sq));
 }
 
 static inline BITBOARD BitboardUnset(SQUARE sq, BITBOARD b)
 {
-    return b ^ (1ull << (ROW(sq)>>1) << COLUMN(sq));
+  return b ^ (1ull << (ROW(sq)>>1) << COLUMN(sq));
 }
 
 static inline BITBOARD LSB(BITBOARD b)
 {
-    return b ^ (b-1);
+  return b ^ (b-1);
 }
 
 static inline int BitCount(BITBOARD b)
 {
-    int count = 0;
-    for(; b; count++){
-        b &= b-1;
-    }
-    return count;
+  int count = 0;
+  for (; b; count++) {
+    b &= b-1;
+  }
+  return count;
 }
 
 static int DotProduct(BITBOARD b, char weights[])
@@ -88,35 +88,35 @@ static int DotProduct(BITBOARD b, char weights[])
    BITBOARD bit = 1;
    int p = 0;
    for (SQUARE sq = 0; b && sq < 64; sq++, bit += bit) {
-      if(b & bit) p += weights[sq];
+    if (b & bit) p += weights[sq];
    }
    return p;
 }
 
 static inline int BitIndexLSB(BITBOARD b)
 {
-    static const BITBOARD B[] = {0xAAAAAAAA, 0xCCCCCCCC, 0xF0F0F0F0, 
-                                 0xFF00FF00, 0xFFFF0000, 0xFFFFFFFF00000000};
-    unsigned int r = (b & B[0]) != 0;
-    for (int i = 5; i > 0; i--){
-        r |= ((b & B[i]) != 0) << i;
-    }
-    return r;
+  static const BITBOARD B[] = {0xAAAAAAAA, 0xCCCCCCCC, 0xF0F0F0F0, 
+                 0xFF00FF00, 0xFFFF0000, 0xFFFFFFFF00000000};
+  unsigned int r = (b & B[0]) != 0;
+  for (int i = 5; i > 0; i--) {
+    r |= ((b & B[i]) != 0) << i;
+  }
+  return r;
 }
 
 static inline BITBOARD NorthFill(BITBOARD b)
 {
-    b |= (b <<  8);
-    b |= (b << 16);
-    b |= (b << 32);
-    return b;
+  b |= (b <<  8);
+  b |= (b << 16);
+  b |= (b << 32);
+  return b;
 }
 static inline BITBOARD SouthFill(BITBOARD b)
 {
-    b |= (b >>  8);
-    b |= (b >> 16);
-    b |= (b >> 32);
-    return b;
+  b |= (b >>  8);
+  b |= (b >> 16);
+  b |= (b >> 32);
+  return b;
 }
 
 static inline BITBOARD FileFill(BITBOARD b)
@@ -126,60 +126,60 @@ static inline BITBOARD FileFill(BITBOARD b)
 
 static inline BITBOARD SouthOne(BITBOARD b)
 {
-    return  b >> 8;
+  return  b >> 8;
 }
 
 static inline BITBOARD NorthOne(BITBOARD b)
 {
-    return  b << 8;
+  return  b << 8;
 }
 
 static inline BITBOARD EastOne(BITBOARD b)
 {
-    return (b & NOT_H) << 1;
+  return (b & NOT_H) << 1;
 }
 
 static inline BITBOARD WestOne(BITBOARD b)
 {
-    return (b & NOT_A) >> 1;
+  return (b & NOT_A) >> 1;
 }
 
 static inline BITBOARD WFrontSpans(BITBOARD wpawns)
 {
-    return NorthOne(NorthFill(wpawns));
+  return NorthOne(NorthFill(wpawns));
 }
 
 static inline BITBOARD WRearSpans(BITBOARD wpawns)
 {
-    return SouthOne(SouthFill(wpawns));
+  return SouthOne(SouthFill(wpawns));
 }
 
 static inline BITBOARD BFrontSpans(BITBOARD bpawns)
 {
-    return SouthOne(SouthFill(bpawns));
+  return SouthOne(SouthFill(bpawns));
 }
 
 static inline BITBOARD BRearSpans(BITBOARD bpawns)
 {
-    return NorthOne(NorthFill(bpawns));
+  return NorthOne(NorthFill(bpawns));
 }
 
 static inline BITBOARD WPassedPawns(BITBOARD wpawns, BITBOARD bpawns)
 {
-    BITBOARD front_spans = BFrontSpans(bpawns);
-    front_spans |= EastOne(front_spans) | WestOne(front_spans);
-    return wpawns & ~front_spans;
+  BITBOARD front_spans = BFrontSpans(bpawns);
+  front_spans |= EastOne(front_spans) | WestOne(front_spans);
+  return wpawns & ~front_spans;
 }
  
 static inline BITBOARD BPassedPawns(BITBOARD bpawns, BITBOARD wpawns)
 {
-    BITBOARD front_spans = WFrontSpans(wpawns);
-    front_spans |= EastOne(front_spans) | WestOne(front_spans);
-    return bpawns & ~front_spans;
+  BITBOARD front_spans = WFrontSpans(wpawns);
+  front_spans |= EastOne(front_spans) | WestOne(front_spans);
+  return bpawns & ~front_spans;
 }
 
 static inline BITBOARD DoubledPawns(BITBOARD pawns)
 {
-    return pawns & WRearSpans(pawns);
+  return pawns & WRearSpans(pawns);
 }
 #endif

@@ -52,22 +52,22 @@ typedef unsigned long long KEY;
 /* white pieces have least significant bit = 1; black = 0.*/
 /* K_CASTLE_RIGHT | Q_CASTLE_RIGHT = BOTH_CASTLES */
 enum PIECES { EMPTY,
-              K_CASTLE_RIGHT,
-              B_PAWN,
-              W_PAWN,
-              B_KNIGHT,
-              W_KNIGHT,
-              B_BISHOP,
-              W_BISHOP,
-              B_ROOK,
-              W_ROOK,
-              B_QUEEN,
-              W_QUEEN,
-              B_KING,
-              W_KING,
-              Q_CASTLE_RIGHT,
-              BOTH_CASTLES
-            };
+        K_CASTLE_RIGHT,
+        B_PAWN,
+        W_PAWN,
+        B_KNIGHT,
+        W_KNIGHT,
+        B_BISHOP,
+        W_BISHOP,
+        B_ROOK,
+        W_ROOK,
+        B_QUEEN,
+        W_QUEEN,
+        B_KING,
+        W_KING,
+        Q_CASTLE_RIGHT,
+        BOTH_CASTLES
+      };
 
 #define WHITE 1
 #define BLACK 0
@@ -140,28 +140,28 @@ enum PIECES { EMPTY,
 #include "pawns.h"
 
 typedef struct BOARD {
-    PIECE squares[BOARDSIZE];
-    BITBOARD pawns[2];
-    COLOR white_to_move;
-    /*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
-    SQUARE en_passant;
-    unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
-    unsigned char w_castled, b_castled;
-    SQUARE wking_pos, bking_pos;
-    int ply;
-    int rev_plies[HISTLEN];
-    KEY zobrist_key;
-    KEY zobrist_history[HISTLEN];
-    int piece_material[2];
-    int pawn_material[2];
-    int bishops[2];
+  PIECE squares[BOARDSIZE];
+  BITBOARD pawns[2];
+  COLOR white_to_move;
+  /*Coordinates "behind" the pawn that can be captured en passant, as in FEN:*/
+  SQUARE en_passant;
+  unsigned char wk_castle, wq_castle, bk_castle, bq_castle;
+  unsigned char w_castled, b_castled;
+  SQUARE wking_pos, bking_pos;
+  int ply;
+  int rev_plies[HISTLEN];
+  KEY zobrist_key;
+  KEY zobrist_history[HISTLEN];
+  int piece_material[2];
+  int pawn_material[2];
+  int bishops[2];
 } BOARD;
 
 typedef struct ZOBKEYS {
-    KEY zob_pieces[16][BOARDSIZE];
-    KEY zob_enpass[BOARDSIZE];
-    KEY zob_castle[4];
-    KEY zob_side;
+  KEY zob_pieces[16][BOARDSIZE];
+  KEY zob_enpass[BOARDSIZE];
+  KEY zob_castle[4];
+  KEY zob_side;
 } ZOBKEYS;
 
 extern ZOBKEYS zobkeys;
@@ -184,20 +184,20 @@ typedef int (PIECEMOVES)(const BOARD*, SQUARE, MOVE*, int, char);
 PIECEMOVES WhitePawnMoves, BlackPawnMoves, NonSlidingMoves, SlidingMoves;
 
 static PIECEMOVES *const piece_moves[] = {
-    0,
-    0,
-    &BlackPawnMoves,
-    &WhitePawnMoves,
-    &NonSlidingMoves,
-    &NonSlidingMoves,
-    &SlidingMoves,
-    &SlidingMoves,
-    &SlidingMoves,
-    &SlidingMoves,
-    &SlidingMoves,
-    &SlidingMoves,
-    &NonSlidingMoves,
-    &NonSlidingMoves,
+  0,
+  0,
+  &BlackPawnMoves,
+  &WhitePawnMoves,
+  &NonSlidingMoves,
+  &NonSlidingMoves,
+  &SlidingMoves,
+  &SlidingMoves,
+  &SlidingMoves,
+  &SlidingMoves,
+  &SlidingMoves,
+  &SlidingMoves,
+  &NonSlidingMoves,
+  &NonSlidingMoves,
 };
 
 #ifndef DELTAS
@@ -210,49 +210,49 @@ static const SQUARE rook_delta[] = {0x01, 0x10, -0x01, -0x10, 0};
 static const SQUARE king_delta[] = {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0};
 #ifdef POINTDELTAS
 static const SQUARE *const deltas[] = {
-    0,
-    0,
-    b_pawn_capture,
-    w_pawn_capture,
-    knight_delta,
-    knight_delta,
-    bishop_delta,
-    bishop_delta,
-    rook_delta,
-    rook_delta,
-    king_delta,
-    king_delta,
-    king_delta,
-    king_delta,
+  0,
+  0,
+  b_pawn_capture,
+  w_pawn_capture,
+  knight_delta,
+  knight_delta,
+  bishop_delta,
+  bishop_delta,
+  rook_delta,
+  rook_delta,
+  king_delta,
+  king_delta,
+  king_delta,
+  king_delta,
 };
 #else
 static const SQUARE deltas[][9] = {
-    {0,0,0,0,0,0,0,0,0,},
-    {0,0,0,0,0,0,0,0,0,},
-    {-0x0F, -0x11,0,0,0,0,0,0,0},
-    {0x0F, 0x11,0,0,0,0,0,0,0},
-    {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0},
-    {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0},
-    {0x11, 0x0F, -0x11, -0x0F,0,0,0,0,0},
-    {0x11, 0x0F, -0x11, -0x0F,0,0,0,0,0},
-    {0x01, 0x10, -0x01, -0x10,0,0,0,0,0},
-    {0x01, 0x10, -0x01, -0x10,0,0,0,0,0},
-    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
-    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
-    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
-    {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0}
+  {0,0,0,0,0,0,0,0,0,},
+  {0,0,0,0,0,0,0,0,0,},
+  {-0x0F, -0x11,0,0,0,0,0,0,0},
+  {0x0F, 0x11,0,0,0,0,0,0,0},
+  {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0},
+  {0x21, 0x12, 0x1F, 0x0E, -0x12, -0x0E, -0x21, -0x1F, 0},
+  {0x11, 0x0F, -0x11, -0x0F,0,0,0,0,0},
+  {0x11, 0x0F, -0x11, -0x0F,0,0,0,0,0},
+  {0x01, 0x10, -0x01, -0x10,0,0,0,0,0},
+  {0x01, 0x10, -0x01, -0x10,0,0,0,0,0},
+  {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
+  {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
+  {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0},
+  {0x11, 0x0F, -0x11, -0x0F, 0x01, 0x10, -0x01, -0x10, 0}
 };
 #endif
 
 static const SQUARE distance_to_center[] = {
-    6, 5, 4, 3, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0,
-    5, 4, 3, 2, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0,
-    4, 3, 2, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0,
-    3, 2, 1, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-    3, 2, 1, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-    4, 3, 2, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0,
-    5, 4, 3, 2, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0,
-    6, 5, 4, 3, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0
+  6, 5, 4, 3, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0,
+  5, 4, 3, 2, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0,
+  4, 3, 2, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0,
+  3, 2, 1, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+  3, 2, 1, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+  4, 3, 2, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0,
+  5, 4, 3, 2, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0,
+  6, 5, 4, 3, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0
 };
 #endif
 
@@ -265,49 +265,49 @@ int Perft(BOARD*, int);
 int SortMoves(BOARD*, MOVE*, int, MOVE[]);
 int FilterWinning(BOARD*, MOVE*, int);
 
-int LazyEval(const BOARD*, int w_contempt);
-int StaticEval(const BOARD*, int w_contempt);
+int LazyEval(const BOARD*);
+int StaticEval(const BOARD*);
 int Value(PIECE);
 
 int AttackingPieces(const BOARD*, SQUARE, COLOR, SQUARE*);
 
 inline int IsAttacked(const BOARD *board, SQUARE square, COLOR attacking_color)
 {
-    return AttackingPieces(board, square, attacking_color, 0);
+  return AttackingPieces(board, square, attacking_color, 0);
 }
 
-inline int WhiteInCheck(const BOARD *board){
-    return IsAttacked(board, board->wking_pos, BLACK);
+inline int WhiteInCheck(const BOARD *board) {
+  return IsAttacked(board, board->wking_pos, BLACK);
 }
 
-inline int BlackInCheck(const BOARD *board){
-    return IsAttacked(board, board->bking_pos, WHITE);
+inline int BlackInCheck(const BOARD *board) {
+  return IsAttacked(board, board->bking_pos, WHITE);
 }
 
-inline int InCheck(const BOARD *board, SQUARE *attacking_sqs){
-    if(board->white_to_move) return AttackingPieces(board, board->wking_pos, BLACK, attacking_sqs);
-    else return AttackingPieces(board, board->bking_pos, WHITE, attacking_sqs);
+inline int InCheck(const BOARD *board, SQUARE *attacking_sqs) {
+  if (board->white_to_move) return AttackingPieces(board, board->wking_pos, BLACK, attacking_sqs);
+  else return AttackingPieces(board, board->bking_pos, WHITE, attacking_sqs);
 }
 
-inline int LeftInCheck(const BOARD *board){
-    if(board->white_to_move) return IsAttacked(board, board->bking_pos, WHITE);
-    else return IsAttacked(board, board->wking_pos, BLACK);
+inline int LeftInCheck(const BOARD *board) {
+  if (board->white_to_move) return IsAttacked(board, board->bking_pos, WHITE);
+  else return IsAttacked(board, board->wking_pos, BLACK);
 }
 
 inline MOVE Move(PIECE piece, SQUARE dest, SQUARE orig)
 {
-    return (piece << 16) | (dest << 8) | orig;
+  return (piece << 16) | (dest << 8) | orig;
 }
 
 /*Game stage according to material present; 0 -> 1 as game progresses.*/
 inline float PawnStage(const BOARD *board)
 {
-    return 1.0f - (float)(board->pawn_material[0] + board->pawn_material[1])/STARTPAWNS;
+  return 1.0f - (float)(board->pawn_material[0] + board->pawn_material[1])/STARTPAWNS;
 }
 
 inline float GameStage(const BOARD *board)
 {
-    return 1.0f - (float)(board->piece_material[0] + board->piece_material[1])/STARTMATERIAL;
+  return 1.0f - (float)(board->piece_material[0] + board->piece_material[1])/STARTMATERIAL;
 }
 
 /* Some methods to convert coordinates to algebraic notation, and the other way round.*/

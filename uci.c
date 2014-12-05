@@ -43,235 +43,235 @@
 CMDFN make_move, quit, go, stop, ponderhit, perft, position, uci, isready, setoption, ucinewgame, showboard;
 
 const struct UCI_COMMAND uci_commands[] = {{"INV", &make_move},
-                                           {"quit", &quit},
-                                           {"go", &go},
-                                           {"stop", &stop},
-                                           {"ponderhit", &ponderhit},
-                                           {"perft", &perft},
-                                           {"position", &position},
-                                           {"uci", &uci},
-                                           {"isready", &isready},
-                                           {"setoption", &setoption},
-                                           {"ucinewgame", &ucinewgame},
-                                           {"show", &showboard}};
-                                         
+                       {"quit", &quit},
+                       {"go", &go},
+                       {"stop", &stop},
+                       {"ponderhit", &ponderhit},
+                       {"perft", &perft},
+                       {"position", &position},
+                       {"uci", &uci},
+                       {"isready", &isready},
+                       {"setoption", &setoption},
+                       {"ucinewgame", &ucinewgame},
+                       {"show", &showboard}};
+                     
 int ParseCommand(const char *command)
-{   if(command == 0) return 0; 
-    for(int i = 0; i < sizeof(uci_commands)/sizeof(struct UCI_COMMAND); i++){
-        if(!strcmp(command, uci_commands[i].name)) return i;
-    }
-    return 0;
+{   if (command == 0) return 0; 
+  for (unsigned int i = 0; i < sizeof(uci_commands)/sizeof(struct UCI_COMMAND); i++) {
+    if (!strcmp(command, uci_commands[i].name)) return i;
+  }
+  return 0;
 }
 
 int Command(const char *input, ENGINE_STATE *stat)
 {
-    char input_copy[2048], cmd_str[20];
-    strcpy(input_copy, input);
-    sscanf(input, "%s", cmd_str);
-    int cmd = ParseCommand(cmd_str);
-    return uci_commands[cmd].cmd(input_copy, stat);
+  char input_copy[2048], cmd_str[20];
+  strcpy(input_copy, input);
+  sscanf(input, "%s", cmd_str);
+  int cmd = ParseCommand(cmd_str);
+  return uci_commands[cmd].cmd(input_copy, stat);
 }
 
 inline void ManageTimes(int nmoves, ENGINE_STATE *stat)
 {
-    if(stat->board->white_to_move){
-        stat->control->wish_time = stat->control->wtime/nmoves + stat->control->wtime_inc;
-        stat->control->max_time = stat->control->wtime;
-    }else{
-        stat->control->wish_time = stat->control->btime/nmoves + stat->control->btime_inc;
-        stat->control->max_time = stat->control->btime;
-    }
+  if (stat->board->white_to_move) {
+    stat->control->wish_time = stat->control->wtime/nmoves + stat->control->wtime_inc;
+    stat->control->max_time = stat->control->wtime;
+  } else {
+    stat->control->wish_time = stat->control->btime/nmoves + stat->control->btime_inc;
+    stat->control->max_time = stat->control->btime;
+  }
 }
 
 inline void ResetTimes(ENGINE_STATE *stat)
 {
-    stat->control->wtime = 0; stat->control->btime = 0;
-    stat->control->wtime_inc = 0; stat->control->btime_inc = 0;
+  stat->control->wtime = 0; stat->control->btime = 0;
+  stat->control->wtime_inc = 0; stat->control->btime_inc = 0;
 }
 
 int make_move(char *input, ENGINE_STATE *stat)
 {
-    char *str_param = strtok(input, " \n\t");
-    if(str_param){
-        MOVE curr_move = AlgebToMove(str_param);
-        if(IsLegal(stat->board, &curr_move)) MakeMove(stat->board, &curr_move);
-    }
-    return 1;
+  char *str_param = strtok(input, " \n\t");
+  if (str_param) {
+    MOVE curr_move = AlgebToMove(str_param);
+    if (IsLegal(stat->board, &curr_move)) MakeMove(stat->board, &curr_move);
+  }
+  return 1;
 }
 
 int quit(char *input, ENGINE_STATE *stat)
 {
-    stat->control->stop = 1;
-    return 0;
+  stat->control->stop = 1;
+  return 0;
 }
 
 int go(char *input, ENGINE_STATE *stat)
-{    
-    stat->control->max_depth = MAXDEPTH;
-    stat->control->max_time = INFINITE;
-    stat->control->wish_time = INFINITE;
-    stat->control->stop = 1;
-    stat->control->ponder = 0;
-    ResetTimes(stat);
-    int movestogo = 20;
-    char manage_times = 1;
-    char *str_param = strtok(input, " \n\t");
-    for(str_param = strtok(NULL, " \n\t"); str_param; str_param = strtok(NULL, " \n\t")){
-        if(!strcmp("depth",  str_param)){
-            str_param = strtok(NULL, " \n\t");
-            if(str_param){
-                stat->control->max_depth = atoi(str_param);
-                manage_times = 0;
-            }
-            break;
-        }else if(!strcmp("time",  str_param)){
-            str_param = strtok(NULL, " \n\t");
-            if(str_param){
-                stat->control->wish_time = INFINITE;
-                stat->control->max_time = atol(str_param);
-                manage_times = 0;
-            }
-        }else if(!strcmp("infinite",  str_param)){
-            manage_times = 0;
-            break;
-        }else if(!strcmp("ponder", str_param)){
-            stat->control->ponder = 1;
-        }else if(!strcmp("btime",  str_param)){
-            str_param = strtok(NULL, " \n\t");
-            if(str_param){
-                stat->control->btime = atoi(str_param);
-            }
-        }else if(!strcmp("wtime",  str_param)){
-            str_param = strtok(NULL, " \n\t");
-            if(str_param){
-                stat->control->wtime = atoi(str_param);
-            }
-        }else if(!strcmp("binc",  str_param)){
-            str_param = strtok(NULL, " \n\t");
-            if(str_param){
-                stat->control->btime_inc = atoi(str_param);
-            }
-        }else if(!strcmp("winc",  str_param)){
-            str_param = strtok(NULL, " \n\t");
-            if(str_param){
-                stat->control->wtime_inc = atoi(str_param);
-            }
-        }else if(!strcmp("movestogo",  str_param)){
-            str_param = strtok(NULL, " \n\t");
-            if(str_param){
-                movestogo = atoi(str_param);
-            }
-        }else break;
-    }
+{  
+  stat->control->max_depth = MAXDEPTH;
+  stat->control->max_time = INFINITE;
+  stat->control->wish_time = INFINITE;
+  stat->control->stop = 1;
+  stat->control->ponder = 0;
+  ResetTimes(stat);
+  int movestogo = 20;
+  char manage_times = 1;
+  char *str_param = strtok(input, " \n\t");
+  for (str_param = strtok(NULL, " \n\t"); str_param; str_param = strtok(NULL, " \n\t")) {
+    if (!strcmp("depth",  str_param)) {
+      str_param = strtok(NULL, " \n\t");
+      if (str_param) {
+        stat->control->max_depth = atoi(str_param);
+        manage_times = 0;
+      }
+      break;
+    } else if (!strcmp("time",  str_param)) {
+      str_param = strtok(NULL, " \n\t");
+      if (str_param) {
+        stat->control->wish_time = INFINITE;
+        stat->control->max_time = atol(str_param);
+        manage_times = 0;
+      }
+    } else if (!strcmp("infinite",  str_param)) {
+      manage_times = 0;
+      break;
+    } else if (!strcmp("ponder", str_param)) {
+      stat->control->ponder = 1;
+    } else if (!strcmp("btime",  str_param)) {
+      str_param = strtok(NULL, " \n\t");
+      if (str_param) {
+        stat->control->btime = atoi(str_param);
+      }
+    } else if (!strcmp("wtime",  str_param)) {
+      str_param = strtok(NULL, " \n\t");
+      if (str_param) {
+        stat->control->wtime = atoi(str_param);
+      }
+    } else if (!strcmp("binc",  str_param)) {
+      str_param = strtok(NULL, " \n\t");
+      if (str_param) {
+        stat->control->btime_inc = atoi(str_param);
+      }
+    } else if (!strcmp("winc",  str_param)) {
+      str_param = strtok(NULL, " \n\t");
+      if (str_param) {
+        stat->control->wtime_inc = atoi(str_param);
+      }
+    } else if (!strcmp("movestogo",  str_param)) {
+      str_param = strtok(NULL, " \n\t");
+      if (str_param) {
+        movestogo = atoi(str_param);
+      }
+    } else break;
+  }
 
-    if(stat->control->stop){
-        if(manage_times){
-            ManageTimes(movestogo, stat);
-        }
-        stat->control->stop = 0;
-        stat->control->init_time = clock();
+  if (stat->control->stop) {
+    if (manage_times) {
+      ManageTimes(movestogo, stat);
+    }
+    stat->control->stop = 0;
+    stat->control->init_time = clock();
 #ifdef __linux__
-        pthread_attr_t tattr;
-        pthread_attr_init(&tattr);
-        pthread_attr_setdetachstate(&tattr,PTHREAD_CREATE_DETACHED);
+    pthread_attr_t tattr;
+    pthread_attr_init(&tattr);
+    pthread_attr_setdetachstate(&tattr,PTHREAD_CREATE_DETACHED);
 
-        pthread_t thread_id;
-        pthread_create(&thread_id, &tattr, (void *)(think), stat);
+    pthread_t thread_id;
+    pthread_create(&thread_id, &tattr, (void *)(think), stat);
 #elif defined _WIN32
-        _beginthread(think, 0, stat);
+    _beginthread(think, 0, stat);
 #endif
-    }
-    return 1;
+  }
+  return 1;
 }
 
 int stop(char *input, ENGINE_STATE *stat)
 {
-    stat->control->ponder = 0;
-    stat->control->stop = 1;
-    return 1;
+  stat->control->ponder = 0;
+  stat->control->stop = 1;
+  return 1;
 }
 
 int ponderhit(char *input, ENGINE_STATE *stat)
 {
-    stat->control->ponder=0;
-    return 1;
+  stat->control->ponder=0;
+  return 1;
 }
 
 int perft(char *input, ENGINE_STATE *stat)
 {
-    int depth = 0;
-    sscanf(input, "perft %i", &depth);
-    stat->control->init_time = clock();
-    unsigned int nodes = Perft(stat->board, depth);
-    float ms = (clock() - stat->control->init_time)/CPMS;
-    printf("Depth: %i Moves: %i knps: %u\n", depth, nodes, (unsigned int)(nodes/ms));
-    return 1;
+  int depth = 0;
+  sscanf(input, "perft %i", &depth);
+  stat->control->init_time = clock();
+  unsigned int nodes = Perft(stat->board, depth);
+  float ms = (clock() - stat->control->init_time)/CPMS;
+  printf("Depth: %i Moves: %i knps: %u\n", depth, nodes, (unsigned int)(nodes/ms));
+  return 1;
 }
 
 int position(char *input, ENGINE_STATE *stat)
 {
-    strtok(input, " \n\t");
-    char *str_param = strtok(NULL, " \n\t");
-    if(!strcmp(str_param, "startpos")) ReadFEN(STARTPOS, stat->board);
-    else if(!strcmp(str_param, "fen")){
-        /*Don't split chain at spaces; cut at 'm' for 'moves' or at '\n'.*/
-        str_param = strtok(NULL, "m\n\t"); 
-        if(str_param) ReadFEN(str_param, stat->board);
-    }else return 0;
-    
-    str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "moves"*/
-    str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "e2e4"*/
-    while(str_param){
-        MOVE curr_move = AlgebToMove(str_param);
-        if(IsLegal(stat->board, &curr_move)) MakeMove(stat->board, &curr_move);
-        else return 0;
-        str_param = strtok(NULL, " \n\t");
-    }
-    return 1;
+  strtok(input, " \n\t");
+  char *str_param = strtok(NULL, " \n\t");
+  if (!strcmp(str_param, "startpos")) ReadFEN(STARTPOS, stat->board);
+  else if (!strcmp(str_param, "fen")) {
+    /*Don't split chain at spaces; cut at 'm' for 'moves' or at '\n'.*/
+    str_param = strtok(NULL, "m\n\t"); 
+    if (str_param) ReadFEN(str_param, stat->board);
+  } else return 0;
+  
+  str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "moves"*/
+  str_param = strtok(NULL, " \n\t");  /*e.g. str_param == "e2e4"*/
+  while (str_param) {
+    MOVE curr_move = AlgebToMove(str_param);
+    if (IsLegal(stat->board, &curr_move)) MakeMove(stat->board, &curr_move);
+    else return 0;
+    str_param = strtok(NULL, " \n\t");
+  }
+  return 1;
 }
 
 int uci(char *input, ENGINE_STATE *stat)
 {
-    stat->control->uci = 1;
-    printf("id name %s v. %s\n", NAME, VERSION);
-    printf("id author Antonio Garro\n");
-    printf("option name Hash type spin default %i min 32 max 2048\n", TABLESIZE);
-    printf("uciok\n");
-    return 1;
+  stat->control->uci = 1;
+  printf("id name %s v. %s\n", NAME, VERSION);
+  printf("id author Antonio Garro\n");
+  printf("option name Hash type spin default %i min 32 max 2048\n", TABLESIZE);
+  printf("uciok\n");
+  return 1;
 }
 
 int isready(char *input, ENGINE_STATE *stat)
 {
-    printf("readyok\n");
-    return 1;
+  printf("readyok\n");
+  return 1;
 }
 
 int setoption(char *input, ENGINE_STATE *stat)
 {
-    int val = 0;
-    if(sscanf(input, "setoption name Hash value %i", &val)) {
-        DeleteTable(&hash_table);
-        DeletePawnTable(&pawn_table);
-        if(AllocPawnTable(&pawn_table, 0.2*val) == 0) return 0;
-        if(AllocTable(&hash_table, 0.8*val) == 0) return 0;
-        ClearHashTable(&hash_table);
-        ClearPawnTable(&pawn_table);
-    } else if(sscanf(input, "setoption name Contempt value %i", &val)) {
-        stat->control->contempt = val;
-        printf("contempt: %u\n", stat->control->contempt);
-    }
-    return 1;
+  int val = 0;
+  if (sscanf(input, "setoption name Hash value %i", &val)) {
+    DeleteTable(&hash_table);
+    DeletePawnTable(&pawn_table);
+    if (AllocPawnTable(&pawn_table, 0.2*val) == 0) return 0;
+    if (AllocTable(&hash_table, 0.8*val) == 0) return 0;
+    ClearHashTable(&hash_table);
+    ClearPawnTable(&pawn_table);
+  } else if (sscanf(input, "setoption name Contempt value %i", &val)) {
+    stat->control->contempt = val;
+    printf("contempt: %i\n", stat->control->contempt);
+  }
+  return 1;
 }
 
 int ucinewgame(char *input, ENGINE_STATE *stat)
 {
-    ClearHashTable(&hash_table);
-    ClearPawnTable(&pawn_table);
-    return 1;
+  ClearHashTable(&hash_table);
+  ClearPawnTable(&pawn_table);
+  return 1;
 }
 
 int showboard(char *input, ENGINE_STATE *stat)
 {
-    if(!stat->control->uci) PrintBoard(stat->board);
-    return 1;
+  if (!stat->control->uci) PrintBoard(stat->board);
+  return 1;
 }

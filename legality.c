@@ -33,48 +33,48 @@
 
 char IsLegal(BOARD *board, MOVE *curr_move)
 {
-    MOVE poss_moves[MAXMOVES];
-    int nposs_movs = MoveGen(board, poss_moves, 1);
-    /*We only compare info about squares to decide legality, not captured piece or previous EP:*/
-    MOVE sqs = SQSMASK(*curr_move); 
-    /*TODO: promoted.*/
-    for(int i = 0; i < nposs_movs; i++){
-        if(sqs == SQSMASK(poss_moves[i])){    /*curr_move is possible.*/
-            MakeMove(board, curr_move);
-            if(!LeftInCheck(board)){
-                Takeback(board, *curr_move);
-                return 1;        /*curr_move is legal.*/
-            }
-            Takeback(board, *curr_move);
-        }
+  MOVE poss_moves[MAXMOVES];
+  int nposs_movs = MoveGen(board, poss_moves, 1);
+  /*We only compare info about squares to decide legality, not captured piece or previous EP:*/
+  MOVE sqs = SQSMASK(*curr_move); 
+  /*TODO: promoted.*/
+  for (int i = 0; i < nposs_movs; i++) {
+    if (sqs == SQSMASK(poss_moves[i])) {  /*curr_move is possible.*/
+      MakeMove(board, curr_move);
+      if (!LeftInCheck(board)) {
+        Takeback(board, *curr_move);
+        return 1;    /*curr_move is legal.*/
+      }
+      Takeback(board, *curr_move);
     }
-    return 0;
+  }
+  return 0;
 }
 
 int Perft(BOARD *board, int depth)
 {
-    int val = 0;
-    int nposs_movs = 0;
-    MOVE poss_moves[MAXMOVES];
-    
-    nposs_movs = MoveGen(board, poss_moves, 1);
-    
-    for(int i = 0; i < nposs_movs; i++){
-        MakeMove(board, &poss_moves[i]);
-        if(depth > 1){
-            if(board->white_to_move){
-                if(!BlackInCheck(board)) val += Perft(board, depth - 1);
-            }else{
-                if(!WhiteInCheck(board)) val += Perft(board, depth - 1);
-            }
-        }else{
-            if(board->white_to_move){
-                if(!BlackInCheck(board)) val++;
-            }else{
-                if(!WhiteInCheck(board)) val++;
-            }
-        }            
-        Takeback(board, poss_moves[i]);
-    }
-    return val;
+  int val = 0;
+  int nposs_movs = 0;
+  MOVE poss_moves[MAXMOVES];
+  
+  nposs_movs = MoveGen(board, poss_moves, 1);
+  
+  for (int i = 0; i < nposs_movs; i++) {
+    MakeMove(board, &poss_moves[i]);
+    if (depth > 1) {
+      if (board->white_to_move) {
+        if (!BlackInCheck(board)) val += Perft(board, depth - 1);
+      } else {
+        if (!WhiteInCheck(board)) val += Perft(board, depth - 1);
+      }
+    } else {
+      if (board->white_to_move) {
+        if (!BlackInCheck(board)) val++;
+      } else {
+        if (!WhiteInCheck(board)) val++;
+      }
+    }      
+    Takeback(board, poss_moves[i]);
+  }
+  return val;
 }

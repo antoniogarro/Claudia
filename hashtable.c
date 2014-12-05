@@ -34,77 +34,77 @@
 
 int AllocTable(HASHTABLE *ht, int table_size)
 {
-    unsigned int s = 1024*1024*table_size;
-    do{
-        ht->entries = (HashData*) malloc(s);
-        ht->size = s/sizeof(HashData);
-        s *= 0.8;
-    }while(ht->entries == 0);
+  unsigned int s = 1024*1024*table_size;
+  do {
+    ht->entries = (HashData*) malloc(s);
+    ht->size = s/sizeof(HashData);
+    s *= 0.8;
+  } while (ht->entries == 0);
 
-    return ht->size;
+  return ht->size;
 }
 
 void DeleteTable(HASHTABLE *ht)
 {
-    free(ht->entries);
+  free(ht->entries);
 }
 
 void ClearHashTable(HASHTABLE *ht)
 {
-    for(int i = 0;  i < ht->size; i++){
-        ht->entries[i].zobrist_key = 0;
-        ht->entries[i].data = 0;
-    }
-    ht->full = 0;
+  for (int i = 0;  i < ht->size; i++) {
+    ht->entries[i].zobrist_key = 0;
+    ht->entries[i].data = 0;
+  }
+  ht->full = 0;
 }
 
 void UpdateTable(HASHTABLE *ht, KEY zob_key, int eval, MOVE best_move, int depth, int flag)
 {
-    int key = zob_key%ht->size;
-    HashData *entry = &(ht->entries[key]);
-    
-    if(MOVEMASK(entry->data)){
-        if(!best_move) return;
-        if(DEPTHMASK(entry->data) > depth) return;
-    }
-    /*if(entry->depth >= depth && entry->best_move && !best_move) return;*/
-    if(entry->zobrist_key != zob_key){
-        if(entry->zobrist_key == 0) ht->full++;
-        entry->zobrist_key = zob_key;
-    }
-    /*if(flag == HASHEXACT || flag == HASHBETA);*/
-    entry->data = PUT_HASH_MOVE(best_move);
-    entry->data |= PUT_HASH_EVAL(eval);
-    entry->data |= PUT_HASH_DEPTH(depth);
-    entry->data |= PUT_HASH_FLAG(flag);
+  int key = zob_key%ht->size;
+  HashData *entry = &(ht->entries[key]);
+  
+  if (MOVEMASK(entry->data)) {
+    if (!best_move) return;
+    if (DEPTHMASK(entry->data) > depth) return;
+  }
+  /*if (entry->depth >= depth && entry->best_move && !best_move) return;*/
+  if (entry->zobrist_key != zob_key) {
+    if (entry->zobrist_key == 0) ht->full++;
+    entry->zobrist_key = zob_key;
+  }
+  /*if (flag == HASHEXACT || flag == HASHBETA);*/
+  entry->data = PUT_HASH_MOVE(best_move);
+  entry->data |= PUT_HASH_EVAL(eval);
+  entry->data |= PUT_HASH_DEPTH(depth);
+  entry->data |= PUT_HASH_FLAG(flag);
 }
 
 MOVE GetHashMove(HASHTABLE *ht, KEY zob_key)
 {
-    int key = zob_key%ht->size;
-    if(ht->entries[key].zobrist_key == zob_key){
-        return MOVEMASK(ht->entries[key].data);
-    }else return 0;
+  int key = zob_key%ht->size;
+  if (ht->entries[key].zobrist_key == zob_key) {
+    return MOVEMASK(ht->entries[key].data);
+  } else return 0;
 }
 
 int GetHashEval(HASHTABLE *ht, KEY zob_key, int depth, int alpha, int beta)
 {
-    int key = zob_key%ht->size;
-    const HashData *entry = &(ht->entries[key]);
-    if(entry->zobrist_key == zob_key && DEPTHMASK(entry->data) >= depth){
-        int eval = EVALMASK(entry->data);
-        char flag = FLAGMASK(entry->data);
-        if(flag == HASH_EXACT){
-            return eval;
-        }
-        if(flag == HASH_BETA && eval >= beta){
-            return beta;
-        }
-        if(flag == HASH_ALPHA && eval < alpha){
-            return alpha;
-        }
+  int key = zob_key%ht->size;
+  const HashData *entry = &(ht->entries[key]);
+  if (entry->zobrist_key == zob_key && DEPTHMASK(entry->data) >= depth) {
+    int eval = EVALMASK(entry->data);
+    char flag = FLAGMASK(entry->data);
+    if (flag == HASH_EXACT) {
+      return eval;
     }
-    return ERRORVALUE;
+    if (flag == HASH_BETA && eval >= beta) {
+      return beta;
+    }
+    if (flag == HASH_ALPHA && eval < alpha) {
+      return alpha;
+    }
+  }
+  return ERRORVALUE;
 }
 
 
@@ -112,48 +112,48 @@ int GetHashEval(HASHTABLE *ht, KEY zob_key, int depth, int alpha, int beta)
 
 int AllocPawnTable(PAWNTABLE *pt, int table_size)
 {
-    unsigned int s = 1024*1024*table_size;
-    do{
-        pt->entries = (PawnData*) malloc(s);
-        pt->size = s/sizeof(PawnData);
-        s *= 0.8;
-    }while(pt->entries == 0);
+  unsigned int s = 1024*1024*table_size;
+  do {
+    pt->entries = (PawnData*) malloc(s);
+    pt->size = s/sizeof(PawnData);
+    s *= 0.8;
+  } while (pt->entries == 0);
 
-    return pt->size;
+  return pt->size;
 }
 
 void DeletePawnTable(PAWNTABLE *pt)
 {
-    free(pt->entries);
+  free(pt->entries);
 }
 
 void ClearPawnTable(PAWNTABLE *pt)
 {
-    for(int i = 0;  i < pt->size; i++){
-        pt->entries[i].pawn_bitboard = 0;
-        pt->entries[i].eval = 0;
-    }
-    pt->full = 0;
+  for (int i = 0;  i < pt->size; i++) {
+    pt->entries[i].pawn_bitboard = 0;
+    pt->entries[i].eval = 0;
+  }
+  pt->full = 0;
 }
 
 void UpdatePawnTable(PAWNTABLE *pt, BITBOARD pawn_bitboard, int eval)
 {
-    int key = pawn_bitboard%pt->size;
-    PawnData *entry = &(pt->entries[key]);
-    
-    if(entry->pawn_bitboard != pawn_bitboard){
-        if(entry->pawn_bitboard == 0) pt->full++;
-        entry->pawn_bitboard = pawn_bitboard;
-    }
-    entry->eval = eval;
+  int key = pawn_bitboard%pt->size;
+  PawnData *entry = &(pt->entries[key]);
+  
+  if (entry->pawn_bitboard != pawn_bitboard) {
+    if (entry->pawn_bitboard == 0) pt->full++;
+    entry->pawn_bitboard = pawn_bitboard;
+  }
+  entry->eval = eval;
 }
 int GetPawnEval(PAWNTABLE *pt, BITBOARD pawn_bitboard)
 {
-    int key = pawn_bitboard%pt->size;
-    const PawnData *entry = &(pt->entries[key]);
-    
-    if(entry->pawn_bitboard == pawn_bitboard){
-        return entry->eval;
-    }
-    return ERRORVALUE;
+  int key = pawn_bitboard%pt->size;
+  const PawnData *entry = &(pt->entries[key]);
+  
+  if (entry->pawn_bitboard == pawn_bitboard) {
+    return entry->eval;
+  }
+  return ERRORVALUE;
 }
