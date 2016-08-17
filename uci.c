@@ -124,7 +124,7 @@ int go(char *input, ENGINE_STATE *stat)
         manage_times = 0;
       }
       break;
-    } else if (!strcmp("time",  str_param)) {
+    } else if (!strcmp("movetime",  str_param)) {
       str_param = strtok(NULL, " \n\t");
       if (str_param) {
         stat->control->wish_time = INFINITE;
