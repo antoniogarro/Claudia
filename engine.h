@@ -35,7 +35,7 @@
 #include "board.h"
 
 #define NAME  "Claudia"
-#define VERSION "0.5"
+#define VERSION "0.5.1"
 
 
 #ifndef VALUES

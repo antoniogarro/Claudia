@@ -110,7 +110,7 @@ static int AlphaBeta (BOARD *board, int depth, int alpha, int beta,
     nmoves = MoveGen(board, moves, 1);
     good = SortMoves(board, moves, nmoves, killers[root]);
   } else {
-    if (!control->ponder && clock() - control->init_time >= control->max_time*CPMS) {
+    if (!control->ponder && clock() - control->init_time >= (control->max_time - 10)*CPMS) {
       control->stop = 1;
     }
     val = LazyEval(board);

@@ -395,7 +395,7 @@ int PolyglotChooseMove(KEY key)
 
   FILE *f = fopen("book.bin", "rb");
   if (!f) {
-    perror("book.bin");
+    /* perror("book.bin"); */
     return 0;
   }
   int offset = PolyglotFindKey(f,key,&entry);
