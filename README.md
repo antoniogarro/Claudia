@@ -1,6 +1,5 @@
 
-Claudia is an open source UCI chess engine written in C. I wrote it from scratch around
-2014 in order to learn a bit about chess programming.
+Claudia is an open source UCI chess engine written in C.
 
 It is one (and the weakest) of the eight chess engines that were originally included with [DGT
 Pi](http://www.digitalgametechnology.com/index.php/products/chess-computers/pi?mavikthumbnails_display_ratio=1.5)
@@ -10,14 +9,14 @@ for DGT Pi, Claudia is "an attractive opponent for intermediate club players" an
 a remarkably human playing style".
 
 From time to time, Claudia plays on the Free Internet Chess Server
-([FICS](https://www.freechess.org)), where it has an authorised computer account under the name of
-[Claudiae](https://www.ficsgames.org/cgi-bin/search.cgi?player=claudiae&action=Statistics)
+([FICS](https://www.freechess.org)), where it has an authorised computer account under
+the name of [Claudiae](https://www.ficsgames.org/cgi-bin/search.cgi?player=claudiae&action=Statistics)
 (the operation is fully automated through my Python script
 [ponderbot](https://github.com/antoniogarro/ponderbot)).
 
-Although there is still much room to improve it, I consider Claudia a finished project
-that I have no plan to keep developing in the near future. Any bug that may still remain, I
-have no immediate intention to fix, and should from now on be considered a feature.
+I wrote Claudia from scratch in order to learn a bit about chess programming. Although
+there is much room to improve it, I consider Claudia a finished project which I do not
+plan to keep developing in the near future.
 
 
 Usage
